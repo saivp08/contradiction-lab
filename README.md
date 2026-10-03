@@ -48,7 +48,17 @@ cd ..
 .venv\Scripts\python scripts/run.py
 ```
 
-Open **http://127.0.0.1:8000**. Click **Run demo investigation**, review the hypotheses and experiments, then **Approve & run experiment**. Scroll to the result and the before/after decision. Use **Research graph** or **Lab notebook** to inspect lineage. Click **Replay verified run** to load the sealed record.
+macOS / Linux (the macOS system Python is 3.9, which is too old; install 3.12 with `uv` or Homebrew):
+
+```bash
+uv venv --python 3.12 .venv
+uv pip install --python .venv/bin/python -r requirements.txt
+# without uv: python3.12 -m venv .venv && .venv/bin/python -m pip install -r requirements.txt
+(cd frontend && npm ci && npm run build)
+.venv/bin/python scripts/run.py
+```
+
+Open **http://127.0.0.1:8000**. Click **Run investigation**, review the hypotheses and experiments, then **Approve & run experiment** and confirm in the approval dialog. Read the result and the before/after decision, then optionally **Approve & run follow-up** on the Next move chapter. Use **Research graph** or **Lab notebook** to inspect lineage. Click **Replay verified run** to load the sealed record.
 
 In this prepared workspace, dependencies already exist in `.packages` and `frontend/node_modules`; launch directly with `python scripts/run.py`. The launcher recognizes `.packages`. Standard installations should use the virtual environment above. Windows PowerShell execution-policy restrictions are avoided with `npm.cmd` and the venv's Python executable; activation is unnecessary.
 
@@ -107,7 +117,11 @@ The selected experiment fits pooled and species-adjusted linear slopes, computes
 
 The reference gives approximately **−0.085 pooled** versus **+0.200 species-adjusted** mm/mm. The result leads to a proposed follow-up on sex and year within species. If uncertainty spans zero or sensitivity is unstable, the system prioritizes replication. If the reversal criterion fails otherwise, it reconsiders covariates. Tests recompute the experiment on perturbed data and verify that the decision changes.
 
-Support scores are a transparent heuristic, not Bayesian probabilities. The test is exploratory and observational; it does not establish causation. The proposed next experiment is recorded but requires a separate future approval; the shipped investigation completes one experimental cycle.
+Support scores are a transparent heuristic, not Bayesian probabilities. Alongside them, every result reports a BIC model comparison (pooled versus adjusted model); the BIC difference approximates twice the log Bayes factor. The species-adjusted model is favoured by ΔBIC ≈ 470; the year-adjusted model is not (ΔBIC ≈ −7). The test is exploratory and observational; it does not establish causation.
+
+**Follow-up cycle.** When the decision proposes it, the user can run the follow-up (species + sex + year regression, 333 birds with recorded sex) under a second, separate approval (`POST /api/investigations/{id}/followup`). Adjusting for sex and year shrinks the within-species slope by about 65% (0.200 → 0.070, 95% CI [0.031, 0.108]) but it stays positive, so H3 is better supported and the next step becomes sex-specific slopes. The follow-up's approval, result and interpretation are included in the replay checksum.
+
+**Live updates.** While a run is in progress the UI listens to a server-sent event stream (`GET /api/investigations/{id}/stream`) and falls back to polling if the stream fails.
 
 ## Tests and verification
 
@@ -123,6 +137,8 @@ npx.cmd playwright install chromium
 # API/production frontend must be running on port 8000:
 npm.cmd test
 ```
+
+On macOS / Linux use `.venv/bin/python` and plain `npm` / `npx`. Format code with `.venv/bin/ruff format backend experiments scripts tests` and `npm run format` in `frontend`.
 
 The frontend lint script runs TypeScript validation; there is no separate ESLint ruleset. Browser testing covers approval, actual results, changed decision, graph provenance, verified replay, and mobile overflow. Screenshots are generated in `docs/demo-desktop.png` and `docs/demo-mobile.png`.
 
@@ -145,4 +161,4 @@ Each run records two evidence claims, three hypotheses, two candidates, time to 
 
 The initial repository was empty: no infrastructure, tests, datasets, credentials interface or sponsor configuration existed. React/Vite + FastAPI were chosen for a responsive scientific UI and typed Python computation, with SQLite keeping deployment simple. No existing work was replaced.
 
-Future work: verify live sponsor execution with credentials; independent datasets and literature retrieval APIs; held-out validation; follow-up execution under a fresh approval; stronger semantic checks on generated hypotheses; authenticated multi-user deployment. This prototype is intended for local trusted use and should not be exposed publicly without authentication and deployment hardening.
+Future work: verify live sponsor execution with credentials; independent datasets and literature retrieval APIs; held-out validation; generalising the pipeline beyond one dataset (CSV upload with user-chosen outcome, predictor and grouping columns); stronger semantic checks on generated hypotheses; authenticated multi-user deployment. This prototype is intended for local trusted use and should not be exposed publicly without authentication and deployment hardening.

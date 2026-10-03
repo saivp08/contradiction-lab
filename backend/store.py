@@ -35,7 +35,9 @@ def connection():
 def save(record: dict) -> None:
     record["updated_at"] = now()
     with connection() as con:
-        con.execute("INSERT OR REPLACE INTO investigations VALUES (?, ?)", (record["id"], json.dumps(record, allow_nan=False)))
+        con.execute(
+            "INSERT OR REPLACE INTO investigations VALUES (?, ?)", (record["id"], json.dumps(record, allow_nan=False))
+        )
 
 
 def get(identifier: str) -> dict:
@@ -49,17 +51,52 @@ def get(identifier: str) -> dict:
 def list_records() -> list[dict]:
     with connection() as con:
         rows = con.execute("SELECT body FROM investigations ORDER BY rowid DESC LIMIT 100").fetchall()
-    return [{k: r[k] for k in ("id", "objective", "mode", "status", "created_at")} for r in (json.loads(row[0]) for row in rows)]
+    return [
+        {**{k: r[k] for k in ("id", "objective", "mode", "status", "created_at")}, "label": r.get("label")}
+        for r in (json.loads(row[0]) for row in rows)
+    ]
 
 
 def add(record: dict, kind: str, data: dict, inputs: list[str]) -> str:
     identifier = uid(kind)
-    record["objects"][identifier] = {"id": identifier, "kind": kind, "data": data, "input_ids": inputs, "created_at": now()}
+    record["objects"][identifier] = {
+        "id": identifier,
+        "kind": kind,
+        "data": data,
+        "input_ids": inputs,
+        "created_at": now(),
+    }
     return identifier
 
 
-def event(record: dict, agent: str, action: str, inputs: list[str], outputs: list[str], tool: str, elapsed: float = 0, status: str = "complete") -> None:
-    record["events"].append({"id": uid("event"), "timestamp": now(), "agent": agent, "action": action, "input_ids": inputs, "output_ids": outputs, "tool": tool, "elapsed_seconds": elapsed, "status": status, "confidence": "bounded by source and method", "citations": [str(v["data"]["citation"]["url"]) for v in record["objects"].values() if v["kind"] == "evidence"], "engine": record["mode"]})
+def event(
+    record: dict,
+    agent: str,
+    action: str,
+    inputs: list[str],
+    outputs: list[str],
+    tool: str,
+    elapsed: float = 0,
+    status: str = "complete",
+) -> None:
+    record["events"].append(
+        {
+            "id": uid("event"),
+            "timestamp": now(),
+            "agent": agent,
+            "action": action,
+            "input_ids": inputs,
+            "output_ids": outputs,
+            "tool": tool,
+            "elapsed_seconds": elapsed,
+            "status": status,
+            "confidence": "bounded by source and method",
+            "citations": [
+                str(v["data"]["citation"]["url"]) for v in record["objects"].values() if v["kind"] == "evidence"
+            ],
+            "engine": record["mode"],
+        }
+    )
     save(record)
 
 
@@ -69,6 +106,8 @@ def by_kind(record: dict, kind: str) -> list[dict]:
 
 def scientific_digest(record: dict) -> str:
     payload = {k: record[k] for k in ("id", "objective", "mode", "objects", "events", "approval", "metrics")}
+    if record.get("followup_approval"):
+        payload["followup_approval"] = record["followup_approval"]
     if record.get("omnigent_receipts"):
         payload["omnigent_receipts"] = record["omnigent_receipts"]
     return hashlib.sha256(json.dumps(payload, sort_keys=True, allow_nan=False).encode()).hexdigest()
