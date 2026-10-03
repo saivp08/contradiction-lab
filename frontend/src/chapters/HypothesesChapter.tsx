@@ -13,7 +13,7 @@ export function HypothesesChapter({
   onShowResult: () => void;
 }) {
   return (
-    <section id="stage-3">
+    <section>
       <SectionHeading
         eyebrow="04 / COMPETING EXPLANATIONS"
         title={
@@ -66,7 +66,7 @@ export function HypothesesChapter({
                 how the evidence moved them.
               </p>
               <button className="text-button" onClick={onShowResult}>
-                See updated support
+                Jump to updated support
                 <ArrowRight size={16} />
               </button>
             </div>

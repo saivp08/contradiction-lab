@@ -14,7 +14,7 @@ Built for Databricks × Hack-Nation — Agentic Scientific Discovery.
 - **Omnigent live:** official `omnigent==0.16.0` CLI orchestrates eight declared specialist agents using role-specific function tools. The actual package loads both supplied graphs in tests. A model-backed end-to-end execution **has not been verified** because no model credentials were supplied. This remains a submission acceptance dependency, not a claim of sponsor compliance already achieved.
 - **Verified replay:** checksum-validated records of completed real computation. A portable local run ships in `data/verified-run.json`; replay retains its original engine label. Never presented as a live run.
 
-![Completed investigation](docs/demo-desktop.png)
+![Completed investigation: data panel with slope decomposition beside the investigation story](docs/redesign-result.png)
 
 ## The scientific problem
 
@@ -58,7 +58,7 @@ uv pip install --python .venv/bin/python -r requirements.txt
 .venv/bin/python scripts/run.py
 ```
 
-Open **http://127.0.0.1:8000**. Click **Run investigation**, review the hypotheses and experiments, then **Approve & run experiment** and confirm in the approval dialog. Read the result and the before/after decision, then optionally **Approve & run follow-up** on the Next move chapter. Use **Research graph** or **Lab notebook** to inspect lineage. Click **Replay verified run** to load the sealed record.
+Open **http://127.0.0.1:8000**. The home page lists your investigations with their key numbers. Click **Run investigation**: the investigation page shows the real data on the left and one tab per stage on the right (Question → Next move), and opens the Experiment tab when the run needs your approval. Click **Approve & run experiment** and confirm. Read the result, the slope decomposition (*Why the sign flips*) and the updated decision, then optionally **Approve & run follow-up**. The left panel's **Research graph** and **Activity** tabs show lineage and every agent/tool event. **Replay verified run** loads the sealed record.
 
 In this prepared workspace, dependencies already exist in `.packages` and `frontend/node_modules`; launch directly with `python scripts/run.py`. The launcher recognizes `.packages`. Standard installations should use the virtual environment above. Windows PowerShell execution-policy restrictions are avoided with `npm.cmd` and the venv's Python executable; activation is unnecessary.
 
@@ -117,7 +117,9 @@ The selected experiment fits pooled and species-adjusted linear slopes, computes
 
 The reference gives approximately **−0.085 pooled** versus **+0.200 species-adjusted** mm/mm. The result leads to a proposed follow-up on sex and year within species. If uncertainty spans zero or sensitivity is unstable, the system prioritizes replication. If the reversal criterion fails otherwise, it reconsiders covariates. Tests recompute the experiment on perturbed data and verify that the decision changes.
 
-Support scores are a transparent heuristic, not Bayesian probabilities. Alongside them, every result reports a BIC model comparison (pooled versus adjusted model); the BIC difference approximates twice the log Bayes factor. The species-adjusted model is favoured by ΔBIC ≈ 470; the year-adjusted model is not (ΔBIC ≈ −7). The test is exploratory and observational; it does not establish causation.
+Support scores are a transparent heuristic, not Bayesian probabilities. Alongside them, every result reports a BIC model comparison (pooled versus adjusted model); the BIC difference approximates twice the log Bayes factor. The species-adjusted model is favoured by ΔBIC ≈ 470; the year-adjusted model is not (ΔBIC ≈ −7).
+
+**Why the sign flips.** Each result includes an exact decomposition of the pooled slope: pooled = w × within-group slope + (1 − w) × between-group slope, where w is the within-group share of bill-length variance. For species: −0.085 = 0.29 × (+0.200) + 0.71 × (−0.203), i.e. +0.058 from within species and −0.143 between species. 71% of bill-length variation lies between species, and species with longer bills have shallower bills, which outweighs the positive within-species relationship. This is the explainability view for these linear models; SHAP would reduce to the same coefficients and is not used. The test is exploratory and observational; it does not establish causation.
 
 **Follow-up cycle.** When the decision proposes it, the user can run the follow-up (species + sex + year regression, 333 birds with recorded sex) under a second, separate approval (`POST /api/investigations/{id}/followup`). Adjusting for sex and year shrinks the within-species slope by about 65% (0.200 → 0.070, 95% CI [0.031, 0.108]) but it stays positive, so H3 is better supported and the next step becomes sex-specific slopes. The follow-up's approval, result and interpretation are included in the replay checksum.
 
@@ -140,7 +142,7 @@ npm.cmd test
 
 On macOS / Linux use `.venv/bin/python` and plain `npm` / `npx`. Format code with `.venv/bin/ruff format backend experiments scripts tests` and `npm run format` in `frontend`.
 
-The frontend lint script runs TypeScript validation; there is no separate ESLint ruleset. Browser testing covers approval, actual results, changed decision, graph provenance, verified replay, and mobile overflow. Screenshots are generated in `docs/demo-desktop.png` and `docs/demo-mobile.png`.
+The frontend lint script runs TypeScript validation; there is no separate ESLint ruleset. Browser testing covers the dashboard, approval, actual results, slope decomposition, changed decision, follow-up, graph provenance, verified replay, and mobile overflow. Screenshots are generated as `docs/redesign-*.png`. Run it against a scratch database (`LAB_DB=/tmp/e2e.sqlite3 python scripts/run.py`) so test runs do not appear in your own workspace.
 
 See [verification report](docs/VERIFICATION.md) for commands actually executed and limitations. Test fixtures alone use synthetic counterfactual data or dummy credentials for configuration parsing. No mocked sponsor run is counted as live execution.
 

@@ -1,28 +1,28 @@
 import { useState } from 'react';
-import type { Result } from './types';
+import type { Decomposition, Point, Result } from './types';
 const colors: Record<string, string> = { Adelie: '#65cdb0', Chinstrap: '#bca2ff', Gentoo: '#f3b978' };
-export function Scatter({ result }: { result: Result }) {
+export function Scatter({ points, caption = true }: { points: Point[]; caption?: boolean }) {
   const [grouped, setGrouped] = useState(false);
   const groups = grouped
     ? Object.entries(
-        result.points.reduce<Record<string, Result['points']>>((groups, p) => {
+        points.reduce<Record<string, Point[]>>((groups, p) => {
           (groups[p.species] ??= []).push(p);
           return groups;
         }, {}),
       )
-    : [['Pooled', result.points] as const];
-  const trends = groups.flatMap(([name, points]) => {
-    if (!points?.length) return [];
-    const mx = points.reduce((s, p) => s + p.x, 0) / points.length,
-      my = points.reduce((s, p) => s + p.y, 0) / points.length;
-    const variance = points.reduce((s, p) => s + (p.x - mx) ** 2, 0);
+    : [['Pooled', points] as const];
+  const trends = groups.flatMap(([name, members]) => {
+    if (!members?.length) return [];
+    const mx = members.reduce((s, p) => s + p.x, 0) / members.length,
+      my = members.reduce((s, p) => s + p.y, 0) / members.length;
+    const variance = members.reduce((s, p) => s + (p.x - mx) ** 2, 0);
     if (!variance) return [];
-    const slope = points.reduce((s, p) => s + (p.x - mx) * (p.y - my), 0) / variance;
+    const slope = members.reduce((s, p) => s + (p.x - mx) * (p.y - my), 0) / variance;
     return [
       {
         name,
-        min: Math.min(...points.map((p) => p.x)),
-        max: Math.max(...points.map((p) => p.x)),
+        min: Math.min(...members.map((p) => p.x)),
+        max: Math.max(...members.map((p) => p.x)),
         slope,
         intercept: my - slope * mx,
       },
@@ -77,7 +77,7 @@ export function Scatter({ result }: { result: Result }) {
             {v}
           </text>
         ))}
-        {result.points.map((p, i) => (
+        {points.map((p, i) => (
           <circle
             key={i}
             cx={x(p.x)}
@@ -109,9 +109,11 @@ export function Scatter({ result }: { result: Result }) {
           Bill depth (mm)
         </text>
       </svg>
-      <p className="caption">
-        Every point is a measured bird. Lines are least-squares fits to the displayed measurements.
-      </p>
+      {caption && (
+        <p className="caption">
+          Every point is a measured bird. Lines are least-squares fits to the displayed measurements.
+        </p>
+      )}
     </div>
   );
 }
@@ -169,5 +171,101 @@ export function Slopes({ result }: { result: Result }) {
         White interval: stratified bootstrap 95% confidence interval for the adjusted slope.
       </p>
     </div>
+  );
+}
+
+const MINT = '#65cdb0',
+  CORAL = '#f4a39e';
+
+/** Diverging bars showing the exact within + between split of the pooled slope. */
+export function DecompositionChart({ parts }: { parts: Decomposition }) {
+  const rows = [
+    {
+      label: `Within ${parts.group}`,
+      value: parts.within_contribution,
+      detail: `${parts.within_slope.toFixed(3)} × ${(parts.within_weight * 100).toFixed(0)}%`,
+    },
+    {
+      label: `Between ${parts.group}`,
+      value: parts.between_contribution,
+      detail: `${parts.between_slope.toFixed(3)} × ${((1 - parts.within_weight) * 100).toFixed(0)}%`,
+    },
+    { label: '= Pooled slope', value: parts.pooled_slope, detail: 'sum' },
+  ];
+  const extent = Math.max(...rows.map((r) => Math.abs(r.value))) * 1.15;
+  const x = (n: number) => 250 + (n / extent) * 150;
+  return (
+    <svg
+      viewBox="0 0 560 150"
+      role="img"
+      aria-label="Pooled slope split into within-group and between-group contributions"
+    >
+      <line x1={x(0)} x2={x(0)} y1="6" y2="140" stroke="#62717c" strokeDasharray="4 4" />
+      {rows.map((r, i) => {
+        const y = 22 + i * 46;
+        const color = r.value < 0 ? CORAL : MINT;
+        return (
+          <g key={r.label}>
+            {i === 2 && <line x1="10" x2="550" y1={y - 22} y2={y - 22} stroke="#ffffff1a" />}
+            <text x="10" y={y + 5}>
+              {r.label}
+            </text>
+            <rect
+              x={Math.min(x(0), x(r.value))}
+              y={y - 9}
+              width={Math.abs(x(r.value) - x(0))}
+              height="18"
+              rx="2"
+              fill={color}
+              opacity={i === 2 ? 1 : 0.8}
+            />
+            <text x="550" y={y + 5} textAnchor="end" fill={color}>
+              {(r.value > 0 ? '+' : '') + r.value.toFixed(3)}
+            </text>
+            <text x="550" y={y + 20} textAnchor="end" className="chart-note">
+              {r.detail}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/** Tiny before/after slope glyph for dashboard cards. */
+export function MiniSlopes({
+  pooled,
+  adjusted,
+  followup,
+}: {
+  pooled: number;
+  adjusted: number;
+  followup?: number;
+}) {
+  const line = (slope: number) => {
+    const rise = Math.max(-1, Math.min(1, slope / 0.25)) * 26;
+    return { y1: 32 + rise, y2: 32 - rise };
+  };
+  const lines = [
+    { slope: pooled, color: CORAL, dash: '' },
+    { slope: adjusted, color: MINT, dash: '' },
+    ...(followup === undefined ? [] : [{ slope: followup, color: MINT, dash: '4 3' }]),
+  ];
+  return (
+    <svg viewBox="0 0 96 64" className="mini-slopes" aria-hidden="true">
+      <line x1="0" x2="96" y1="32" y2="32" stroke="#ffffff14" />
+      {lines.map((l, i) => (
+        <line
+          key={i}
+          x1="8"
+          x2="88"
+          {...line(l.slope)}
+          stroke={l.color}
+          strokeWidth="2.5"
+          strokeDasharray={l.dash}
+          strokeLinecap="round"
+        />
+      ))}
+    </svg>
   );
 }

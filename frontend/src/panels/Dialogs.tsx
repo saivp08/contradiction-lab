@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react';
-import { ArrowUpRight, Play, Plus, ShieldCheck, X } from 'lucide-react';
+import { useEffect, useRef, type ReactNode } from 'react';
+import { ArrowUpRight, Play, ShieldCheck, X } from 'lucide-react';
 import { REFERENCE_QUESTION } from '../lib';
-import type { HistoryItem, LabObject, RecordData } from '../types';
+import type { LabObject, RecordData } from '../types';
 
 function Dialog({
   id,
@@ -16,9 +16,44 @@ function Dialog({
   onClose: () => void;
   children: ReactNode;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+  // Focus the first control, trap Tab inside the dialog, lock page scroll, and restore focus on close.
+  useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const selector = 'button:not(:disabled),a[href],input,textarea,select,summary,[tabindex="0"]';
+    const controls = () =>
+      Array.from(dialog.querySelectorAll<HTMLElement>(selector)).filter(
+        (el) => el.getClientRects().length > 0,
+      );
+    controls()[0]?.focus();
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    function trap(e: KeyboardEvent) {
+      if (e.key !== 'Tab') return;
+      const elements = controls(),
+        first = elements[0],
+        last = elements.at(-1);
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last?.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first?.focus();
+      }
+    }
+    document.addEventListener('keydown', trap);
+    return () => {
+      document.removeEventListener('keydown', trap);
+      document.body.style.overflow = overflow;
+      previous?.focus();
+    };
+  }, []);
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div
+        ref={ref}
         className={'modal ' + className}
         role="dialog"
         aria-modal="true"
@@ -31,57 +66,6 @@ function Dialog({
         {children}
       </div>
     </div>
-  );
-}
-
-export function WorkspaceDialog({
-  history,
-  search,
-  onSearch,
-  onLoad,
-  onNew,
-  onClose,
-}: {
-  history: HistoryItem[];
-  search: string;
-  onSearch: (value: string) => void;
-  onLoad: (id: string) => void;
-  onNew: () => void;
-  onClose: () => void;
-}) {
-  const query = search.toLowerCase();
-  return (
-    <Dialog id="workspace-title" className="switcher" closeLabel="Close workspace" onClose={onClose}>
-      <span className="eyebrow">YOUR RESEARCH</span>
-      <h2 id="workspace-title">Investigations</h2>
-      <input
-        autoFocus
-        aria-label="Search investigations"
-        placeholder="Find an investigation…"
-        value={search}
-        onChange={(e) => onSearch(e.target.value)}
-      />
-      <div className="history">
-        {history
-          .filter((h) => (h.label || h.objective).toLowerCase().includes(query))
-          .map((h) => (
-            <button key={h.id} onClick={() => onLoad(h.id)}>
-              <span className={'status-dot ' + h.status} />
-              <span>
-                {h.label || h.objective}
-                <small>
-                  {h.id.slice(-6)} · {h.status.replaceAll('_', ' ')}
-                </small>
-              </span>
-              <ArrowUpRight size={18} />
-            </button>
-          ))}
-      </div>
-      <button className="button" onClick={onNew}>
-        <Plus size={17} />
-        New investigation
-      </button>
-    </Dialog>
   );
 }
 

@@ -1,12 +1,11 @@
-import { ArrowRight } from 'lucide-react';
 import { evidenceLabels } from '../lib';
 import type { Evidence } from '../types';
 import { SectionHeading, Source, Tag } from '../ui';
 
-export function EvidenceChapter({ evidence, onNext }: { evidence: Evidence[]; onNext: () => void }) {
+export function EvidenceChapter({ evidence }: { evidence: Evidence[] }) {
   const sources = new Set(evidence.map((e) => e.citation.identifier)).size;
   return (
-    <section id="stage-1">
+    <section>
       <SectionHeading
         eyebrow="02 / SOURCE EVIDENCE"
         title="A contradiction hiding in plain sight"
@@ -57,10 +56,6 @@ export function EvidenceChapter({ evidence, onNext }: { evidence: Evidence[]; on
             analysis contexts.
           </p>
         </div>
-        <button className="text-button" onClick={onNext}>
-          Explore the contradiction
-          <ArrowRight size={18} />
-        </button>
       </div>
     </section>
   );

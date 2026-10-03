@@ -6,11 +6,11 @@ Before presenting, start the app and confirm the intended engine. **Use “Omnig
 
 “Contradiction Lab turns scientific disagreement into the next experiment. Here, penguin bill dimensions seem to tell opposite stories. Pool the species and the relationship is negative. Separate them and it becomes positive.”
 
-Point to the side-by-side evidence cards and clickable citation. “These are two analysis contexts from one published article, not fabricated conflicting papers.”
+Open with the home page, then the investigation page: real measurements on the left, the story on the right. Point to the evidence cards and clickable citation. “These are two analysis contexts from one published article, not fabricated conflicting papers.”
 
 ## 0:15–0:35 — Evidence and specialist work
 
-Click **Run demo investigation** (or choose Omnigent in **New investigation** if configured). Show the progress rail and Agent Lab. “The workflow retrieves the source claims, checks that they concern comparable variables, and identifies species aggregation as the context difference.”
+Click **Run investigation** on the home page (or choose Omnigent in **New investigation** if configured). Show the stage tabs filling in and the **Activity** tab in the data panel. “The workflow retrieves the source claims, checks that they concern comparable variables, and identifies species aggregation as the context difference.”
 
 For local mode say “deterministic scientific specialists”; for a verified live sponsor run say “Omnigent dispatches the specialist agents.”
 
@@ -22,11 +22,11 @@ Show the hypothesis arena: species composition, sampling variability, and residu
 
 Show species-adjusted regression beside year adjustment. “The planner ranks learning value, discrimination, coverage, feasibility and cost. Species adjustment most directly tests the differing context.”
 
-Review the dataset, seed, resampling count and observational limitations. Click **Approve & run experiment**. “A model cannot bypass this gate.”
+The page switches to the Experiment tab. Click **Approve & run experiment** and review the dataset, seed and resampling count in the confirmation dialog before approving. “A model cannot bypass this gate.”
 
 ## 1:15–1:35 — Real computation
 
-Show the real result: negative pooled slope, positive adjusted slope, bootstrap interval, species-colored scatterplot, and subgroup slopes. Open sensitivity details. “Python computed this from 342 observed birds. The record includes the data hash, code hash, seed and library versions.”
+Show the real result: negative pooled slope, positive adjusted slope, bootstrap interval and ΔBIC. In the data panel, toggle **Color by species** and point to **Why the sign flips**: 71% of bill-length variation is between species, which outweighs the positive within-species slope. Open sensitivity details. “Python computed this from 342 observed birds. The record includes the data hash, code hash, seed and library versions.”
 
 ## 1:35–1:50 — The plan changes
 
@@ -36,7 +36,7 @@ Scroll to **Science moves when the plan changes**. “Species composition receiv
 
 ## 1:50–2:00 — Audit and measurable progress
 
-Show the provenance graph and measured activity. “Two claims, three hypotheses, two tests compared, measured computation and decision time. No invented speedup.”
+Optionally run the approved follow-up (sex + year shrinks the slope by 65% but it stays positive). Show the **Research graph** tab and measured activity. “Two claims, three hypotheses, two tests compared, measured computation and decision time. No invented speedup.”
 
 Click **Replay verified run**. “This is the persisted completed computation, checksum-verified and explicitly labeled replay.”
 

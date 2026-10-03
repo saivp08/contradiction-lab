@@ -207,3 +207,16 @@ def test_followup_rejected_when_decision_did_not_propose_it():
     workflow.run_local(record["id"])
     with pytest.raises(ValueError, match="did not propose"):
         workflow.run_followup(record["id"])
+
+
+def test_slope_decomposition_is_exact_and_explains_reversal():
+    from experiments.penguins import decompose
+
+    frame, _ = load_data()
+    parts = decompose(frame, "species")
+    assert parts["within_contribution"] + parts["between_contribution"] == pytest.approx(parts["pooled_slope"])
+    assert parts["within_slope"] > 0 > parts["between_slope"] and parts["pooled_slope"] < 0
+    assert {m["group"] for m in parts["group_means"]} == {"Adelie", "Chinstrap", "Gentoo"}
+    assert compute(frame, "species_adjustment", 42, 100)["decomposition"]["within_slope"] == pytest.approx(
+        parts["within_slope"]
+    )

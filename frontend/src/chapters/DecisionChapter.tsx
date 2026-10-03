@@ -21,7 +21,7 @@ export function DecisionChapter({
   onRunFollowup: () => void;
 }) {
   return (
-    <section id="stage-6">
+    <section>
       <SectionHeading
         eyebrow="07 / EVIDENCE-DRIVEN DECISION"
         title="Science moves when the plan changes."

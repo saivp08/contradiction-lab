@@ -1,25 +1,9 @@
-import { ArrowRight, Clock3, Layers3, ShieldCheck } from 'lucide-react';
-import { Tag } from '../ui';
+import { Clock3, Layers3, ShieldCheck } from 'lucide-react';
 
-export function QuestionChapter({
-  question,
-  status,
-  busy,
-  started,
-  onBegin,
-}: {
-  question: string;
-  status: string;
-  busy: boolean;
-  started: boolean;
-  onBegin: () => void;
-}) {
+export function QuestionChapter({ question }: { question: string }) {
   return (
-    <section className="question-card" id="stage-0">
-      <div className="section-kicker">
-        <span className="eyebrow">RESEARCH QUESTION / 01</span>
-        <Tag tone="green">{status}</Tag>
-      </div>
+    <section className="question-card">
+      <span className="eyebrow">01 / RESEARCH QUESTION</span>
       <h2>{question}</h2>
       <div className="question-meta">
         <span>
@@ -39,10 +23,6 @@ export function QuestionChapter({
         Reference reanalysis of a published aggregation reversal. One article, two analysis contexts; not
         conflicting independent studies.
       </p>
-      <button className="button primary begin" disabled={busy} onClick={onBegin}>
-        {started ? 'Continue investigation' : 'Begin investigation'}
-        <ArrowRight size={18} />
-      </button>
     </section>
   );
 }
