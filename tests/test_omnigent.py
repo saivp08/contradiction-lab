@@ -8,6 +8,7 @@ import pytest
 @pytest.mark.skipif(importlib.util.find_spec("omnigent") is None, reason="Official optional sponsor SDK not installed")
 def test_real_omnigent_loader_accepts_both_graphs(monkeypatch):
     from omnigent import load_agent_def
+
     monkeypatch.setenv("OMNIGENT_MODEL", "gpt-4.1-mini")
     monkeypatch.setenv("OPENAI_API_KEY", "unit-test-parse-only-not-a-real-key")
     # Configuration parsing only. No provider call or mock sponsor execution.
