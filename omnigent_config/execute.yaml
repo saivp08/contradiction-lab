@@ -1,0 +1,152 @@
+{
+  "name": "ContradictionLab_execute",
+  "executor": {
+    "harness": "openai-agents",
+    "model": "${OMNIGENT_MODEL}",
+    "auth": {
+      "type": "api_key",
+      "api_key": "${OPENAI_API_KEY}"
+    }
+  },
+  "async": false,
+  "skills": "none",
+  "prompt": "You orchestrate the scientific workflow. Call each specialist exactly once in this order: ExperimentRunner, AnalysisAgent, DecisionAgent, SafetyAgent. Each specialist MUST call its scientific function tool. Pass the returned structured record to the next specialist. Stop on any error. Never bypass approval. Output only a concise status; no private chain of thought.",
+  "tools": {
+    "ExperimentRunner": {
+      "type": "agent",
+      "description": "Execute only the already approved scientific tool; never fabricate numerical results.",
+      "executor": {
+        "harness": "openai-agents",
+        "model": "${OMNIGENT_MODEL}",
+        "auth": {
+          "type": "api_key",
+          "api_key": "${OPENAI_API_KEY}"
+        }
+      },
+      "async": false,
+      "prompt": "Execute only the already approved scientific tool; never fabricate numerical results. Call your function tool with a brief observable scientific rationale (not hidden reasoning). Return its actual structured output. Do not invent facts or execute other tools.",
+      "tools": {
+        "scientific_step": {
+          "type": "function",
+          "callable": "backend.omnigent_tools.runner",
+          "description": "Execute only the already approved scientific tool; never fabricate numerical results.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "rationale": {
+                "type": "string",
+                "description": "Concise evidence-grounded rationale, 10\u20131500 characters"
+              }
+            },
+            "required": [
+              "rationale"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "AnalysisAgent": {
+      "type": "agent",
+      "description": "Inspect the actual metrics passed from the runner. Interpret confidence intervals and uncertainty; update support using the transparent scoring rubric.",
+      "executor": {
+        "harness": "openai-agents",
+        "model": "${OMNIGENT_MODEL}",
+        "auth": {
+          "type": "api_key",
+          "api_key": "${OPENAI_API_KEY}"
+        }
+      },
+      "async": false,
+      "prompt": "Inspect the actual metrics passed from the runner. Interpret confidence intervals and uncertainty; update support using the transparent scoring rubric. Call your function tool with a brief observable scientific rationale (not hidden reasoning). Return its actual structured output. Do not invent facts or execute other tools.",
+      "tools": {
+        "scientific_step": {
+          "type": "function",
+          "callable": "backend.omnigent_tools.analysis",
+          "description": "Inspect the actual metrics passed from the runner. Interpret confidence intervals and uncertainty; update support using the transparent scoring rubric.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "rationale": {
+                "type": "string",
+                "description": "Concise evidence-grounded rationale, 10\u20131500 characters"
+              }
+            },
+            "required": [
+              "rationale"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "DecisionAgent": {
+      "type": "agent",
+      "description": "Use actual result-dependent support updates to select the next experiment; explain what evidence changed the plan.",
+      "executor": {
+        "harness": "openai-agents",
+        "model": "${OMNIGENT_MODEL}",
+        "auth": {
+          "type": "api_key",
+          "api_key": "${OPENAI_API_KEY}"
+        }
+      },
+      "async": false,
+      "prompt": "Use actual result-dependent support updates to select the next experiment; explain what evidence changed the plan. Call your function tool with a brief observable scientific rationale (not hidden reasoning). Return its actual structured output. Do not invent facts or execute other tools.",
+      "tools": {
+        "scientific_step": {
+          "type": "function",
+          "callable": "backend.omnigent_tools.decision",
+          "description": "Use actual result-dependent support updates to select the next experiment; explain what evidence changed the plan.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "rationale": {
+                "type": "string",
+                "description": "Concise evidence-grounded rationale, 10\u20131500 characters"
+              }
+            },
+            "required": [
+              "rationale"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "SafetyAgent": {
+      "type": "agent",
+      "description": "Audit citations, lineage, approval and computational provenance. Do not claim causation or clinical implications.",
+      "executor": {
+        "harness": "openai-agents",
+        "model": "${OMNIGENT_MODEL}",
+        "auth": {
+          "type": "api_key",
+          "api_key": "${OPENAI_API_KEY}"
+        }
+      },
+      "async": false,
+      "prompt": "Audit citations, lineage, approval and computational provenance. Do not claim causation or clinical implications. Call your function tool with a brief observable scientific rationale (not hidden reasoning). Return its actual structured output. Do not invent facts or execute other tools.",
+      "tools": {
+        "scientific_step": {
+          "type": "function",
+          "callable": "backend.omnigent_tools.safety",
+          "description": "Audit citations, lineage, approval and computational provenance. Do not claim causation or clinical implications.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "rationale": {
+                "type": "string",
+                "description": "Concise evidence-grounded rationale, 10\u20131500 characters"
+              }
+            },
+            "required": [
+              "rationale"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  }
+}
