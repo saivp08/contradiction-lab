@@ -36,6 +36,11 @@ ROLES = [
         "Inspect the actual metrics passed from the runner. Interpret confidence intervals and uncertainty; update support using the transparent scoring rubric.",
     ),
     (
+        "CriticAgent",
+        "critic",
+        "Attack the analysed result with adversarial challenges (noise, single-year or single-group effects, overfitting, confounding). Each challenge is settled only by computed numbers; report which are rebutted, standing or open.",
+    ),
+    (
         "DecisionAgent",
         "decision",
         "Use actual result-dependent support updates to select the next experiment; explain what evidence changed the plan.",
@@ -99,4 +104,4 @@ for phase, roles in [("prepare", ROLES[:4]), ("execute", ROLES[4:])]:
     (ROOT / "omnigent_config" / f"{phase}.yaml").write_text(json.dumps(config, indent=2))
 
 if __name__ == "__main__":
-    print("Generated two Omnigent phase graphs with eight specialist agents.")
+    print("Generated two Omnigent phase graphs with nine specialist agents.")

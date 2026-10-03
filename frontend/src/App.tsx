@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FlaskConical, X } from 'lucide-react';
-import { REFERENCE_QUESTION, api, navigate, parseRoute, type Route } from './lib';
+import { REFERENCE_QUESTION, api, freshRuns, navigate, parseRoute, type Route } from './lib';
 import type { Dataset, Evidence, Point, RecordData, Summary } from './types';
 import { Home } from './pages/Home';
 import { Investigation } from './pages/Investigation';
@@ -18,6 +18,7 @@ export default function App() {
   const [newOpen, setNewOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [featured, setFeatured] = useState<RecordData | null>(null);
 
   useEffect(() => {
     const update = () => setRoute(parseRoute(window.location.hash));
@@ -50,6 +51,15 @@ export default function App() {
     return () => window.removeEventListener('keydown', escape);
   }, [newOpen]);
 
+  // The home page hero shows the floor of the most recent completed debate.
+  const featuredId = history.find((h) => h.status === 'complete')?.id;
+  useEffect(() => {
+    if (!featuredId) return setFeatured(null);
+    api<RecordData>('/investigations/' + featuredId)
+      .then(setFeatured)
+      .catch(() => setFeatured(null));
+  }, [featuredId]);
+
   function refreshHistory() {
     api<Summary[]>('/investigations')
       .then(setHistory)
@@ -66,6 +76,7 @@ export default function App() {
       setNewOpen(false);
       setLabel('');
       refreshHistory();
+      freshRuns.add(r.id);
       navigate({ page: 'run', id: r.id, replay: false });
     } catch (e) {
       setError((e as Error).message);
@@ -104,7 +115,13 @@ export default function App() {
         </div>
       )}
       {route.page === 'home' ? (
-        <Home history={history} busy={busy} onNew={() => setNewOpen(true)} onQuickStart={() => start('')} />
+        <Home
+          history={history}
+          featured={featured}
+          busy={busy}
+          onNew={() => setNewOpen(true)}
+          onQuickStart={() => start('')}
+        />
       ) : (
         <Investigation
           id={route.id}

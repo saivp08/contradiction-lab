@@ -84,5 +84,8 @@ export const STATUS_LABELS: Record<string, string> = {
 export const statusLabel = (status: string) => STATUS_LABELS[status] ?? status.replaceAll('_', ' ');
 
 /** Backend stage counter (one step per specialist role) needed before each story section has content. */
-const STAGE_NEEDED = [0, 1, 2, 3, 4, 5, 7];
+const STAGE_NEEDED = [0, 1, 2, 3, 4, 5, 8];
 export const sectionReady = (stage: number, section: number) => stage >= STAGE_NEEDED[section];
+
+/** Runs started in this browser session; their arena animates from the first exchange. */
+export const freshRuns = new Set<string>();

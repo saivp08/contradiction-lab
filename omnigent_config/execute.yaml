@@ -10,7 +10,7 @@
   },
   "async": false,
   "skills": "none",
-  "prompt": "You orchestrate the scientific workflow. Call each specialist exactly once in this order: ExperimentRunner, AnalysisAgent, DecisionAgent, SafetyAgent. Each specialist MUST call its scientific function tool. Pass the returned structured record to the next specialist. Stop on any error. Never bypass approval. Output only a concise status; no private chain of thought.",
+  "prompt": "You orchestrate the scientific workflow. Call each specialist exactly once in this order: ExperimentRunner, AnalysisAgent, CriticAgent, DecisionAgent, SafetyAgent. Each specialist MUST call its scientific function tool. Pass the returned structured record to the next specialist. Stop on any error. Never bypass approval. Output only a concise status; no private chain of thought.",
   "tools": {
     "ExperimentRunner": {
       "type": "agent",
@@ -64,6 +64,40 @@
           "type": "function",
           "callable": "backend.omnigent_tools.analysis",
           "description": "Inspect the actual metrics passed from the runner. Interpret confidence intervals and uncertainty; update support using the transparent scoring rubric.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "rationale": {
+                "type": "string",
+                "description": "Concise evidence-grounded rationale, 10\u20131500 characters"
+              }
+            },
+            "required": [
+              "rationale"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "CriticAgent": {
+      "type": "agent",
+      "description": "Attack the analysed result with adversarial challenges (noise, single-year or single-group effects, overfitting, confounding). Each challenge is settled only by computed numbers; report which are rebutted, standing or open.",
+      "executor": {
+        "harness": "openai-agents",
+        "model": "${OMNIGENT_MODEL}",
+        "auth": {
+          "type": "api_key",
+          "api_key": "${OPENAI_API_KEY}"
+        }
+      },
+      "async": false,
+      "prompt": "Attack the analysed result with adversarial challenges (noise, single-year or single-group effects, overfitting, confounding). Each challenge is settled only by computed numbers; report which are rebutted, standing or open. Call your function tool with a brief observable scientific rationale (not hidden reasoning). Return its actual structured output. Do not invent facts or execute other tools.",
+      "tools": {
+        "scientific_step": {
+          "type": "function",
+          "callable": "backend.omnigent_tools.critic",
+          "description": "Attack the analysed result with adversarial challenges (noise, single-year or single-group effects, overfitting, confounding). Each challenge is settled only by computed numbers; report which are rebutted, standing or open.",
           "parameters": {
             "type": "object",
             "properties": {

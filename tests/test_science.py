@@ -220,3 +220,32 @@ def test_slope_decomposition_is_exact_and_explains_reversal():
     assert compute(frame, "species_adjustment", 42, 100)["decomposition"]["within_slope"] == pytest.approx(
         parts["within_slope"]
     )
+
+
+def test_critic_challenges_are_settled_by_computed_numbers():
+    frame, _ = load_data()
+    reference = compute(frame, "species_adjustment", 42, 100)
+    verdicts = {c["challenge_id"]: c["verdict"] for c in science.critique(reference)}
+    assert verdicts == {"X1": "rebutted", "X2": "rebutted", "X3": "rebutted", "X4": "rebutted", "X5": "open"}
+    # Synthetic counterfactual only in a unit test: without within-species signal the attacks land.
+    altered = frame.copy()
+    altered["bill_depth_mm"] = np.random.default_rng(8).normal(17, 2, len(frame))
+    weak = {c["challenge_id"]: c["verdict"] for c in science.critique(compute(altered, "species_adjustment", 42, 100))}
+    assert weak["X1"] == "stands" and weak["X4"] == "stands"
+
+
+def test_critic_runs_between_analysis_and_decision():
+    record = workflow.create(NewInvestigation())
+    workflow.run_local(record["id"])
+    workflow.approve(record["id"], "E1")
+    workflow.run_local(record["id"])
+    record = store.get(record["id"])
+    agents = [e["agent"] for e in record["events"] if e["agent"] in workflow.ROLES and e["status"] == "complete"]
+    assert agents[agents.index("AnalysisAgent") + 1] == "CriticAgent"
+    critique = store.by_kind(record, "critique")[0]
+    decision = store.by_kind(record, "decision")[0]
+    assert critique["id"] in decision["input_ids"]
+    assert decision["data"]["open_challenges"] == ["X5"]
+    record = workflow.run_followup(record["id"])
+    resolved = store.by_kind(record, "critique")[-1]["data"]["challenges"][0]
+    assert resolved["challenge_id"] == "X5" and resolved["verdict"] == "partly conceded"

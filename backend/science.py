@@ -152,6 +152,26 @@ def followup_proposal(seed: int) -> Experiment:
     )
 
 
+def resolve_followup_challenge(result: dict) -> dict:
+    """The critic's open sex-confounding challenge, re-judged with the follow-up's numbers."""
+    low, high = result["adjusted_ci95"]
+    persists = low > 0
+    return {
+        "challenge_id": "X5",
+        "attack": "Sex differences within each group could be confounding the slope.",
+        "test": "Does the within-species slope survive adjustment for sex and year?",
+        "evidence": f"Species-only {result['species_only_slope']:+.3f} → with sex + year {result['adjusted_slope']:+.3f}, "
+        f"95% CI [{low:.3f}, {high:.3f}].",
+        "verdict": "partly conceded"
+        if persists and result["attenuation"] >= 0.2
+        else "rebutted"
+        if persists
+        else "stands",
+        "challenger": "CriticAgent",
+        "defender": "AnalysisAgent",
+    }
+
+
 def interpret_followup(result: dict) -> dict:
     low, high = result["adjusted_ci95"]
     persists = low > 0
@@ -218,7 +238,62 @@ def evaluate(result: dict) -> list[dict]:
     ]
 
 
-def decide(result: dict, updates: list[dict]) -> dict:
+def critique(result: dict) -> list[dict]:
+    """Adversarial review: each challenge is settled by a number the experiment actually computed."""
+    low, high = result["adjusted_ci95"]
+    slope_sign = 1 if result["adjusted_slope"] > 0 else -1
+    group = result["group"]
+    challenges = [
+        {
+            "challenge_id": "X1",
+            "attack": "The reversal is sampling noise.",
+            "test": "Does the 95% bootstrap interval for the adjusted slope exclude zero?",
+            "evidence": f"95% CI [{low:.3f}, {high:.3f}] from {result['bootstrap_samples']} stratified resamples.",
+            "verdict": "rebutted" if low > 0 or high < 0 else "stands",
+        },
+        {
+            "challenge_id": "X2",
+            "attack": "A single collection year drives the result.",
+            "test": "Does the adjusted slope keep its sign when each year is left out?",
+            "evidence": "; ".join(f"omit {s['excluded_year']}: {s['slope']:+.3f}" for s in result["sensitivity"]) + ".",
+            "verdict": "rebutted" if all(s["slope"] * slope_sign > 0 for s in result["sensitivity"]) else "stands",
+        },
+        {
+            "challenge_id": "X3",
+            "attack": f"One {group} carries the whole effect.",
+            "test": f"Does every {group} subgroup slope share the adjusted slope's sign?",
+            "evidence": "; ".join(f"{s['group']}: {s['slope']:+.3f}" for s in result["subgroups"]) + ".",
+            "verdict": "rebutted" if all(s["slope"] * slope_sign > 0 for s in result["subgroups"]) else "stands",
+        },
+    ]
+    comparison = result.get("model_comparison")
+    if comparison:
+        challenges.append(
+            {
+                "challenge_id": "X4",
+                "attack": "The adjusted model only fits better because it has more parameters.",
+                "test": "Does BIC, which penalises extra parameters, still favour the adjusted model by more than 10?",
+                "evidence": f"ΔBIC {comparison['delta_bic']:+.1f} (positive favours the adjusted model).",
+                "verdict": "rebutted" if comparison["delta_bic"] > 10 else "stands",
+            }
+        )
+    if "sex" not in result["group"]:
+        challenges.append(
+            {
+                "challenge_id": "X5",
+                "attack": "Sex differences within each group could be confounding the slope.",
+                "test": "Was sex adjusted for in this experiment?",
+                "evidence": "Not tested: this model adjusts for " + group + " only.",
+                "verdict": "open",
+            }
+        )
+    for challenge in challenges:
+        challenge["challenger"] = "CriticAgent"
+        challenge["defender"] = "AnalysisAgent"
+    return challenges
+
+
+def decide(result: dict, updates: list[dict], challenges: list[dict] | None = None) -> dict:
     if updates[0]["updated_support"] >= 80:
         next_step = "Test sex and year effects within species"
         search = "Retrieve sex-specific bill morphometry and measurement-protocol evidence."
@@ -244,6 +319,7 @@ def decide(result: dict, updates: list[dict]) -> dict:
         if updates[1]["updated_support"] >= 60
         else "Covariate sensitivity analysis",
         "requires_new_approval": True,
+        "open_challenges": [c["challenge_id"] for c in challenges or [] if c["verdict"] != "rebutted"],
     }
 
 

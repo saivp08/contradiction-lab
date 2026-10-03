@@ -173,6 +173,7 @@ export interface Summary {
   };
   followup?: { adjusted_slope: number; adjusted_ci95: number[] };
   next_decision?: string;
+  challenges?: Record<string, number>;
 }
 export function objects<T>(record: RecordData | null, kind: string): T[] {
   return Object.values(record?.objects || {})

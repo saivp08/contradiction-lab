@@ -10,7 +10,7 @@ Open with the home page, then the investigation page: real measurements on the l
 
 ## 0:15–0:35 — Evidence and specialist work
 
-Click **Run investigation** on the home page (or choose Omnigent in **New investigation** if configured). Show the stage tabs filling in and the **Activity** tab in the data panel. “The workflow retrieves the source claims, checks that they concern comparable variables, and identifies species aggregation as the context difference.”
+Click **Start a debate** on the home page (or choose Omnigent in **New investigation** if configured). Narrate the Arena as specialists pass the question, claims and hypotheses between seats and the run pauses at your seat. “The workflow retrieves the source claims, checks that they concern comparable variables, and identifies species aggregation as the context difference.”
 
 For local mode say “deterministic scientific specialists”; for a verified live sponsor run say “Omnigent dispatches the specialist agents.”
 
@@ -26,7 +26,7 @@ The page switches to the Experiment tab. Click **Approve & run experiment** and 
 
 ## 1:15–1:35 — Real computation
 
-Show the real result: negative pooled slope, positive adjusted slope, bootstrap interval and ΔBIC. In the data panel, toggle **Color by species** and point to **Why the sign flips**: 71% of bill-length variation is between species, which outweighs the positive within-species slope. Open sensitivity details. “Python computed this from 342 observed birds. The record includes the data hash, code hash, seed and library versions.”
+Watch the Critic fire five challenges at the result while Analysis answers each with a computed number: four rebutted, one (sex confounding) left open. Then show the real result: negative pooled slope, positive adjusted slope, bootstrap interval and ΔBIC. In the data panel, toggle **Color by species** and point to **Why the sign flips**: 71% of bill-length variation is between species, which outweighs the positive within-species slope. Open sensitivity details. “Python computed this from 342 observed birds. The record includes the data hash, code hash, seed and library versions.”
 
 ## 1:35–1:50 — The plan changes
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { ArrowRight, ArrowUpRight, Check, Clock3, Download, ShieldCheck } from 'lucide-react';
 import { DecompositionChart, Scatter } from '../Plots';
 import { ResearchGraph } from '../ResearchGraph';
@@ -6,7 +6,7 @@ import { fmt, signed } from '../lib';
 import type { Decomposition, LabObject, Point, RecordData, Result } from '../types';
 import { Empty } from '../ui';
 
-const TABS = ['Data', 'Lineage', 'Activity'] as const;
+const TABS = ['Arena', 'Data', 'Lineage', 'Activity'] as const;
 type Tab = (typeof TABS)[number];
 
 function pooledSlope(points: Point[]) {
@@ -127,12 +127,14 @@ export function InstrumentPanel({
   record,
   referencePoints,
   onSelect,
+  arena,
 }: {
   record: RecordData | null;
   referencePoints: Point[];
   onSelect: (o: LabObject) => void;
+  arena: ReactNode;
 }) {
-  const [tab, setTab] = useState<Tab>('Data');
+  const [tab, setTab] = useState<Tab>('Arena');
   const results = Object.values(record?.objects ?? {});
   const result = results.find((o) => o.kind === 'result')?.data as Result | undefined;
   const followup = results.find((o) => o.kind === 'followup_result')?.data as Result | undefined;
@@ -148,15 +150,12 @@ export function InstrumentPanel({
             className={tab === t ? 'active' : ''}
             onClick={() => setTab(t)}
           >
-            {t === 'Lineage'
-              ? 'Research graph'
-              : t === 'Activity'
-                ? `Activity · ${record?.events.length ?? 0}`
-                : t}
+            {t === 'Lineage' ? 'Research graph' : t === 'Activity' ? 'Record' : t}
           </button>
         ))}
       </div>
       <div className="panel-body" role="tabpanel" aria-label={tab}>
+        {tab === 'Arena' && arena}
         {tab === 'Data' && (
           <>
             <KeyNumbers result={result} points={points} />
