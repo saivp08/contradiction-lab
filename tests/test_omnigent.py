@@ -12,10 +12,10 @@ def test_real_omnigent_loader_accepts_both_graphs(monkeypatch):
     monkeypatch.setenv("OMNIGENT_MODEL", "gpt-4.1-mini")
     monkeypatch.setenv("OPENAI_API_KEY", "unit-test-parse-only-not-a-real-key")
     # Configuration parsing only. No provider call or mock sponsor execution.
-    for phase in ("prepare", "execute"):
+    for phase, specialists in (("prepare", 4), ("execute", 5)):
         path = Path("omnigent_config") / (phase + ".yaml")
         agent = load_agent_def(path)
-        assert len(agent.tools) == 4
+        assert len(agent.tools) == specialists
         config = json.loads(path.read_text())
         assert "os_env" not in config
         for tool in config["tools"].values():

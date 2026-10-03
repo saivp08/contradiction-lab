@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ArrowLeft, ArrowRight, Check, Info, Plus, Radio, RotateCcw, X } from 'lucide-react';
 import { QuestionChapter } from '../chapters/QuestionChapter';
 import { EvidenceChapter } from '../chapters/EvidenceChapter';
@@ -8,9 +8,13 @@ import { ExperimentChapter } from '../chapters/ExperimentChapter';
 import { ResultChapter } from '../chapters/ResultChapter';
 import { DecisionChapter } from '../chapters/DecisionChapter';
 import { InstrumentPanel } from '../panels/InstrumentPanel';
+import { Arena } from '../arena/Arena';
+import { AGENTS, buildBeats, visibleRecord } from '../arena/beats';
+import { usePlayback } from '../arena/usePlayback';
 import { ApprovalDialog, ProvenanceDialog } from '../panels/Dialogs';
 import {
   REFERENCE_QUESTION,
+  freshRuns,
   RESTING,
   STAGES,
   api,
@@ -148,9 +152,29 @@ export function Investigation({
 
   useLiveRecord(record, setRecord, setError);
 
+  // The arena plays recorded events back as beats; the rest of the page shows the record as of the current beat.
+  const beats = useMemo(() => buildBeats(record), [record]);
+  const playback = usePlayback(beats, id + (replay ? ':replay' : ''), freshRuns.has(id) || replay);
+  useEffect(() => {
+    if (beats.length) freshRuns.delete(id);
+  }, [beats.length, id]);
+  const view = visibleRecord(record, beats, playback.shown);
+  const [follow, setFollow] = useState(true);
+  const current = playback.playing ? beats[playback.shown - 1] : undefined;
+  useEffect(() => {
+    if (!follow || !current?.to) return;
+    const stage = AGENTS.find((a) => a.id === current.to)?.stage;
+    if (stage !== undefined && current.kind !== 'approval') setTab(stage);
+  }, [current?.key, follow]);
+  const pick = (i: number) => {
+    setFollow(false);
+    show(i);
+  };
+
   // Guide the reader when the run reaches a point that needs them, or produces a result.
   useEffect(() => {
-    if (!record) return;
+    if (!view) return;
+    const record = view;
     const before = previousStatus.current;
     previousStatus.current = record.status;
     // Open the tab that needs the reader: the approval step, or the result once it arrives.
@@ -164,7 +188,7 @@ export function Investigation({
     if (record.status === 'complete' && (!before || ['running', 'approved'].includes(before))) show(5);
     if (!before || before === record.status) return;
     if (RESTING.includes(record.status)) onChanged();
-  }, [record?.status]);
+  }, [view?.status]);
 
   useEffect(() => {
     function escape(e: KeyboardEvent) {
@@ -197,7 +221,8 @@ export function Investigation({
           body: JSON.stringify({ experiment_id: experimentId, approved: true }),
         }),
       );
-      show(5);
+      setFollow(true);
+      playback.play();
     });
   const runFollowup = () =>
     act(async () => {
@@ -209,31 +234,34 @@ export function Investigation({
           body: JSON.stringify({ approved: true }),
         }),
       );
+      setFollow(true);
+      playback.play();
       onChanged();
     });
 
   const isReplay = record?.display_mode === 'replay';
-  const live = record?.mode === 'omnigent';
-  const stage = record?.stage ?? 0;
-  const failed = record && ['failed', 'no_contradiction'].includes(record.status);
-  const working = !!record && !isReplay && !RESTING.includes(record.status);
-  const evidence = record ? objects<Evidence>(record, 'evidence') : reference;
-  const hypotheses = objects<Hypothesis>(record, 'hypothesis');
-  const experiments = objects<Experiment>(record, 'experiment').filter((e) => !e.followup);
-  const result = objects<Result>(record, 'result')[0];
-  const updates = objects<{ updates: Update[] }>(record, 'analysis')[0]?.updates;
-  const decision = objects<Decision>(record, 'decision')[0];
-  const followupResult = objects<Result>(record, 'followup_result')[0];
-  const followup = objects<FollowupDecision>(record, 'followup_decision')[0];
-  const ready = (i: number) => !!record && (sectionReady(stage, i) || (i === 5 && stage >= 4));
-  const done = (i: number) => !!record && (record.status === 'complete' || sectionReady(stage, i + 1));
+  const live = view?.mode === 'omnigent';
+  const stage = view?.stage ?? 0;
+  const failed = view && ['failed', 'no_contradiction'].includes(view.status);
+  const working = !!view && !isReplay && !RESTING.includes(view.status);
+  const evidence = record ? objects<Evidence>(view, 'evidence') : reference;
+  const hypotheses = objects<Hypothesis>(view, 'hypothesis');
+  const experiments = objects<Experiment>(view, 'experiment').filter((e) => !e.followup);
+  const result = objects<Result>(view, 'result')[0];
+  const updates = objects<{ updates: Update[] }>(view, 'analysis')[0]?.updates;
+  const decision = objects<Decision>(view, 'decision')[0];
+  const followupResult = objects<Result>(view, 'followup_result')[0];
+  const followup = objects<FollowupDecision>(view, 'followup_decision')[0];
+  const ready = (i: number) => !!view && (sectionReady(stage, i) || (i === 5 && stage >= 4));
+  const done = (i: number) => !!view && (view.status === 'complete' || sectionReady(stage, i + 1));
   const waiting = failed
     ? 'Not reached: the run stopped earlier.'
     : working
       ? 'Specialists are working on this step…'
       : 'Waiting for earlier steps.';
+  const waitingForYou = view?.status === 'awaiting_approval' && !isReplay && !playback.playing;
   const findObject = (kind: string) => {
-    const o = Object.values(record?.objects || {}).find((o) => o.kind === kind);
+    const o = Object.values(view?.objects || {}).find((o) => o.kind === kind);
     if (o) setSelected(o);
   };
   const about = isReplay
@@ -255,12 +283,21 @@ export function Investigation({
           <span className="eyebrow">
             {isReplay ? 'VERIFIED REPLAY' : live ? 'LIVE AI AGENTS' : 'RULE-BASED RUN'}
           </span>
-          <h1>{record?.label || (record ? `Investigation ${record.id.slice(-6)}` : 'Loading…')}</h1>
+          <h1>
+            {record?.label ||
+              (record ? (
+                <>
+                  Investigation <span className="run-id">{record.id.slice(-6)}</span>
+                </>
+              ) : (
+                'Loading…'
+              ))}
+          </h1>
         </div>
         {record && (
-          <span className={'status-pill ' + (isReplay ? 'replay' : record.status)}>
+          <span className={'status-pill ' + (isReplay ? 'replay' : view?.status)}>
             {working && <Radio size={12} />}
-            {isReplay ? 'Checksum verified' : statusLabel(record.status)}
+            {isReplay ? 'Checksum verified' : statusLabel(view?.status ?? record.status)}
           </span>
         )}
         <details className="run-about">
@@ -299,7 +336,30 @@ export function Investigation({
         </div>
       )}
       <div className="split">
-        <InstrumentPanel record={record} referencePoints={referencePoints} onSelect={setSelected} />
+        <InstrumentPanel
+          key={id + (replay ? ':replay' : '')}
+          record={view}
+          referencePoints={referencePoints}
+          onSelect={setSelected}
+          arena={
+            <Arena
+              record={view}
+              beats={beats}
+              shown={playback.shown}
+              playing={playback.playing}
+              speed={playback.speed}
+              live={live}
+              waitingForYou={waitingForYou}
+              onSpeed={playback.setSpeed}
+              onReplay={() => {
+                setFollow(true);
+                playback.replay();
+              }}
+              onSkip={playback.skip}
+              onReview={() => pick(4)}
+            />
+          }
+        />
         <div className="story">
           <nav className="story-nav" role="tablist" aria-label="Investigation stages">
             {STAGES.map((s, i) => (
@@ -310,22 +370,20 @@ export function Investigation({
                   (done(i) ? 'done ' : '') + (i === tab ? 'current ' : '') + (ready(i) ? '' : 'locked')
                 }
                 aria-selected={i === tab}
-                onClick={() => show(i)}
+                onClick={() => pick(i)}
               >
                 <i>{done(i) ? <Check size={11} /> : i + 1}</i>
                 <span>{s}</span>
-                {i === 4 && record?.status === 'awaiting_approval' && !isReplay && (
-                  <b className="needs-dot" />
-                )}
+                {i === 4 && view?.status === 'awaiting_approval' && !isReplay && <b className="needs-dot" />}
               </button>
             ))}
           </nav>
-          {record && (
+          {view && (
             <>
               {
                 [
                   <StorySection index={0} ready waiting="">
-                    <QuestionChapter question={record.objective || REFERENCE_QUESTION} />
+                    <QuestionChapter question={view.objective || REFERENCE_QUESTION} />
                   </StorySection>,
                   <StorySection index={1} ready={ready(1)} waiting={waiting}>
                     <EvidenceChapter evidence={evidence} />
@@ -337,15 +395,15 @@ export function Investigation({
                     <HypothesesChapter
                       hypotheses={hypotheses}
                       updated={!!updates}
-                      onShowResult={() => show(5)}
+                      onShowResult={() => pick(5)}
                     />
                   </StorySection>,
                   <StorySection index={4} ready={ready(4)} waiting={waiting}>
                     <ExperimentChapter
                       experiments={experiments}
-                      selected={record.selected_experiment}
-                      rationale={record.selection_rationale}
-                      canApprove={record.status === 'awaiting_approval' && !isReplay}
+                      selected={view.selected_experiment}
+                      rationale={view.selection_rationale}
+                      canApprove={view.status === 'awaiting_approval' && !isReplay}
                       busy={busy}
                       onRequestApproval={(experiment) => setPending({ kind: 'experiment', experiment })}
                     />
@@ -358,8 +416,8 @@ export function Investigation({
                     <ResultChapter
                       result={result}
                       updates={updates}
-                      status={record.status}
-                      events={record.events}
+                      status={view.status}
+                      events={view.events}
                       onInspect={() => findObject('result')}
                     />
                   </StorySection>,
@@ -372,7 +430,7 @@ export function Investigation({
                       decision={decision}
                       followup={followup}
                       followupResult={followupResult}
-                      canRunFollowup={record.status === 'complete' && !isReplay}
+                      canRunFollowup={view.status === 'complete' && !isReplay}
                       busy={busy}
                       onRunFollowup={() => setPending({ kind: 'followup' })}
                     />
@@ -384,13 +442,13 @@ export function Investigation({
                   STAGE {tab + 1} OF {STAGES.length}
                 </span>
                 {tab > 0 && (
-                  <button className="text-button" onClick={() => show(tab - 1)}>
+                  <button className="text-button" onClick={() => pick(tab - 1)}>
                     <ArrowLeft size={16} />
                     {STAGES[tab - 1]}
                   </button>
                 )}
                 {tab < STAGES.length - 1 && (
-                  <button className="button" onClick={() => show(tab + 1)}>
+                  <button className="button" onClick={() => pick(tab + 1)}>
                     {STAGES[tab + 1]}
                     <ArrowRight size={16} />
                   </button>

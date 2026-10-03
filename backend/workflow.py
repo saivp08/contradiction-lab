@@ -15,6 +15,7 @@ ROLES = [
     "ExperimentPlanner",
     "ExperimentRunner",
     "AnalysisAgent",
+    "CriticAgent",
     "DecisionAgent",
     "SafetyAgent",
 ]
@@ -180,11 +181,24 @@ def advance(identifier: str, role: str, rationale: str = "", candidates: list[di
                 "; ".join(f"{u['hypothesis_id']}: {u['result_consistency']}" for u in updates),
                 "evaluate_result",
             )
-        elif role == "DecisionAgent":
+        elif role == "CriticAgent":
             result = store.by_kind(record, "result")[0]
             analysis = store.by_kind(record, "analysis")[0]
             inputs = [result["id"], analysis["id"]]
-            decision = science.decide(result["data"], analysis["data"]["updates"])
+            challenges = science.critique(result["data"])
+            outputs = [store.add(record, "critique", {"challenges": challenges}, inputs)]
+            tally = {v: sum(c["verdict"] == v for c in challenges) for v in ("rebutted", "stands", "open")}
+            action, tool = (
+                f"Raised {len(challenges)} challenges: {tally['rebutted']} rebutted by the data, "
+                f"{tally['stands']} standing, {tally['open']} open.",
+                "challenge_result",
+            )
+        elif role == "DecisionAgent":
+            result = store.by_kind(record, "result")[0]
+            analysis = store.by_kind(record, "analysis")[0]
+            critique = store.by_kind(record, "critique")[0]
+            inputs = [result["id"], analysis["id"], critique["id"]]
+            decision = science.decide(result["data"], analysis["data"]["updates"], critique["data"]["challenges"])
             outputs = [store.add(record, "decision", decision, inputs)]
             action, tool = "Research plan updated: " + decision["next_decision"], "choose_next_decision"
             record["metrics"]["result_to_decision_seconds"] = (
@@ -334,6 +348,16 @@ def run_followup(identifier: str, actor: str = "local human operator") -> dict:
             [result_id],
             "experiments.penguins.compute",
             perf_counter() - started,
+        )
+        challenge = science.resolve_followup_challenge(result)
+        challenge_id = store.add(record, "critique", {"challenges": [challenge], "followup": True}, [result_id])
+        store.event(
+            record,
+            "CriticAgent",
+            f"Challenge X5 (sex confounding) {challenge['verdict']}: {challenge['evidence']}",
+            [result_id],
+            [challenge_id],
+            "challenge_result",
         )
         interpretation = science.interpret_followup(result)
         interpretation_id = store.add(record, "followup_decision", interpretation, [result_id, decision["id"]])

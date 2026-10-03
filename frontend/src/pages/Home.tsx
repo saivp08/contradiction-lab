@@ -1,8 +1,10 @@
-import { useState } from 'react';
-import { ArrowRight, Clock3, Layers3, Play, RotateCcw, Search, ShieldCheck } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ArrowRight, Play, RotateCcw, Search } from 'lucide-react';
 import { MiniSlopes } from '../Plots';
+import { Floor } from '../arena/Arena';
+import { buildBeats } from '../arena/beats';
 import { REFERENCE_QUESTION, STAGES, navigate, sectionReady, signed, statusLabel } from '../lib';
-import type { Summary } from '../types';
+import type { RecordData, Summary } from '../types';
 
 function StageMeter({ stage, status }: { stage: number; status: string }) {
   const filled =
@@ -16,10 +18,22 @@ function StageMeter({ stage, status }: { stage: number; status: string }) {
   );
 }
 
+function Tally({ challenges }: { challenges: Record<string, number> }) {
+  return (
+    <div className="tally">
+      {Object.entries(challenges).map(([verdict, n]) => (
+        <span key={verdict} className={'stamp ' + verdict.replace(' ', '-')}>
+          {n} {verdict}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function InvestigationCard({ item }: { item: Summary }) {
   const open = () => navigate({ page: 'run', id: item.id, replay: false });
   return (
-    <article className="run-card">
+    <article className={'run-card ' + item.status}>
       <button className="run-card-main" onClick={open}>
         <div className="run-card-top">
           <span className={'status-pill ' + item.status}>{statusLabel(item.status)}</span>
@@ -51,10 +65,11 @@ function InvestigationCard({ item }: { item: Summary }) {
         ) : (
           <p className="run-card-pending">
             {item.status === 'awaiting_approval'
-              ? 'Waiting for you to approve an experiment.'
+              ? 'The planner is waiting for you to approve an experiment.'
               : 'No result yet.'}
           </p>
         )}
+        {item.challenges && <Tally challenges={item.challenges} />}
         {item.next_decision && (
           <p className="run-card-next">
             <span>Next</span> {item.next_decision}
@@ -68,7 +83,7 @@ function InvestigationCard({ item }: { item: Summary }) {
           onClick={() => navigate({ page: 'run', id: item.id, replay: true })}
         >
           <RotateCcw size={13} />
-          Verified replay
+          Watch the verified debate
         </button>
       )}
     </article>
@@ -77,58 +92,78 @@ function InvestigationCard({ item }: { item: Summary }) {
 
 export function Home({
   history,
+  featured,
   busy,
   onNew,
   onQuickStart,
 }: {
   history: Summary[];
+  featured: RecordData | null;
   busy: boolean;
   onNew: () => void;
   onQuickStart: () => void;
 }) {
   const [query, setQuery] = useState('');
+  const beats = useMemo(() => buildBeats(featured), [featured]);
   const shown = history.filter((h) =>
     (h.label || h.objective + h.id).toLowerCase().includes(query.trim().toLowerCase()),
   );
   const needsYou = history.filter((h) => h.status === 'awaiting_approval').length;
+  const featuredSummary = featured && history.find((h) => h.id === featured.id);
   return (
     <main className="home">
       <section className="home-hero">
-        <div>
-          <span className="eyebrow">CONTRADICTION LAB</span>
-          <h1>Turn scientific disagreement into the next experiment.</h1>
+        <div className="hero-copy">
+          <span className="eyebrow">CONTRADICTION LAB · AGENTIC SCIENCE</span>
+          <h1>
+            Two findings disagree. <em>Let the agents fight it out.</em>
+          </h1>
           <p>
-            Compare cited findings, register competing explanations, approve a test, run real analysis, and
-            let the result change the research plan.
+            Ten seats, one contested question. Specialists pull the evidence, propose explanations and design
+            a test. You approve it. Then a critic attacks the result, and every challenge is settled by
+            numbers the experiment actually computed.
           </p>
-        </div>
-        <div className="question-tile">
-          <span className="eyebrow">REFERENCE QUESTION</span>
-          <h2>{REFERENCE_QUESTION}</h2>
-          <div className="question-meta">
-            <span>
-              <Layers3 size={13} />
-              Palmer Penguins
-            </span>
-            <span>
-              <Clock3 size={13} />
-              2007–2009
-            </span>
-            <span>
-              <ShieldCheck size={13} />
-              CC0 public data
-            </span>
+          <blockquote className="hero-question">{REFERENCE_QUESTION}</blockquote>
+          <div className="hero-actions">
+            <button className="button primary" disabled={busy} onClick={onQuickStart}>
+              <Play size={15} />
+              {busy ? 'Starting…' : 'Start a debate'}
+            </button>
+            <button className="text-button" onClick={onNew}>
+              Name the run first
+              <ArrowRight size={15} />
+            </button>
           </div>
-          <button className="button primary" disabled={busy} onClick={onQuickStart}>
-            <Play size={15} />
-            {busy ? 'Starting…' : 'Run investigation'}
-          </button>
         </div>
+        <figure className="hero-floor">
+          {featured ? (
+            <>
+              <Floor record={featured} visible={beats} />
+              <figcaption>
+                <span>
+                  Latest debate · {featured.label || featured.id.slice(-6)}
+                  {featuredSummary?.challenges && <Tally challenges={featuredSummary.challenges} />}
+                </span>
+                <button
+                  className="text-button"
+                  onClick={() => navigate({ page: 'run', id: featured.id, replay: true })}
+                >
+                  <RotateCcw size={13} />
+                  Watch it play out
+                </button>
+              </figcaption>
+            </>
+          ) : (
+            <div className="hero-empty">
+              <p>No debates yet. Start one and watch the agents take their seats.</p>
+            </div>
+          )}
+        </figure>
       </section>
       <section className="home-list">
         <div className="home-list-head">
           <div>
-            <h2>Your investigations</h2>
+            <h2>Investigations</h2>
             <p className="muted">
               {history.length} run{history.length === 1 ? '' : 's'}
               {needsYou > 0 && <span className="needs-you"> · {needsYou} waiting for your approval</span>}
@@ -162,7 +197,7 @@ export function Home({
             <p>
               {history.length
                 ? 'No runs match your search.'
-                : 'No investigations yet. Run the reference question to begin.'}
+                : 'No investigations yet. Start a debate on the reference question to begin.'}
             </p>
           </div>
         )}

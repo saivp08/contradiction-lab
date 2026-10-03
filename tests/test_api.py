@@ -38,6 +38,7 @@ def test_api_full_flow_and_replay(client):
     assert len(listing) == 1
     assert listing[0]["result"]["pooled_slope"] < 0 < listing[0]["followup"]["adjusted_slope"]
     assert listing[0]["next_decision"]
+    assert listing[0]["challenges"] == {"partly conceded": 1, "rebutted": 4}
 
 
 def test_api_rejects_missing_credentials_invalid_input_and_cross_origin(client, monkeypatch):

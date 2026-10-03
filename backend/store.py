@@ -66,6 +66,12 @@ def summary(record: dict) -> dict:
     if "followup_result" in results:
         followup = results["followup_result"]
         row["followup"] = {k: followup[k] for k in ("adjusted_slope", "adjusted_ci95")}
+    verdicts = {}
+    for critique in by_kind(record, "critique"):
+        for challenge in critique["data"]["challenges"]:
+            verdicts[challenge["challenge_id"]] = challenge["verdict"]
+    if verdicts:
+        row["challenges"] = {v: list(verdicts.values()).count(v) for v in sorted(set(verdicts.values()))}
     decisions = by_kind(record, "followup_decision") or by_kind(record, "decision")
     if decisions:
         row["next_decision"] = decisions[0]["data"]["next_decision"]

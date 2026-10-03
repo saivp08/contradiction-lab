@@ -11,7 +11,7 @@ Built for Databricks × Hack-Nation — Agentic Scientific Discovery.
 ## What works, and what is credential-dependent
 
 - **Local development:** complete, tested discovery loop on a real open dataset. Deterministic specialist functions, explicitly labeled **not Omnigent and not an LLM**.
-- **Omnigent live:** official `omnigent==0.16.0` CLI orchestrates eight declared specialist agents using role-specific function tools. The actual package loads both supplied graphs in tests. A model-backed end-to-end execution **has not been verified** because no model credentials were supplied. This remains a submission acceptance dependency, not a claim of sponsor compliance already achieved.
+- **Omnigent live:** official `omnigent==0.16.0` CLI orchestrates nine declared specialist agents using role-specific function tools. The actual package loads both supplied graphs in tests. A model-backed end-to-end execution **has not been verified** because no model credentials were supplied. This remains a submission acceptance dependency, not a claim of sponsor compliance already achieved.
 - **Verified replay:** checksum-validated records of completed real computation. A portable local run ships in `data/verified-run.json`; replay retains its original engine label. Never presented as a live run.
 
 ![Completed investigation: data panel with slope decomposition beside the investigation story](docs/redesign-result.png)
@@ -58,7 +58,9 @@ uv pip install --python .venv/bin/python -r requirements.txt
 .venv/bin/python scripts/run.py
 ```
 
-Open **http://127.0.0.1:8000**. The home page lists your investigations with their key numbers. Click **Run investigation**: the investigation page shows the real data on the left and one tab per stage on the right (Question → Next move), and opens the Experiment tab when the run needs your approval. Click **Approve & run experiment** and confirm. Read the result, the slope decomposition (*Why the sign flips*) and the updated decision, then optionally **Approve & run follow-up**. The left panel's **Research graph** and **Activity** tabs show lineage and every agent/tool event. **Replay verified run** loads the sealed record.
+Open **http://127.0.0.1:8000**. The home page shows the latest debate on the agent floor and your investigations with their slopes and challenge verdicts. Click **Start a debate**: the **Arena** plays the run back exchange by exchange (specialists passing claims, hypotheses and test specs to each other), then pauses at your seat for approval. Approve the experiment and watch the Critic attack the result while Analysis answers each challenge with the computed number. The stage tabs on the right follow the action. The open challenge (sex confounding) becomes the follow-up, which you can approve on **Next move**. The left panel also has **Data** (scatter, slope decomposition), **Research graph** and **Record** (raw events, export). **Replay verified run** replays the sealed record.
+
+The arena is a playback of real recorded events and computed challenge verdicts, paced for reading (1×/2×/4×, skip). Local specialists are rule-based; no dialogue is generated.
 
 In this prepared workspace, dependencies already exist in `.packages` and `frontend/node_modules`; launch directly with `python scripts/run.py`. The launcher recognizes `.packages`. Standard installations should use the virtual environment above. Windows PowerShell execution-policy restrictions are avoided with `npm.cmd` and the venv's Python executable; activation is unnecessary.
 
@@ -87,7 +89,7 @@ flowchart LR
   API --> Mode{Explicit engine}
   Mode --> OM[Official Omnigent CLI]
   Mode --> Local[Local deterministic development loop]
-  OM --> Agents[Eight specialist agents]
+  OM --> Agents[Nine specialist agents]
   Agents --> Tools[Role-specific scientific tools]
   Local --> Tools
   Gate --> Tools
@@ -106,6 +108,7 @@ flowchart LR
 | ExperimentPlanner | Score two allowlisted tests; explain selection and await approval |
 | ExperimentRunner | Execute approved code; record data/code hashes, parameters and results |
 | AnalysisAgent | Evaluate actual intervals and sensitivity; update heuristic support |
+| CriticAgent | Attack the result with five challenges (noise, single year, single group, overfitting, sex confounding); each is rebutted, standing or left open by a computed number. Open challenges drive the next experiment |
 | DecisionAgent | Select follow-up based on the computed evidence |
 | SafetyAgent | Validate citations, approval, lineage and experiment provenance |
 
@@ -142,7 +145,7 @@ npm.cmd test
 
 On macOS / Linux use `.venv/bin/python` and plain `npm` / `npx`. Format code with `.venv/bin/ruff format backend experiments scripts tests` and `npm run format` in `frontend`.
 
-The frontend lint script runs TypeScript validation; there is no separate ESLint ruleset. Browser testing covers the dashboard, approval, actual results, slope decomposition, changed decision, follow-up, graph provenance, verified replay, and mobile overflow. Screenshots are generated as `docs/redesign-*.png`. Run it against a scratch database (`LAB_DB=/tmp/e2e.sqlite3 python scripts/run.py`) so test runs do not appear in your own workspace.
+The frontend lint script runs TypeScript validation; there is no separate ESLint ruleset. Browser testing covers the dashboard, arena playback, critic challenges, approval, actual results, slope decomposition, changed decision, follow-up, graph provenance, verified replay, and mobile overflow. Screenshots are generated as `docs/redesign-*.png`. Run it against a scratch database (`LAB_DB=/tmp/e2e.sqlite3 python scripts/run.py`) so test runs do not appear in your own workspace.
 
 See [verification report](docs/VERIFICATION.md) for commands actually executed and limitations. Test fixtures alone use synthetic counterfactual data or dummy credentials for configuration parsing. No mocked sponsor run is counted as live execution.
 

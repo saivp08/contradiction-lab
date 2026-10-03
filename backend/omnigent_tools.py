@@ -48,6 +48,10 @@ def analysis(rationale: str) -> dict:
     return _step("AnalysisAgent", rationale)
 
 
+def critic(rationale: str) -> dict:
+    return _step("CriticAgent", rationale)
+
+
 def decision(rationale: str) -> dict:
     return _step("DecisionAgent", rationale)
 

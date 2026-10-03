@@ -57,8 +57,9 @@ Omnigent dispatches the specialists, passes their structured outputs and handles
 | HypothesisAgent | `hypothesis` | Context + generated JSON array of three Hypothesis objects | H1 species / H2 sampling / H3 sex-year → ExperimentPlanner |
 | ExperimentPlanner | `planner` | Hypotheses + validated dataset | Two Experiment proposals and selection → human |
 | ExperimentRunner | `runner` | Approved proposal only | Numerical result, runtime metadata → AnalysisAgent |
-| AnalysisAgent | `analysis` | Actual Result | Support updates → DecisionAgent |
-| DecisionAgent | `decision` | Result and support updates | Result-dependent decision → SafetyAgent |
+| AnalysisAgent | `analysis` | Actual Result | Support updates → CriticAgent |
+| CriticAgent | `critic` | Result + support updates | Five adversarial challenges, each settled by a computed number (rebutted / stands / open) → DecisionAgent |
+| DecisionAgent | `decision` | Result, support updates and open challenges | Result-dependent decision → SafetyAgent |
 | SafetyAgent | `safety` | Complete research record | Audit and sealed replay |
 
 Each function is scoped by `LAB_ACTIVE_INVESTIGATION`, supplied to the CLI subprocess by the backend. Function calls return structured object IDs and scientific state, excluding large plot arrays. Each specialist has one mutation capability. There is no shell, filesystem editing, general network, arbitrary Python or approval capability in the declared graphs. The root agent receives only the four allowed sub-agent tools for its phase. The prototype uses sequential execution deliberately; it does not claim parallel hypothesis evaluation.
