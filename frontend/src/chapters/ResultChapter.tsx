@@ -1,5 +1,5 @@
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
-import { Scatter, Slopes } from '../Plots';
+import { Slopes } from '../Plots';
 import { signed } from '../lib';
 import type { LabEvent, ModelComparison, Result, Update } from '../types';
 import { Empty, SectionHeading, Tag } from '../ui';
@@ -43,7 +43,7 @@ export function ResultChapter({
   onInspect: () => void;
 }) {
   return (
-    <section id="stage-5">
+    <section>
       <SectionHeading
         eyebrow="06 / COMPUTATIONAL EVIDENCE"
         title={
@@ -94,8 +94,7 @@ export function ResultChapter({
             <ModelEvidence comparison={result.model_comparison} label={result.group} />
           )}
           <details className="details">
-            <summary>Explore measured data & regression slopes</summary>
-            <Scatter result={result} />
+            <summary>Slopes by species, with uncertainty</summary>
             <Slopes result={result} />
           </details>
           <details className="details">

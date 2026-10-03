@@ -57,3 +57,32 @@ export function evidenceLabels(e: Evidence, index: number) {
 }
 
 export const experimentTitle = (e: Experiment) => e.title || e.method.replaceAll('_', ' ');
+
+export type Route = { page: 'home' } | { page: 'run'; id: string; replay: boolean };
+
+export function parseRoute(hash: string): Route {
+  const match = hash.match(/^#\/run\/([\w-]+)(\/replay)?$/);
+  return match ? { page: 'run', id: match[1], replay: !!match[2] } : { page: 'home' };
+}
+
+export const navigate = (route: Route) => {
+  window.location.hash = route.page === 'home' ? '/' : `/run/${route.id}${route.replay ? '/replay' : ''}`;
+};
+
+export const STATUS_LABELS: Record<string, string> = {
+  created: 'Starting',
+  investigating: 'In progress',
+  awaiting_approval: 'Needs approval',
+  approved: 'Running',
+  running: 'Running',
+  complete: 'Complete',
+  failed: 'Failed',
+  no_contradiction: 'No contradiction',
+  sponsor_preparing_approval: 'Preparing',
+  sponsor_verifying: 'Verifying',
+};
+export const statusLabel = (status: string) => STATUS_LABELS[status] ?? status.replaceAll('_', ' ');
+
+/** Backend stage counter (one step per specialist role) needed before each story section has content. */
+const STAGE_NEEDED = [0, 1, 2, 3, 4, 5, 7];
+export const sectionReady = (stage: number, section: number) => stage >= STAGE_NEEDED[section];

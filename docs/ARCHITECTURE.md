@@ -4,7 +4,7 @@ The repository started empty. Installed Python scientific libraries were reusabl
 
 ## Components
 
-- `frontend/src`: React/TypeScript dashboard. `App.tsx` holds state and layout; `chapters/` has one component per investigation stage; `panels/` holds the agent drawer, graph, notebook and dialogs (including the approval confirmation). Real-data SVG plots, no frontend provider credentials. Subscribes to a server-sent event stream while work is active (polling fallback); no staged fake event text.
+- `frontend/src`: React/TypeScript app with hash routing. `pages/Home.tsx` is the investigation dashboard (key numbers, stage progress, replay links). `pages/Investigation.tsx` is a split view: `panels/InstrumentPanel.tsx` (sticky data panel: key numbers, scatter, slope decomposition; research graph; activity timeline) beside the investigation stages as tabs, one per component in `chapters/`, with approval confirmation dialogs. The page switches to the Experiment tab when approval is needed and to the Result tab when the result arrives. Real-data SVG plots, no frontend provider credentials. Subscribes to a server-sent event stream while work is active (polling fallback); no staged fake event text.
 - `backend/main.py`: typed FastAPI routes, background execution, approval endpoint, export/replay, local-origin write guard, static frontend serving.
 - `backend/models.py`: strict Pydantic scientific contracts. Reject extra fields, invalid URLs, unbounded bootstrap requests and unknown experiment methods.
 - `backend/workflow.py`: validates stage progression, records handoffs and approval, invokes scientific functions, seals completed records. This is the local runner and the permission boundary for sponsor-issued tool calls; it is not advertised as Omnigent.

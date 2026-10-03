@@ -152,8 +152,16 @@ def reference():
     from backend.science import retrieve_evidence
     from experiments.penguins import load_data
 
-    _, metadata = load_data()
-    return {"dataset": metadata, "evidence": [v.model_dump(mode="json") for v in retrieve_evidence()]}
+    frame, metadata = load_data()
+    points = [
+        {"x": float(row.bill_length_mm), "y": float(row.bill_depth_mm), "species": row.species, "year": int(row.year)}
+        for row in frame.itertuples()
+    ]
+    return {
+        "dataset": metadata,
+        "evidence": [v.model_dump(mode="json") for v in retrieve_evidence()],
+        "points": points,
+    }
 
 
 if (ROOT / "frontend/dist/assets").exists():

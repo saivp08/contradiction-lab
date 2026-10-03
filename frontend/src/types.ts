@@ -56,7 +56,8 @@ export interface Result {
   adjusted_slope: number;
   adjusted_ci95: number[];
   group: string;
-  points: { x: number; y: number; species: string; year: number }[];
+  points: Point[];
+  decomposition?: Decomposition;
   subgroups: { group: string; n: number; slope: number }[];
   sensitivity: { excluded_year: number; slope: number }[];
   limitations: string[];
@@ -69,6 +70,23 @@ export interface Result {
   model_comparison?: ModelComparison;
   species_only_slope?: number;
   attenuation?: number;
+}
+export interface Point {
+  x: number;
+  y: number;
+  species: string;
+  year: number;
+}
+export interface Decomposition {
+  group: string;
+  pooled_slope: number;
+  within_slope: number;
+  between_slope: number;
+  within_weight: number;
+  within_contribution: number;
+  between_contribution: number;
+  group_means: { group: string; n: number; x: number; y: number }[];
+  note: string;
 }
 export interface ModelComparison {
   pooled_bic: number;
@@ -137,12 +155,24 @@ export interface RecordData {
   created_at: string;
   approval: unknown;
 }
-export interface HistoryItem {
+export interface Summary {
   id: string;
   objective: string;
   label?: string | null;
   status: string;
   mode: string;
+  stage: number;
+  created_at: string;
+  updated_at?: string;
+  result?: {
+    group: string;
+    n: number;
+    pooled_slope: number;
+    adjusted_slope: number;
+    adjusted_ci95: number[];
+  };
+  followup?: { adjusted_slope: number; adjusted_ci95: number[] };
+  next_decision?: string;
 }
 export function objects<T>(record: RecordData | null, kind: string): T[] {
   return Object.values(record?.objects || {})

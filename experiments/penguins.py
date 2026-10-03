@@ -83,6 +83,40 @@ def model_comparison(pooled_rss: float, adjusted_rss: float, n: int, groups: int
     }
 
 
+def decompose(frame: pd.DataFrame, group: str) -> dict:
+    """Exact split of the pooled slope into within-group and between-group parts.
+
+    Total sums of squares and cross-products split into within- and between-group terms, so
+    pooled = w × within_slope + (1 − w) × between_slope, where w is the within-group share of
+    bill-length variance. The between-group slope runs through the group means.
+    """
+    x, y = frame.bill_length_mm.to_numpy(), frame.bill_depth_mm.to_numpy()
+    sxx_total = float((x - x.mean()) @ (x - x.mean()))
+    groups = frame.groupby(group)
+    means = groups[["bill_length_mm", "bill_depth_mm"]].mean()
+    counts = groups.size()
+    dx, dy = means.bill_length_mm - x.mean(), means.bill_depth_mm - y.mean()
+    sxx_between, sxy_between = float((counts * dx * dx).sum()), float((counts * dx * dy).sum())
+    sxx_within = sxx_total - sxx_between
+    within = adjusted(frame, group)
+    between = sxy_between / sxx_between if sxx_between > 1e-12 else 0.0
+    weight = sxx_within / sxx_total
+    return {
+        "group": group,
+        "pooled_slope": slope(x, y),
+        "within_slope": within,
+        "between_slope": between,
+        "within_weight": weight,
+        "within_contribution": weight * within,
+        "between_contribution": (1 - weight) * between,
+        "group_means": [
+            {"group": str(name), "n": int(counts[name]), "x": float(row.bill_length_mm), "y": float(row.bill_depth_mm)}
+            for name, row in means.iterrows()
+        ],
+        "note": "Exact identity: pooled slope = within contribution + between contribution.",
+    }
+
+
 METHODS = {"species_adjustment", "year_sensitivity", "species_sex_year"}
 
 
@@ -145,6 +179,7 @@ def compute(
         "model_comparison": model_comparison(
             float(pooled_residual @ pooled_residual), float(residual @ residual), len(frame), len(groups), group
         ),
+        "decomposition": decompose(frame, group),
         "reversal": bool(pooled * conditional < 0),
         "robust_reversal": bool(pooled < 0 < ci[0] and all(v["slope"] > 0 for v in sensitivity)),
         "points": points,

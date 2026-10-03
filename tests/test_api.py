@@ -11,7 +11,8 @@ def client():
 
 def test_api_full_flow_and_replay(client):
     assert client.get("/api/health").status_code == 200
-    assert client.get("/api/reference").json()["dataset"]["n_complete"] == 342
+    reference = client.get("/api/reference").json()
+    assert reference["dataset"]["n_complete"] == 342 and len(reference["points"]) == 342
     response = client.post("/api/investigations", json={"mode": "local"})
     assert response.status_code == 201
     identifier = response.json()["id"]
@@ -33,7 +34,10 @@ def test_api_full_flow_and_replay(client):
     assert followed.status_code == 200
     assert client.get(path + "/replay").json()["replay_verified"]
     assert client.post(path + "/followup", json={"approved": True}).status_code == 409
-    assert len(client.get("/api/investigations").json()) == 1
+    listing = client.get("/api/investigations").json()
+    assert len(listing) == 1
+    assert listing[0]["result"]["pooled_slope"] < 0 < listing[0]["followup"]["adjusted_slope"]
+    assert listing[0]["next_decision"]
 
 
 def test_api_rejects_missing_credentials_invalid_input_and_cross_origin(client, monkeypatch):

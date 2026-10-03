@@ -51,10 +51,25 @@ def get(identifier: str) -> dict:
 def list_records() -> list[dict]:
     with connection() as con:
         rows = con.execute("SELECT body FROM investigations ORDER BY rowid DESC LIMIT 100").fetchall()
-    return [
-        {**{k: r[k] for k in ("id", "objective", "mode", "status", "created_at")}, "label": r.get("label")}
-        for r in (json.loads(row[0]) for row in rows)
-    ]
+    return [summary(json.loads(row[0])) for row in rows]
+
+
+def summary(record: dict) -> dict:
+    """Listing row: identity, progress and the key numbers, without chart data."""
+    row = {k: record[k] for k in ("id", "objective", "mode", "status", "created_at", "stage")}
+    row["label"] = record.get("label")
+    row["updated_at"] = record.get("updated_at")
+    results = {v["kind"]: v["data"] for v in record["objects"].values() if v["kind"] in ("result", "followup_result")}
+    if "result" in results:
+        result = results["result"]
+        row["result"] = {k: result[k] for k in ("group", "n", "pooled_slope", "adjusted_slope", "adjusted_ci95")}
+    if "followup_result" in results:
+        followup = results["followup_result"]
+        row["followup"] = {k: followup[k] for k in ("adjusted_slope", "adjusted_ci95")}
+    decisions = by_kind(record, "followup_decision") or by_kind(record, "decision")
+    if decisions:
+        row["next_decision"] = decisions[0]["data"]["next_decision"]
+    return row
 
 
 def add(record: dict, kind: str, data: dict, inputs: list[str]) -> str:

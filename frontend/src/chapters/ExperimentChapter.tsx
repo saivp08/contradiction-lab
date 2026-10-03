@@ -19,7 +19,7 @@ export function ExperimentChapter({
   onRequestApproval: (experiment: Experiment) => void;
 }) {
   return (
-    <section id="stage-4">
+    <section>
       <SectionHeading
         eyebrow="05 / EXPERIMENT DESIGN"
         title="Choose the test that teaches us more"
@@ -49,7 +49,7 @@ export function ExperimentChapter({
                   key={e.experiment_id}
                 >
                   <div className="card-top">
-                    <span className="eyebrow">{e.experiment_id} / COMPUTATIONAL EXPERIMENT</span>
+                    <span className="eyebrow">{e.experiment_id} / EXPERIMENT</span>
                     {recommended && <Tag tone="green">Recommended</Tag>}
                   </div>
                   <h3>{experimentTitle(e)}</h3>
