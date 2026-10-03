@@ -1,0 +1,2971 @@
+{
+  "id": "lab-f693a1441158",
+  "objective": "Why does the relationship between penguin bill length and depth reverse when species are separated?",
+  "reference_question": "Why does the bill length\u2013depth association reverse across aggregation choices?",
+  "scope": "Reference investigation only. Custom objective is contextual; variables and dataset remain the approved penguin analysis.",
+  "mode": "local",
+  "status": "complete",
+  "stage": 8,
+  "seed": 42,
+  "created_at": "2026-10-03T18:59:32.367893+00:00",
+  "objects": {
+    "question-13d5e8dad035": {
+      "id": "question-13d5e8dad035",
+      "kind": "question",
+      "data": {
+        "objective": "Why does the relationship between penguin bill length and depth reverse when species are separated?",
+        "scope": "Reference investigation only. Custom objective is contextual; variables and dataset remain the approved penguin analysis."
+      },
+      "input_ids": [],
+      "created_at": "2026-10-03T18:59:32.367908+00:00"
+    },
+    "evidence-ab5f06129d2d": {
+      "id": "evidence-ab5f06129d2d",
+      "kind": "evidence",
+      "data": {
+        "evidence_id": "EV1",
+        "source": "Curated literature extract (one article, two analysis contexts)",
+        "citation": {
+          "title": "Palmer Archipelago Penguins Data in the palmerpenguins R Package - An Alternative to Anderson's Irises",
+          "authors": [
+            "Allison M. Horst",
+            "Alison Presmanes Hill",
+            "Kristen B. Gorman"
+          ],
+          "year": 2022,
+          "identifier": "10.32614/RJ-2022-020",
+          "url": "https://journal.r-project.org/articles/RJ-2022-020/",
+          "location": "Continuous quantitative variables; discussion of bill dimensions and Simpson's paradox",
+          "retrieved_at": "2026-10-03"
+        },
+        "claim": "Bill length and depth show a negative association when species are pooled.",
+        "direction_of_effect": "negative",
+        "population_or_system": "Palmer Archipelago penguins, 2007\u20132009",
+        "intervention_or_variable": "Bill length (mm)",
+        "outcome": "Bill depth (mm)",
+        "sample_size_if_known": null,
+        "experimental_conditions": {
+          "aggregation": "All species pooled",
+          "system": "Same observational dataset",
+          "measurement": "Bill morphometry",
+          "period": "2007\u20132009"
+        },
+        "methodology": "Published exploratory visual comparison; reproduced with regression in this application.",
+        "limitations": [
+          "Not two independent studies.",
+          "Aggregation changes the estimand; this is an apparent contradiction, not a refutation."
+        ],
+        "confidence": "high",
+        "provenance": {
+          "retrieval": "Manually curated from the linked primary article, not live search",
+          "dataset_sha256": "f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
+          "evidence_location": "Continuous quantitative variables; discussion of bill dimensions and Simpson's paradox"
+        }
+      },
+      "input_ids": [
+        "question-13d5e8dad035"
+      ],
+      "created_at": "2026-10-03T18:59:32.376863+00:00"
+    },
+    "evidence-637d487cba2d": {
+      "id": "evidence-637d487cba2d",
+      "kind": "evidence",
+      "data": {
+        "evidence_id": "EV2",
+        "source": "Curated literature extract (one article, two analysis contexts)",
+        "citation": {
+          "title": "Palmer Archipelago Penguins Data in the palmerpenguins R Package - An Alternative to Anderson's Irises",
+          "authors": [
+            "Allison M. Horst",
+            "Alison Presmanes Hill",
+            "Kristen B. Gorman"
+          ],
+          "year": 2022,
+          "identifier": "10.32614/RJ-2022-020",
+          "url": "https://journal.r-project.org/articles/RJ-2022-020/",
+          "location": "Continuous quantitative variables; discussion of bill dimensions and Simpson's paradox",
+          "retrieved_at": "2026-10-03"
+        },
+        "claim": "Within species, bill length and depth show positive associations.",
+        "direction_of_effect": "positive",
+        "population_or_system": "Palmer Archipelago penguins, 2007\u20132009",
+        "intervention_or_variable": "Bill length (mm)",
+        "outcome": "Bill depth (mm)",
+        "sample_size_if_known": null,
+        "experimental_conditions": {
+          "aggregation": "Species separated",
+          "system": "Same observational dataset",
+          "measurement": "Bill morphometry",
+          "period": "2007\u20132009"
+        },
+        "methodology": "Published exploratory visual comparison; reproduced with regression in this application.",
+        "limitations": [
+          "Not two independent studies.",
+          "Aggregation changes the estimand; this is an apparent contradiction, not a refutation."
+        ],
+        "confidence": "high",
+        "provenance": {
+          "retrieval": "Manually curated from the linked primary article, not live search",
+          "dataset_sha256": "f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
+          "evidence_location": "Continuous quantitative variables; discussion of bill dimensions and Simpson's paradox"
+        }
+      },
+      "input_ids": [
+        "question-13d5e8dad035"
+      ],
+      "created_at": "2026-10-03T18:59:32.376882+00:00"
+    },
+    "contradiction-1b89f94f1ade": {
+      "id": "contradiction-1b89f94f1ade",
+      "kind": "contradiction",
+      "data": {
+        "contradiction_id": "C1",
+        "evidence_a": "EV1",
+        "evidence_b": "EV2",
+        "conflicting_claim": "Bill length and depth have opposite association directions across aggregation choices.",
+        "shared_context": "Palmer Archipelago penguin bill measurements, 2007\u20132009.",
+        "differing_conditions": [
+          "Species pooled versus species separated"
+        ],
+        "contradiction_strength": "contextual reversal",
+        "uncertainty": "Same dataset, not independent replications. Different estimands can legitimately have different signs.",
+        "explanation": "An apparent contradiction due to analysis context; not evidence that either source is false."
+      },
+      "input_ids": [
+        "evidence-ab5f06129d2d",
+        "evidence-637d487cba2d"
+      ],
+      "created_at": "2026-10-03T18:59:32.385254+00:00"
+    },
+    "hypothesis-83bafc73d14f": {
+      "id": "hypothesis-83bafc73d14f",
+      "kind": "hypothesis",
+      "data": {
+        "hypothesis_id": "H1",
+        "statement": "Species composition explains the reversal",
+        "rationale": "Pooling species may combine between-species differences with within-species variation.",
+        "supporting_evidence": [
+          "EV1",
+          "EV2"
+        ],
+        "conflicting_evidence": [],
+        "predictions": [
+          "A species-adjusted slope is positive while the pooled slope is negative."
+        ],
+        "falsification_condition": "A nonpositive adjusted slope or an interval spanning zero.",
+        "uncertainty": "Candidate explanation, not a causal conclusion. Initial scores are neutral heuristic values.",
+        "agent_generated": false,
+        "support_score": 50.0
+      },
+      "input_ids": [
+        "contradiction-1b89f94f1ade"
+      ],
+      "created_at": "2026-10-03T18:59:32.392060+00:00"
+    },
+    "hypothesis-6b18b39b86dc": {
+      "id": "hypothesis-6b18b39b86dc",
+      "kind": "hypothesis",
+      "data": {
+        "hypothesis_id": "H2",
+        "statement": "Sampling variability explains the reversal",
+        "rationale": "A small or unstable association might change sign under resampling.",
+        "supporting_evidence": [
+          "EV1",
+          "EV2"
+        ],
+        "conflicting_evidence": [],
+        "predictions": [
+          "The adjusted interval spans zero or the sign changes when a year is omitted."
+        ],
+        "falsification_condition": "A positive interval and stable sign across every omitted year.",
+        "uncertainty": "Candidate explanation, not a causal conclusion. Initial scores are neutral heuristic values.",
+        "agent_generated": false,
+        "support_score": 50.0
+      },
+      "input_ids": [
+        "contradiction-1b89f94f1ade"
+      ],
+      "created_at": "2026-10-03T18:59:32.392076+00:00"
+    },
+    "hypothesis-a70d7c9a8699": {
+      "id": "hypothesis-a70d7c9a8699",
+      "kind": "hypothesis",
+      "data": {
+        "hypothesis_id": "H3",
+        "statement": "Sex or year differences explain residual association",
+        "rationale": "Species adjustment alone does not account for other measured covariates.",
+        "supporting_evidence": [
+          "EV1",
+          "EV2"
+        ],
+        "conflicting_evidence": [],
+        "predictions": [
+          "Residual association changes after sex/year adjustment."
+        ],
+        "falsification_condition": "Stable adjusted estimates across sex and year controls in a follow-up test.",
+        "uncertainty": "Candidate explanation, not a causal conclusion. Initial scores are neutral heuristic values.",
+        "agent_generated": false,
+        "support_score": 50.0
+      },
+      "input_ids": [
+        "contradiction-1b89f94f1ade"
+      ],
+      "created_at": "2026-10-03T18:59:32.392082+00:00"
+    },
+    "experiment-a7221fb48495": {
+      "id": "experiment-a7221fb48495",
+      "kind": "experiment",
+      "data": {
+        "experiment_id": "E1",
+        "hypothesis_targets": [
+          "H1",
+          "H2",
+          "H3"
+        ],
+        "scientific_question": "Does controlling for species reverse the pooled relationship?",
+        "method": "species_adjustment",
+        "required_data": "Palmer Penguins / f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
+        "variables": [
+          "bill_length_mm",
+          "bill_depth_mm",
+          "species",
+          "year"
+        ],
+        "expected_information_gain": 0.9,
+        "feasibility": 1.0,
+        "data_availability": 0.9941860465116279,
+        "computational_cost": 0.1,
+        "discrimination": 0.95,
+        "limitations": [
+          "Exploratory, observational reanalysis; no causal identification.",
+          "Heuristic planning scores, not expected bits of information."
+        ],
+        "success_criterion": "Adjusted 95% interval excludes zero with opposite sign to pooled slope; sign survives year exclusions.",
+        "failure_criterion": "Interval includes zero, no reversal, or unstable sensitivity results.",
+        "seed": 42,
+        "bootstrap_samples": 500,
+        "planning_score": 0.8963
+      },
+      "input_ids": [
+        "hypothesis-83bafc73d14f",
+        "hypothesis-6b18b39b86dc",
+        "hypothesis-a70d7c9a8699"
+      ],
+      "created_at": "2026-10-03T18:59:32.406653+00:00"
+    },
+    "experiment-2e6f211db764": {
+      "id": "experiment-2e6f211db764",
+      "kind": "experiment",
+      "data": {
+        "experiment_id": "E2",
+        "hypothesis_targets": [
+          "H1",
+          "H2",
+          "H3"
+        ],
+        "scientific_question": "Does controlling for collection year resolve the disagreement?",
+        "method": "year_sensitivity",
+        "required_data": "Palmer Penguins / f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
+        "variables": [
+          "bill_length_mm",
+          "bill_depth_mm",
+          "species",
+          "year"
+        ],
+        "expected_information_gain": 0.6,
+        "feasibility": 1.0,
+        "data_availability": 0.9941860465116279,
+        "computational_cost": 0.1,
+        "discrimination": 0.55,
+        "limitations": [
+          "Exploratory, observational reanalysis; no causal identification.",
+          "Heuristic planning scores, not expected bits of information."
+        ],
+        "success_criterion": "Adjusted 95% interval excludes zero with opposite sign to pooled slope; sign survives year exclusions.",
+        "failure_criterion": "Interval includes zero, no reversal, or unstable sensitivity results.",
+        "seed": 42,
+        "bootstrap_samples": 500,
+        "planning_score": 0.6913
+      },
+      "input_ids": [
+        "hypothesis-83bafc73d14f",
+        "hypothesis-6b18b39b86dc",
+        "hypothesis-a70d7c9a8699"
+      ],
+      "created_at": "2026-10-03T18:59:32.406668+00:00"
+    },
+    "run-3c74ba936fad": {
+      "id": "run-3c74ba936fad",
+      "kind": "run",
+      "data": {
+        "specification_id": "experiment-a7221fb48495",
+        "started_at": "2026-10-03T18:59:32.422349+00:00",
+        "seed": 42,
+        "approval": {
+          "experiment_id": "E1",
+          "approved_at": "2026-10-03T18:59:32.415693+00:00",
+          "actor": "developer-authorized reproducibility script; not a UI click",
+          "scope": "One allowlisted local computational experiment"
+        }
+      },
+      "input_ids": [
+        "experiment-a7221fb48495"
+      ],
+      "created_at": "2026-10-03T18:59:32.422369+00:00"
+    },
+    "result-593bc1c648f3": {
+      "id": "result-593bc1c648f3",
+      "kind": "result",
+      "data": {
+        "method": "species_adjustment",
+        "group": "species",
+        "n": 342,
+        "pooled_slope": -0.0850212807771766,
+        "adjusted_slope": 0.19989428095469577,
+        "adjusted_ci95": [
+          0.16479378601016387,
+          0.23389227420426822
+        ],
+        "subgroups": [
+          {
+            "group": "Adelie",
+            "n": 151,
+            "slope": 0.17883434964257802
+          },
+          {
+            "group": "Chinstrap",
+            "n": 68,
+            "slope": 0.2222117240036715
+          },
+          {
+            "group": "Gentoo",
+            "n": 123,
+            "slope": 0.2048443406214756
+          }
+        ],
+        "sensitivity": [
+          {
+            "excluded_year": 2007,
+            "slope": 0.20906270470146182
+          },
+          {
+            "excluded_year": 2008,
+            "slope": 0.19212713875552337
+          },
+          {
+            "excluded_year": 2009,
+            "slope": 0.19751641046954277
+          }
+        ],
+        "within_group_spearman": 0.5318164099399623,
+        "pooled_rmse": 1.9166562709559611,
+        "adjusted_rmse": 0.9477541264325486,
+        "reversal": true,
+        "robust_reversal": true,
+        "points": [
+          {
+            "x": 39.1,
+            "y": 18.7,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 39.5,
+            "y": 17.4,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 40.3,
+            "y": 18.0,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 36.7,
+            "y": 19.3,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 39.3,
+            "y": 20.6,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 38.9,
+            "y": 17.8,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 39.2,
+            "y": 19.6,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 34.1,
+            "y": 18.1,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 42.0,
+            "y": 20.2,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 37.8,
+            "y": 17.1,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 37.8,
+            "y": 17.3,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 41.1,
+            "y": 17.6,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 38.6,
+            "y": 21.2,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 34.6,
+            "y": 21.1,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 36.6,
+            "y": 17.8,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 38.7,
+            "y": 19.0,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 42.5,
+            "y": 20.7,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 34.4,
+            "y": 18.4,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 46.0,
+            "y": 21.5,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 37.8,
+            "y": 18.3,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 37.7,
+            "y": 18.7,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 35.9,
+            "y": 19.2,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 38.2,
+            "y": 18.1,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 38.8,
+            "y": 17.2,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 35.3,
+            "y": 18.9,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 40.6,
+            "y": 18.6,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 40.5,
+            "y": 17.9,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 37.9,
+            "y": 18.6,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 40.5,
+            "y": 18.9,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 39.5,
+            "y": 16.7,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 37.2,
+            "y": 18.1,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 39.5,
+            "y": 17.8,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 40.9,
+            "y": 18.9,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 36.4,
+            "y": 17.0,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 39.2,
+            "y": 21.1,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 38.8,
+            "y": 20.0,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 42.2,
+            "y": 18.5,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 37.6,
+            "y": 19.3,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 39.8,
+            "y": 19.1,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 36.5,
+            "y": 18.0,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 40.8,
+            "y": 18.4,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 36.0,
+            "y": 18.5,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 44.1,
+            "y": 19.7,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 37.0,
+            "y": 16.9,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 39.6,
+            "y": 18.8,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 41.1,
+            "y": 19.0,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 37.5,
+            "y": 18.9,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 36.0,
+            "y": 17.9,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 42.3,
+            "y": 21.2,
+            "species": "Adelie",
+            "year": 2007
+          },
+          {
+            "x": 39.6,
+            "y": 17.7,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 40.1,
+            "y": 18.9,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 35.0,
+            "y": 17.9,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 42.0,
+            "y": 19.5,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 34.5,
+            "y": 18.1,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 41.4,
+            "y": 18.6,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 39.0,
+            "y": 17.5,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 40.6,
+            "y": 18.8,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 36.5,
+            "y": 16.6,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 37.6,
+            "y": 19.1,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 35.7,
+            "y": 16.9,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 41.3,
+            "y": 21.1,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 37.6,
+            "y": 17.0,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 41.1,
+            "y": 18.2,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 36.4,
+            "y": 17.1,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 41.6,
+            "y": 18.0,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 35.5,
+            "y": 16.2,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 41.1,
+            "y": 19.1,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 35.9,
+            "y": 16.6,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 41.8,
+            "y": 19.4,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 33.5,
+            "y": 19.0,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 39.7,
+            "y": 18.4,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 39.6,
+            "y": 17.2,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 45.8,
+            "y": 18.9,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 35.5,
+            "y": 17.5,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 42.8,
+            "y": 18.5,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 40.9,
+            "y": 16.8,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 37.2,
+            "y": 19.4,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 36.2,
+            "y": 16.1,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 42.1,
+            "y": 19.1,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 34.6,
+            "y": 17.2,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 42.9,
+            "y": 17.6,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 36.7,
+            "y": 18.8,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 35.1,
+            "y": 19.4,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 37.3,
+            "y": 17.8,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 41.3,
+            "y": 20.3,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 36.3,
+            "y": 19.5,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 36.9,
+            "y": 18.6,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 38.3,
+            "y": 19.2,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 38.9,
+            "y": 18.8,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 35.7,
+            "y": 18.0,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 41.1,
+            "y": 18.1,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 34.0,
+            "y": 17.1,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 39.6,
+            "y": 18.1,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 36.2,
+            "y": 17.3,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 40.8,
+            "y": 18.9,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 38.1,
+            "y": 18.6,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 40.3,
+            "y": 18.5,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 33.1,
+            "y": 16.1,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 43.2,
+            "y": 18.5,
+            "species": "Adelie",
+            "year": 2008
+          },
+          {
+            "x": 35.0,
+            "y": 17.9,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 41.0,
+            "y": 20.0,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 37.7,
+            "y": 16.0,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 37.8,
+            "y": 20.0,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 37.9,
+            "y": 18.6,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 39.7,
+            "y": 18.9,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 38.6,
+            "y": 17.2,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 38.2,
+            "y": 20.0,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 38.1,
+            "y": 17.0,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 43.2,
+            "y": 19.0,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 38.1,
+            "y": 16.5,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 45.6,
+            "y": 20.3,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 39.7,
+            "y": 17.7,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 42.2,
+            "y": 19.5,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 39.6,
+            "y": 20.7,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 42.7,
+            "y": 18.3,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 38.6,
+            "y": 17.0,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 37.3,
+            "y": 20.5,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 35.7,
+            "y": 17.0,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 41.1,
+            "y": 18.6,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 36.2,
+            "y": 17.2,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 37.7,
+            "y": 19.8,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 40.2,
+            "y": 17.0,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 41.4,
+            "y": 18.5,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 35.2,
+            "y": 15.9,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 40.6,
+            "y": 19.0,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 38.8,
+            "y": 17.6,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 41.5,
+            "y": 18.3,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 39.0,
+            "y": 17.1,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 44.1,
+            "y": 18.0,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 38.5,
+            "y": 17.9,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 43.1,
+            "y": 19.2,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 36.8,
+            "y": 18.5,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 37.5,
+            "y": 18.5,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 38.1,
+            "y": 17.6,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 41.1,
+            "y": 17.5,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 35.6,
+            "y": 17.5,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 40.2,
+            "y": 20.1,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 37.0,
+            "y": 16.5,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 39.7,
+            "y": 17.9,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 40.2,
+            "y": 17.1,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 40.6,
+            "y": 17.2,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 32.1,
+            "y": 15.5,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 40.7,
+            "y": 17.0,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 37.3,
+            "y": 16.8,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 39.0,
+            "y": 18.7,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 39.2,
+            "y": 18.6,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 36.6,
+            "y": 18.4,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 36.0,
+            "y": 17.8,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 37.8,
+            "y": 18.1,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 36.0,
+            "y": 17.1,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 41.5,
+            "y": 18.5,
+            "species": "Adelie",
+            "year": 2009
+          },
+          {
+            "x": 46.1,
+            "y": 13.2,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 50.0,
+            "y": 16.3,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 48.7,
+            "y": 14.1,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 50.0,
+            "y": 15.2,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 47.6,
+            "y": 14.5,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 46.5,
+            "y": 13.5,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 45.4,
+            "y": 14.6,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 46.7,
+            "y": 15.3,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 43.3,
+            "y": 13.4,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 46.8,
+            "y": 15.4,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 40.9,
+            "y": 13.7,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 49.0,
+            "y": 16.1,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 45.5,
+            "y": 13.7,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 48.4,
+            "y": 14.6,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 45.8,
+            "y": 14.6,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 49.3,
+            "y": 15.7,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 42.0,
+            "y": 13.5,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 49.2,
+            "y": 15.2,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 46.2,
+            "y": 14.5,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 48.7,
+            "y": 15.1,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 50.2,
+            "y": 14.3,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 45.1,
+            "y": 14.5,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 46.5,
+            "y": 14.5,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 46.3,
+            "y": 15.8,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 42.9,
+            "y": 13.1,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 46.1,
+            "y": 15.1,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 44.5,
+            "y": 14.3,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 47.8,
+            "y": 15.0,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 48.2,
+            "y": 14.3,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 50.0,
+            "y": 15.3,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 47.3,
+            "y": 15.3,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 42.8,
+            "y": 14.2,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 45.1,
+            "y": 14.5,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 59.6,
+            "y": 17.0,
+            "species": "Gentoo",
+            "year": 2007
+          },
+          {
+            "x": 49.1,
+            "y": 14.8,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 48.4,
+            "y": 16.3,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 42.6,
+            "y": 13.7,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 44.4,
+            "y": 17.3,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 44.0,
+            "y": 13.6,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 48.7,
+            "y": 15.7,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 42.7,
+            "y": 13.7,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 49.6,
+            "y": 16.0,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 45.3,
+            "y": 13.7,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 49.6,
+            "y": 15.0,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 50.5,
+            "y": 15.9,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 43.6,
+            "y": 13.9,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 45.5,
+            "y": 13.9,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 50.5,
+            "y": 15.9,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 44.9,
+            "y": 13.3,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 45.2,
+            "y": 15.8,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 46.6,
+            "y": 14.2,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 48.5,
+            "y": 14.1,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 45.1,
+            "y": 14.4,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 50.1,
+            "y": 15.0,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 46.5,
+            "y": 14.4,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 45.0,
+            "y": 15.4,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 43.8,
+            "y": 13.9,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 45.5,
+            "y": 15.0,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 43.2,
+            "y": 14.5,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 50.4,
+            "y": 15.3,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 45.3,
+            "y": 13.8,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 46.2,
+            "y": 14.9,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 45.7,
+            "y": 13.9,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 54.3,
+            "y": 15.7,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 45.8,
+            "y": 14.2,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 49.8,
+            "y": 16.8,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 46.2,
+            "y": 14.4,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 49.5,
+            "y": 16.2,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 43.5,
+            "y": 14.2,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 50.7,
+            "y": 15.0,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 47.7,
+            "y": 15.0,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 46.4,
+            "y": 15.6,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 48.2,
+            "y": 15.6,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 46.5,
+            "y": 14.8,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 46.4,
+            "y": 15.0,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 48.6,
+            "y": 16.0,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 47.5,
+            "y": 14.2,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 51.1,
+            "y": 16.3,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 45.2,
+            "y": 13.8,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 45.2,
+            "y": 16.4,
+            "species": "Gentoo",
+            "year": 2008
+          },
+          {
+            "x": 49.1,
+            "y": 14.5,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 52.5,
+            "y": 15.6,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 47.4,
+            "y": 14.6,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 50.0,
+            "y": 15.9,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 44.9,
+            "y": 13.8,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 50.8,
+            "y": 17.3,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 43.4,
+            "y": 14.4,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 51.3,
+            "y": 14.2,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 47.5,
+            "y": 14.0,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 52.1,
+            "y": 17.0,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 47.5,
+            "y": 15.0,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 52.2,
+            "y": 17.1,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 45.5,
+            "y": 14.5,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 49.5,
+            "y": 16.1,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 44.5,
+            "y": 14.7,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 50.8,
+            "y": 15.7,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 49.4,
+            "y": 15.8,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 46.9,
+            "y": 14.6,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 48.4,
+            "y": 14.4,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 51.1,
+            "y": 16.5,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 48.5,
+            "y": 15.0,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 55.9,
+            "y": 17.0,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 47.2,
+            "y": 15.5,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 49.1,
+            "y": 15.0,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 47.3,
+            "y": 13.8,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 46.8,
+            "y": 16.1,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 41.7,
+            "y": 14.7,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 53.4,
+            "y": 15.8,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 43.3,
+            "y": 14.0,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 48.1,
+            "y": 15.1,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 50.5,
+            "y": 15.2,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 49.8,
+            "y": 15.9,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 43.5,
+            "y": 15.2,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 51.5,
+            "y": 16.3,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 46.2,
+            "y": 14.1,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 55.1,
+            "y": 16.0,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 44.5,
+            "y": 15.7,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 48.8,
+            "y": 16.2,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 47.2,
+            "y": 13.7,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 46.8,
+            "y": 14.3,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 50.4,
+            "y": 15.7,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 45.2,
+            "y": 14.8,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 49.9,
+            "y": 16.1,
+            "species": "Gentoo",
+            "year": 2009
+          },
+          {
+            "x": 46.5,
+            "y": 17.9,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 50.0,
+            "y": 19.5,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 51.3,
+            "y": 19.2,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 45.4,
+            "y": 18.7,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 52.7,
+            "y": 19.8,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 45.2,
+            "y": 17.8,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 46.1,
+            "y": 18.2,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 51.3,
+            "y": 18.2,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 46.0,
+            "y": 18.9,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 51.3,
+            "y": 19.9,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 46.6,
+            "y": 17.8,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 51.7,
+            "y": 20.3,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 47.0,
+            "y": 17.3,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 52.0,
+            "y": 18.1,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 45.9,
+            "y": 17.1,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 50.5,
+            "y": 19.6,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 50.3,
+            "y": 20.0,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 58.0,
+            "y": 17.8,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 46.4,
+            "y": 18.6,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 49.2,
+            "y": 18.2,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 42.4,
+            "y": 17.3,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 48.5,
+            "y": 17.5,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 43.2,
+            "y": 16.6,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 50.6,
+            "y": 19.4,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 46.7,
+            "y": 17.9,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 52.0,
+            "y": 19.0,
+            "species": "Chinstrap",
+            "year": 2007
+          },
+          {
+            "x": 50.5,
+            "y": 18.4,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 49.5,
+            "y": 19.0,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 46.4,
+            "y": 17.8,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 52.8,
+            "y": 20.0,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 40.9,
+            "y": 16.6,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 54.2,
+            "y": 20.8,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 42.5,
+            "y": 16.7,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 51.0,
+            "y": 18.8,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 49.7,
+            "y": 18.6,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 47.5,
+            "y": 16.8,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 47.6,
+            "y": 18.3,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 52.0,
+            "y": 20.7,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 46.9,
+            "y": 16.6,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 53.5,
+            "y": 19.9,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 49.0,
+            "y": 19.5,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 46.2,
+            "y": 17.5,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 50.9,
+            "y": 19.1,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 45.5,
+            "y": 17.0,
+            "species": "Chinstrap",
+            "year": 2008
+          },
+          {
+            "x": 50.9,
+            "y": 17.9,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 50.8,
+            "y": 18.5,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 50.1,
+            "y": 17.9,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 49.0,
+            "y": 19.6,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 51.5,
+            "y": 18.7,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 49.8,
+            "y": 17.3,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 48.1,
+            "y": 16.4,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 51.4,
+            "y": 19.0,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 45.7,
+            "y": 17.3,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 50.7,
+            "y": 19.7,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 42.5,
+            "y": 17.3,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 52.2,
+            "y": 18.8,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 45.2,
+            "y": 16.6,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 49.3,
+            "y": 19.9,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 50.2,
+            "y": 18.8,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 45.6,
+            "y": 19.4,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 51.9,
+            "y": 19.5,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 46.8,
+            "y": 16.5,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 45.7,
+            "y": 17.0,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 55.8,
+            "y": 19.8,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 43.5,
+            "y": 18.1,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 49.6,
+            "y": 18.2,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 50.8,
+            "y": 19.0,
+            "species": "Chinstrap",
+            "year": 2009
+          },
+          {
+            "x": 50.2,
+            "y": 18.7,
+            "species": "Chinstrap",
+            "year": 2009
+          }
+        ],
+        "bootstrap_samples": 500,
+        "seed": 42,
+        "compute_seconds": 0.8751786000011634,
+        "null": "The within-group linear slope is zero.",
+        "alternative": "The within-group slope is positive despite the negative pooled slope.",
+        "assumptions": [
+          "Linear common within-group slope; subgroup slopes shown to assess heterogeneity.",
+          "Bootstrap treats birds as independent within strata; colony clustering may narrow intervals.",
+          "Complete-case analysis; missingness may be informative."
+        ],
+        "limitations": [
+          "Observational association, not causation.",
+          "Exploratory reanalysis of a known reversal, not a new scientific discovery.",
+          "Bootstrap intervals are conditional on grouping and do not adjust for selection.",
+          "In-sample RMSE is descriptive, not held-out predictive performance."
+        ],
+        "provenance": {
+          "dataset_sha256": "f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
+          "dataset": {
+            "name": "Palmer Penguins",
+            "source": "https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv",
+            "license": "CC0-1.0",
+            "license_url": "https://allisonhorst.github.io/palmerpenguins/LICENSE.html",
+            "retrieved_at": "2026-10-03",
+            "sha256": "f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
+            "version": "vendored snapshot 2026-10-03 (content-addressed)",
+            "preprocessing": "Drop only rows missing bill length, bill depth, species or year; no imputation.",
+            "n_raw": 344,
+            "n_complete": 342,
+            "n_dropped": 2
+          },
+          "code_sha256": "aec6b3275ecb56fec18101cd38f7661d3b6d2e0072a729da9761a37d0015fe33",
+          "tool": "experiments.penguins.compute",
+          "timestamp": "2026-10-03T18:59:33.307410+00:00",
+          "parameters": {
+            "experiment_id": "E1",
+            "hypothesis_targets": [
+              "H1",
+              "H2",
+              "H3"
+            ],
+            "scientific_question": "Does controlling for species reverse the pooled relationship?",
+            "method": "species_adjustment",
+            "required_data": "Palmer Penguins / f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
+            "variables": [
+              "bill_length_mm",
+              "bill_depth_mm",
+              "species",
+              "year"
+            ],
+            "expected_information_gain": 0.9,
+            "feasibility": 1.0,
+            "data_availability": 0.9941860465116279,
+            "computational_cost": 0.1,
+            "discrimination": 0.95,
+            "limitations": [
+              "Exploratory, observational reanalysis; no causal identification.",
+              "Heuristic planning scores, not expected bits of information."
+            ],
+            "success_criterion": "Adjusted 95% interval excludes zero with opposite sign to pooled slope; sign survives year exclusions.",
+            "failure_criterion": "Interval includes zero, no reversal, or unstable sensitivity results.",
+            "seed": 42,
+            "bootstrap_samples": 500
+          },
+          "runtime": {
+            "python": "3.14.6",
+            "numpy": "2.5.1",
+            "pandas": "3.0.3",
+            "scipy": "1.18.0"
+          }
+        }
+      },
+      "input_ids": [
+        "run-3c74ba936fad"
+      ],
+      "created_at": "2026-10-03T18:59:33.307467+00:00"
+    },
+    "analysis-01b172cceb38": {
+      "id": "analysis-01b172cceb38",
+      "kind": "analysis",
+      "data": {
+        "updates": [
+          {
+            "hypothesis_id": "H1",
+            "prior_support": 50,
+            "result_consistency": "better supported",
+            "updated_support": 85,
+            "evidence_for": "Adjusted slope 0.200; 95% CI [0.165, 0.234]; stable across year exclusions: True.",
+            "evidence_against": "This test does not isolate all correlated variables.",
+            "remaining_uncertainty": "Scores follow a disclosed heuristic, are not probabilities, and do not establish causation."
+          },
+          {
+            "hypothesis_id": "H2",
+            "prior_support": 50,
+            "result_consistency": "weakened",
+            "updated_support": 20,
+            "evidence_for": "Adjusted slope 0.200; 95% CI [0.165, 0.234]; stable across year exclusions: True.",
+            "evidence_against": "This test does not isolate all correlated variables.",
+            "remaining_uncertainty": "Scores follow a disclosed heuristic, are not probabilities, and do not establish causation."
+          },
+          {
+            "hypothesis_id": "H3",
+            "prior_support": 50,
+            "result_consistency": "unresolved",
+            "updated_support": 50,
+            "evidence_for": "Adjusted slope 0.200; 95% CI [0.165, 0.234]; stable across year exclusions: True.",
+            "evidence_against": "This test does not isolate all correlated variables.",
+            "remaining_uncertainty": "Scores follow a disclosed heuristic, are not probabilities, and do not establish causation."
+          }
+        ],
+        "score_label": "Heuristic support score, not probability"
+      },
+      "input_ids": [
+        "result-593bc1c648f3",
+        "hypothesis-83bafc73d14f",
+        "hypothesis-6b18b39b86dc",
+        "hypothesis-a70d7c9a8699"
+      ],
+      "created_at": "2026-10-03T18:59:33.320534+00:00"
+    },
+    "decision-0e68bde280af": {
+      "id": "decision-0e68bde280af",
+      "kind": "decision",
+      "data": {
+        "previous_plan": "Compare species composition with sampling variability",
+        "new_evidence": {
+          "adjusted_slope": 0.19989428095469577,
+          "adjusted_ci95": [
+            0.16479378601016387,
+            0.23389227420426822
+          ],
+          "pooled_slope": -0.0850212807771766,
+          "reversal": true
+        },
+        "changed_belief": [
+          {
+            "hypothesis_id": "H1",
+            "prior_support": 50,
+            "result_consistency": "better supported",
+            "updated_support": 85,
+            "evidence_for": "Adjusted slope 0.200; 95% CI [0.165, 0.234]; stable across year exclusions: True.",
+            "evidence_against": "This test does not isolate all correlated variables.",
+            "remaining_uncertainty": "Scores follow a disclosed heuristic, are not probabilities, and do not establish causation."
+          },
+          {
+            "hypothesis_id": "H2",
+            "prior_support": 50,
+            "result_consistency": "weakened",
+            "updated_support": 20,
+            "evidence_for": "Adjusted slope 0.200; 95% CI [0.165, 0.234]; stable across year exclusions: True.",
+            "evidence_against": "This test does not isolate all correlated variables.",
+            "remaining_uncertainty": "Scores follow a disclosed heuristic, are not probabilities, and do not establish causation."
+          },
+          {
+            "hypothesis_id": "H3",
+            "prior_support": 50,
+            "result_consistency": "unresolved",
+            "updated_support": 50,
+            "evidence_for": "Adjusted slope 0.200; 95% CI [0.165, 0.234]; stable across year exclusions: True.",
+            "evidence_against": "This test does not isolate all correlated variables.",
+            "remaining_uncertainty": "Scores follow a disclosed heuristic, are not probabilities, and do not establish causation."
+          }
+        ],
+        "next_decision": "Test sex and year effects within species",
+        "rationale": "Species adjustment reverses the pooled sign with a positive interval and stable year exclusions; investigate what remains within species.",
+        "next_evidence_search": "Retrieve sex-specific bill morphometry and measurement-protocol evidence.",
+        "next_experiment": "Species + sex + year regression",
+        "requires_new_approval": true
+      },
+      "input_ids": [
+        "result-593bc1c648f3",
+        "analysis-01b172cceb38"
+      ],
+      "created_at": "2026-10-03T18:59:33.327813+00:00"
+    },
+    "safety-9bb2cd0ff45a": {
+      "id": "safety-9bb2cd0ff45a",
+      "kind": "safety",
+      "data": {
+        "status": "passed",
+        "checks": [
+          "Citations validated",
+          "Lineage intact",
+          "Human approval recorded",
+          "Dataset and code hashes present"
+        ],
+        "flags": [
+          "No causal or clinical claims permitted",
+          "Known contextual reversal, not independent-study disagreement",
+          "No measured speedup baseline"
+        ]
+      },
+      "input_ids": [
+        "decision-0e68bde280af"
+      ],
+      "created_at": "2026-10-03T18:59:33.335965+00:00"
+    }
+  },
+  "events": [
+    {
+      "id": "event-46f1cd85352b",
+      "timestamp": "2026-10-03T18:59:32.376891+00:00",
+      "agent": "LiteratureAgent",
+      "action": "Retrieved 2 curated claims from 1 cited article; offline reference catalog.",
+      "input_ids": [
+        "question-13d5e8dad035"
+      ],
+      "output_ids": [
+        "evidence-ab5f06129d2d",
+        "evidence-637d487cba2d"
+      ],
+      "tool": "retrieve_evidence",
+      "elapsed_seconds": 0.0003628000013122801,
+      "status": "complete",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-fc2e91139cff",
+      "timestamp": "2026-10-03T18:59:32.385273+00:00",
+      "agent": "ContradictionAgent",
+      "action": "An apparent contradiction due to analysis context; not evidence that either source is false.",
+      "input_ids": [
+        "evidence-ab5f06129d2d",
+        "evidence-637d487cba2d"
+      ],
+      "output_ids": [
+        "contradiction-1b89f94f1ade"
+      ],
+      "tool": "compare_claims",
+      "elapsed_seconds": 0.00013249999938125256,
+      "status": "complete",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-72ebb9e132f9",
+      "timestamp": "2026-10-03T18:59:32.392087+00:00",
+      "agent": "HypothesisAgent",
+      "action": "Registered 3 testable candidate explanations with falsification criteria.",
+      "input_ids": [
+        "contradiction-1b89f94f1ade"
+      ],
+      "output_ids": [
+        "hypothesis-83bafc73d14f",
+        "hypothesis-6b18b39b86dc",
+        "hypothesis-a70d7c9a8699"
+      ],
+      "tool": "propose_hypotheses",
+      "elapsed_seconds": 0.00010180000026593916,
+      "status": "complete",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-4941261e9633",
+      "timestamp": "2026-10-03T18:59:32.406684+00:00",
+      "agent": "ExperimentPlanner",
+      "action": "Compared 2 tests; selected E1. Waiting for human approval.",
+      "input_ids": [
+        "hypothesis-83bafc73d14f",
+        "hypothesis-6b18b39b86dc",
+        "hypothesis-a70d7c9a8699"
+      ],
+      "output_ids": [
+        "experiment-a7221fb48495",
+        "experiment-2e6f211db764"
+      ],
+      "tool": "rank_experiments",
+      "elapsed_seconds": 0.007729799999651732,
+      "status": "complete",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-44d3ca38f143",
+      "timestamp": "2026-10-03T18:59:32.415720+00:00",
+      "agent": "Seed script",
+      "action": "Approved E1 (developer-authorized reproducibility script; not a UI click)",
+      "input_ids": [],
+      "output_ids": [],
+      "tool": "approval_gate",
+      "elapsed_seconds": 0,
+      "status": "complete",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-38e259414ada",
+      "timestamp": "2026-10-03T18:59:32.422376+00:00",
+      "agent": "ExperimentRunner",
+      "action": "Loading dataset",
+      "input_ids": [
+        "run-3c74ba936fad"
+      ],
+      "output_ids": [],
+      "tool": "scientific_python",
+      "elapsed_seconds": 0,
+      "status": "running",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-555146fb49f5",
+      "timestamp": "2026-10-03T18:59:32.428234+00:00",
+      "agent": "ExperimentRunner",
+      "action": "Validating schema",
+      "input_ids": [
+        "run-3c74ba936fad"
+      ],
+      "output_ids": [],
+      "tool": "scientific_python",
+      "elapsed_seconds": 0,
+      "status": "running",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-b2cab160dc3c",
+      "timestamp": "2026-10-03T18:59:32.432321+00:00",
+      "agent": "ExperimentRunner",
+      "action": "Preparing variables",
+      "input_ids": [
+        "run-3c74ba936fad"
+      ],
+      "output_ids": [],
+      "tool": "scientific_python",
+      "elapsed_seconds": 0,
+      "status": "running",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-0a3c8f1d7230",
+      "timestamp": "2026-10-03T18:59:32.438087+00:00",
+      "agent": "ExperimentRunner",
+      "action": "Running analysis",
+      "input_ids": [
+        "run-3c74ba936fad"
+      ],
+      "output_ids": [],
+      "tool": "scientific_python",
+      "elapsed_seconds": 0,
+      "status": "running",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-a19c55acb7d5",
+      "timestamp": "2026-10-03T18:59:32.444618+00:00",
+      "agent": "ExperimentRunner",
+      "action": "Computing uncertainty",
+      "input_ids": [
+        "run-3c74ba936fad"
+      ],
+      "output_ids": [],
+      "tool": "scientific_python",
+      "elapsed_seconds": 0,
+      "status": "running",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-85dcd3352129",
+      "timestamp": "2026-10-03T18:59:33.297167+00:00",
+      "agent": "ExperimentRunner",
+      "action": "Generating visualization",
+      "input_ids": [
+        "run-3c74ba936fad"
+      ],
+      "output_ids": [],
+      "tool": "scientific_python",
+      "elapsed_seconds": 0,
+      "status": "running",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-8285cddd0aef",
+      "timestamp": "2026-10-03T18:59:33.307475+00:00",
+      "agent": "ExperimentRunner",
+      "action": "Saving run artifact",
+      "input_ids": [
+        "run-3c74ba936fad"
+      ],
+      "output_ids": [],
+      "tool": "scientific_python",
+      "elapsed_seconds": 0,
+      "status": "running",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-d225169f186b",
+      "timestamp": "2026-10-03T18:59:33.312791+00:00",
+      "agent": "ExperimentRunner",
+      "action": "Computed real regression and 500 stratified bootstrap draws on 342 birds.",
+      "input_ids": [
+        "experiment-a7221fb48495"
+      ],
+      "output_ids": [
+        "result-593bc1c648f3"
+      ],
+      "tool": "experiments.penguins.compute",
+      "elapsed_seconds": 0.8904647999988811,
+      "status": "complete",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-f1e7737f34f7",
+      "timestamp": "2026-10-03T18:59:33.320552+00:00",
+      "agent": "AnalysisAgent",
+      "action": "H1: better supported; H2: weakened; H3: unresolved",
+      "input_ids": [
+        "result-593bc1c648f3",
+        "hypothesis-83bafc73d14f",
+        "hypothesis-6b18b39b86dc",
+        "hypothesis-a70d7c9a8699"
+      ],
+      "output_ids": [
+        "analysis-01b172cceb38"
+      ],
+      "tool": "evaluate_result",
+      "elapsed_seconds": 5.060000148660038e-05,
+      "status": "complete",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-175c960085eb",
+      "timestamp": "2026-10-03T18:59:33.327832+00:00",
+      "agent": "DecisionAgent",
+      "action": "Research plan updated: Test sex and year effects within species",
+      "input_ids": [
+        "result-593bc1c648f3",
+        "analysis-01b172cceb38"
+      ],
+      "output_ids": [
+        "decision-0e68bde280af"
+      ],
+      "tool": "choose_next_decision",
+      "elapsed_seconds": 3.6499999623629265e-05,
+      "status": "complete",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-8053605f3a39",
+      "timestamp": "2026-10-03T18:59:33.335983+00:00",
+      "agent": "SafetyAgent",
+      "action": "Validated provenance, approval and lineage. Research record sealed for replay.",
+      "input_ids": [
+        "decision-0e68bde280af"
+      ],
+      "output_ids": [
+        "safety-9bb2cd0ff45a"
+      ],
+      "tool": "rigor_audit",
+      "elapsed_seconds": 9.239999963028822e-05,
+      "status": "complete",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    }
+  ],
+  "approval": {
+    "experiment_id": "E1",
+    "approved_at": "2026-10-03T18:59:32.415693+00:00",
+    "actor": "developer-authorized reproducibility script; not a UI click",
+    "scope": "One allowlisted local computational experiment"
+  },
+  "metrics": {
+    "question_to_spec_seconds": 0.038782,
+    "compute_seconds": 0.8751786000011634,
+    "result_to_decision_seconds": 0.020356,
+    "claims_retrieved": 2,
+    "unique_sources": 1,
+    "hypotheses_evaluated": 3,
+    "experiments_compared": 2,
+    "total_wall_seconds": 0.971452,
+    "human_approvals": 0,
+    "baseline": "No manual baseline measured; wall time includes approval wait."
+  },
+  "error": null,
+  "updated_at": "2026-10-03T18:59:33.339765+00:00",
+  "selected_experiment": "E1",
+  "selection_rationale": "Species adjustment directly tests the differing aggregation condition. Weighted learning, discrimination, coverage, feasibility and cost scores favor it over year adjustment; scores are explicit heuristics.",
+  "verified_sha256": "c82e2a7f6cf7fa27e30b093478b28f36b48c55109a0091e71364949bcb61b0f5"
+}

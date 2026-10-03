@@ -1,0 +1,82 @@
+[
+  {
+    "evidence_id": "EV1",
+    "source": "Curated literature extract (one article, two analysis contexts)",
+    "citation": {
+      "title": "Palmer Archipelago Penguins Data in the palmerpenguins R Package - An Alternative to Anderson's Irises",
+      "authors": [
+        "Allison M. Horst",
+        "Alison Presmanes Hill",
+        "Kristen B. Gorman"
+      ],
+      "year": 2022,
+      "identifier": "10.32614/RJ-2022-020",
+      "url": "https://journal.r-project.org/articles/RJ-2022-020/",
+      "location": "Continuous quantitative variables; discussion of bill dimensions and Simpson's paradox",
+      "retrieved_at": "2026-10-03"
+    },
+    "claim": "Bill length and depth show a negative association when species are pooled.",
+    "direction_of_effect": "negative",
+    "population_or_system": "Palmer Archipelago penguins, 2007\u20132009",
+    "intervention_or_variable": "Bill length (mm)",
+    "outcome": "Bill depth (mm)",
+    "sample_size_if_known": null,
+    "experimental_conditions": {
+      "aggregation": "All species pooled",
+      "system": "Same observational dataset",
+      "measurement": "Bill morphometry",
+      "period": "2007\u20132009"
+    },
+    "methodology": "Published exploratory visual comparison; reproduced with regression in this application.",
+    "limitations": [
+      "Not two independent studies.",
+      "Aggregation changes the estimand; this is an apparent contradiction, not a refutation."
+    ],
+    "confidence": "high",
+    "provenance": {
+      "retrieval": "Manually curated from the linked primary article, not live search",
+      "dataset_sha256": "f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
+      "evidence_location": "Continuous quantitative variables; discussion of bill dimensions and Simpson's paradox"
+    }
+  },
+  {
+    "evidence_id": "EV2",
+    "source": "Curated literature extract (one article, two analysis contexts)",
+    "citation": {
+      "title": "Palmer Archipelago Penguins Data in the palmerpenguins R Package - An Alternative to Anderson's Irises",
+      "authors": [
+        "Allison M. Horst",
+        "Alison Presmanes Hill",
+        "Kristen B. Gorman"
+      ],
+      "year": 2022,
+      "identifier": "10.32614/RJ-2022-020",
+      "url": "https://journal.r-project.org/articles/RJ-2022-020/",
+      "location": "Continuous quantitative variables; discussion of bill dimensions and Simpson's paradox",
+      "retrieved_at": "2026-10-03"
+    },
+    "claim": "Within species, bill length and depth show positive associations.",
+    "direction_of_effect": "positive",
+    "population_or_system": "Palmer Archipelago penguins, 2007\u20132009",
+    "intervention_or_variable": "Bill length (mm)",
+    "outcome": "Bill depth (mm)",
+    "sample_size_if_known": null,
+    "experimental_conditions": {
+      "aggregation": "Species separated",
+      "system": "Same observational dataset",
+      "measurement": "Bill morphometry",
+      "period": "2007\u20132009"
+    },
+    "methodology": "Published exploratory visual comparison; reproduced with regression in this application.",
+    "limitations": [
+      "Not two independent studies.",
+      "Aggregation changes the estimand; this is an apparent contradiction, not a refutation."
+    ],
+    "confidence": "high",
+    "provenance": {
+      "retrieval": "Manually curated from the linked primary article, not live search",
+      "dataset_sha256": "f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
+      "evidence_location": "Continuous quantitative variables; discussion of bill dimensions and Simpson's paradox"
+    }
+  }
+]

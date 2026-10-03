@@ -1,0 +1,14 @@
+.packages/
+.vendor/
+.venv/
+node_modules/
+frontend/dist/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.env
+artifacts/
+*.sqlite*
+test-results/
+test-tmp*/
+playwright-report/

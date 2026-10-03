@@ -1,0 +1,157 @@
+{
+  "name": "ContradictionLab_prepare",
+  "executor": {
+    "harness": "openai-agents",
+    "model": "${OMNIGENT_MODEL}",
+    "auth": {
+      "type": "api_key",
+      "api_key": "${OPENAI_API_KEY}"
+    }
+  },
+  "async": false,
+  "skills": "none",
+  "prompt": "You orchestrate the scientific workflow. Call each specialist exactly once in this order: LiteratureAgent, ContradictionAgent, HypothesisAgent, ExperimentPlanner. Each specialist MUST call its scientific function tool. Pass the returned structured record to the next specialist. Stop on any error. Never bypass approval. Output only a concise status; no private chain of thought.",
+  "tools": {
+    "LiteratureAgent": {
+      "type": "agent",
+      "description": "Retrieve cited source claims from the curated reference catalog; disclose that this is offline retrieval.",
+      "executor": {
+        "harness": "openai-agents",
+        "model": "${OMNIGENT_MODEL}",
+        "auth": {
+          "type": "api_key",
+          "api_key": "${OPENAI_API_KEY}"
+        }
+      },
+      "async": false,
+      "prompt": "Retrieve cited source claims from the curated reference catalog; disclose that this is offline retrieval. Call your function tool with a brief observable scientific rationale (not hidden reasoning). Return its actual structured output. Do not invent facts or execute other tools.",
+      "tools": {
+        "scientific_step": {
+          "type": "function",
+          "callable": "backend.omnigent_tools.literature",
+          "description": "Retrieve cited source claims from the curated reference catalog; disclose that this is offline retrieval.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "rationale": {
+                "type": "string",
+                "description": "Concise evidence-grounded rationale, 10\u20131500 characters"
+              }
+            },
+            "required": [
+              "rationale"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "ContradictionAgent": {
+      "type": "agent",
+      "description": "Assess comparability and distinguish aggregation reversal from independent-study disagreement.",
+      "executor": {
+        "harness": "openai-agents",
+        "model": "${OMNIGENT_MODEL}",
+        "auth": {
+          "type": "api_key",
+          "api_key": "${OPENAI_API_KEY}"
+        }
+      },
+      "async": false,
+      "prompt": "Assess comparability and distinguish aggregation reversal from independent-study disagreement. Call your function tool with a brief observable scientific rationale (not hidden reasoning). Return its actual structured output. Do not invent facts or execute other tools.",
+      "tools": {
+        "scientific_step": {
+          "type": "function",
+          "callable": "backend.omnigent_tools.contradiction",
+          "description": "Assess comparability and distinguish aggregation reversal from independent-study disagreement.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "rationale": {
+                "type": "string",
+                "description": "Concise evidence-grounded rationale, 10\u20131500 characters"
+              }
+            },
+            "required": [
+              "rationale"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "HypothesisAgent": {
+      "type": "agent",
+      "description": "Generate three testable explanations within the reference rubric: H1 species composition, H2 sampling variability, H3 sex/year effects. Supply your own statements, scientific rationales, predictions and falsification criteria as hypotheses_json. Each object needs hypothesis_id, statement, rationale, supporting_evidence (EV1/EV2), conflicting_evidence, predictions (string list), falsification_condition, uncertainty, agent_generated (true), support_score (50). Do not claim a novel discovery.",
+      "executor": {
+        "harness": "openai-agents",
+        "model": "${OMNIGENT_MODEL}",
+        "auth": {
+          "type": "api_key",
+          "api_key": "${OPENAI_API_KEY}"
+        }
+      },
+      "async": false,
+      "prompt": "Generate three testable explanations within the reference rubric: H1 species composition, H2 sampling variability, H3 sex/year effects. Supply your own statements, scientific rationales, predictions and falsification criteria as hypotheses_json. Each object needs hypothesis_id, statement, rationale, supporting_evidence (EV1/EV2), conflicting_evidence, predictions (string list), falsification_condition, uncertainty, agent_generated (true), support_score (50). Do not claim a novel discovery. Call your function tool with a brief observable scientific rationale (not hidden reasoning). Return its actual structured output. Do not invent facts or execute other tools.",
+      "tools": {
+        "scientific_step": {
+          "type": "function",
+          "callable": "backend.omnigent_tools.hypothesis",
+          "description": "Generate three testable explanations within the reference rubric: H1 species composition, H2 sampling variability, H3 sex/year effects. Supply your own statements, scientific rationales, predictions and falsification criteria as hypotheses_json. Each object needs hypothesis_id, statement, rationale, supporting_evidence (EV1/EV2), conflicting_evidence, predictions (string list), falsification_condition, uncertainty, agent_generated (true), support_score (50). Do not claim a novel discovery.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "rationale": {
+                "type": "string",
+                "description": "Concise evidence-grounded rationale, 10\u20131500 characters"
+              },
+              "hypotheses_json": {
+                "type": "string",
+                "description": "JSON array of three Hypothesis contracts in order H1, H2, H3"
+              }
+            },
+            "required": [
+              "rationale",
+              "hypotheses_json"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "ExperimentPlanner": {
+      "type": "agent",
+      "description": "Compare allowlisted experiments by disclosed heuristic scores and stop for human approval.",
+      "executor": {
+        "harness": "openai-agents",
+        "model": "${OMNIGENT_MODEL}",
+        "auth": {
+          "type": "api_key",
+          "api_key": "${OPENAI_API_KEY}"
+        }
+      },
+      "async": false,
+      "prompt": "Compare allowlisted experiments by disclosed heuristic scores and stop for human approval. Call your function tool with a brief observable scientific rationale (not hidden reasoning). Return its actual structured output. Do not invent facts or execute other tools.",
+      "tools": {
+        "scientific_step": {
+          "type": "function",
+          "callable": "backend.omnigent_tools.planner",
+          "description": "Compare allowlisted experiments by disclosed heuristic scores and stop for human approval.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "rationale": {
+                "type": "string",
+                "description": "Concise evidence-grounded rationale, 10\u20131500 characters"
+              }
+            },
+            "required": [
+              "rationale"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  }
+}
