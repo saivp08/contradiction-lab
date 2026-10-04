@@ -16,7 +16,7 @@ const SEATS: Record<AgentId, { x: number; y: number }> = {
   AnalysisAgent: { x: 386, y: 322 },
   DecisionAgent: { x: 234, y: 322 },
   SafetyAgent: { x: 82, y: 322 },
-  CriticAgent: { x: 56, y: 190 },
+  CriticAgent: { x: 60, y: 190 },
 };
 const LANES: [AgentId, AgentId][] = [
   ['LiteratureAgent', 'ContradictionAgent'],
@@ -77,7 +77,7 @@ function Packet({ beat, speed }: { beat: Beat; speed: number }) {
   const p = at(r, t);
   const raw = beat.kind === 'defend' ? beat.label.toUpperCase() : beat.label;
   const label = raw.length > 24 ? raw.slice(0, 23) + '…' : raw;
-  const width = Math.min(180, label.length * 6.6 + 18);
+  const width = Math.min(190, label.length * 6.8 + 18);
   const payload = beat.kind === 'handoff' && beat.payload ? ' k-' + beat.payload : '';
   return (
     <g className={'packet ' + TONE[beat.kind] + payload} style={{ opacity: t >= 1 ? 0.0 : 1 }}>
@@ -95,26 +95,26 @@ function Packet({ beat, speed }: { beat: Beat; speed: number }) {
 function Seat({ id, state }: { id: AgentId; state: 'idle' | 'done' | 'active' | 'waiting' }) {
   const agent = agentOf(id)!;
   const { x, y } = SEATS[id];
+  // Wide enough for every real agent name; the label still ellipsizes as a safety net.
+  const width = id === 'Human' ? 92 : 116;
   return (
     <g
       className={'seat ' + state + (id === 'Human' ? ' human' : '') + (id === 'CriticAgent' ? ' critic' : '')}
     >
       {state === 'active' && <circle className="ripple" cx={x} cy={y} r={30} />}
-      <rect x={x - 46} y={y - 22} width={92} height={44} rx={id === 'Human' ? 22 : 6} />
-      {id === 'Human' ? (
-        <text className="name" x={x} y={y + 4} textAnchor="middle">
-          {state === 'waiting' ? 'You · approve' : 'You'}
-        </text>
-      ) : (
-        <>
-          <text className="initials" x={x - 32} y={y + 5}>
-            {agent.initials}
-          </text>
-          <text className="name" x={x - 10} y={y + 4}>
-            {agent.short}
-          </text>
-        </>
-      )}
+      <rect x={x - width / 2} y={y - 22} width={width} height={44} rx={id === 'Human' ? 22 : 6} />
+      <foreignObject x={x - width / 2} y={y - 22} width={width} height={44}>
+        <div className={'seat-label' + (id === 'Human' ? ' centered' : '')} title={agent.name}>
+          {id === 'Human' ? (
+            <span className="seat-name">{state === 'waiting' ? 'You · approve' : 'You'}</span>
+          ) : (
+            <>
+              <span className="seat-initials">{agent.initials}</span>
+              <span className="seat-name">{agent.short}</span>
+            </>
+          )}
+        </div>
+      </foreignObject>
     </g>
   );
 }
@@ -147,9 +147,11 @@ function Board({ record }: { record: RecordData | null }) {
             <text className="hid" x={166} y={y + 4}>
               {h.hypothesis_id}
             </text>
-            <text className="statement" x={194} y={y - 4}>
-              {h.statement.length > 44 ? h.statement.slice(0, 43) + '…' : h.statement}
-            </text>
+            <foreignObject x={194} y={y - 17} width={240} height={16}>
+              <div className="board-statement" title={h.statement}>
+                {h.statement}
+              </div>
+            </foreignObject>
             <rect className="track" x={194} y={y + 4} width={240} height={5} rx={2.5} />
             <rect className="fill" x={194} y={y + 4} width={(240 * value) / 100} height={5} rx={2.5} />
             <line className="prior" x1={194 + 120} x2={194 + 120} y1={y + 1} y2={y + 12} />
