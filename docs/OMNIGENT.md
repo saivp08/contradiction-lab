@@ -54,7 +54,7 @@ Omnigent dispatches the specialists, passes their structured outputs and handles
 |---|---|---|---|
 | LiteratureAgent | `literature` | Active record + concise rationale | Evidence → ContradictionAgent |
 | ContradictionAgent | `contradiction` | Two comparable Evidence objects | Contradiction → HypothesisAgent |
-| HypothesisAgent | `hypothesis` | Context + generated JSON array of three Hypothesis objects | H1 species / H2 sampling / H3 sex-year → ExperimentPlanner |
+| HypothesisAgent | `hypothesis` | Context + generated JSON array of three Hypothesis objects | Three falsifiable explanations → ExperimentPlanner |
 | ExperimentPlanner | `planner` | Hypotheses + validated dataset | Two Experiment proposals and selection → human |
 | ExperimentRunner | `runner` | Approved proposal only | Numerical result, runtime metadata → AnalysisAgent |
 | AnalysisAgent | `analysis` | Actual Result | Support updates → CriticAgent |

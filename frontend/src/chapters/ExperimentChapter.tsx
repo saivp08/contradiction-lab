@@ -36,7 +36,7 @@ export function ExperimentChapter({
               <ShieldCheck size={20} />
               <p>
                 <strong>Nothing runs without you.</strong> Review the proposed tests below, then approve one to run it
-                on the dataset.
+                on the extracted claims.
               </p>
             </div>
           )}

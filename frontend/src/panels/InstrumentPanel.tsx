@@ -1,72 +1,12 @@
 import { useState, type ReactNode } from 'react';
-import { ArrowRight, ArrowUpRight, Check, Clock3, Download, ShieldCheck } from 'lucide-react';
-import { DecompositionChart, Scatter } from '../Plots';
+import { ArrowUpRight, Check, Clock3, Download, ShieldCheck } from 'lucide-react';
 import { ResearchGraph } from '../ResearchGraph';
-import { fmt, signed } from '../lib';
-import type {
-  Decomposition,
-  LabObject,
-  PapersResult,
-  PapersSource,
-  Point,
-  RecordData,
-  Result,
-} from '../types';
+import { fmt } from '../lib';
+import type { LabObject, PapersResult, PapersSource, RecordData } from '../types';
 import { Empty } from '../ui';
 
 const TABS = ['Arena', 'Data', 'Lineage', 'Activity'] as const;
 type Tab = (typeof TABS)[number];
-
-function pooledSlope(points: Point[]) {
-  if (!points.length) return null;
-  const mx = points.reduce((s, p) => s + p.x, 0) / points.length,
-    my = points.reduce((s, p) => s + p.y, 0) / points.length;
-  const sxx = points.reduce((s, p) => s + (p.x - mx) ** 2, 0);
-  return sxx ? points.reduce((s, p) => s + (p.x - mx) * (p.y - my), 0) / sxx : null;
-}
-
-function KeyNumbers({ result, points }: { result?: Result; points: Point[] }) {
-  const pooled = result?.pooled_slope ?? pooledSlope(points);
-  return (
-    <div className="key-numbers">
-      <div>
-        <span>Pooled slope</span>
-        <strong className="coral">{pooled === null ? '—' : signed(pooled)}</strong>
-        <small>all birds together</small>
-      </div>
-      <ArrowRight size={18} className="key-arrow" />
-      <div>
-        <span>{result ? `${result.group}-adjusted` : 'Adjusted slope'}</span>
-        <strong className={result ? 'mint' : 'pending'}>
-          {result ? signed(result.adjusted_slope) : '?'}
-        </strong>
-        <small>
-          {result
-            ? `95% CI [${result.adjusted_ci95.map((v) => v.toFixed(3)).join(', ')}]`
-            : 'after you approve an experiment'}
-        </small>
-      </div>
-    </div>
-  );
-}
-
-function WhyItFlips({ parts }: { parts: Decomposition }) {
-  const between = 1 - parts.within_weight;
-  return (
-    <section className="panel-block">
-      <h3>Why the sign flips</h3>
-      <p>
-        The pooled slope splits exactly into a <em>within-{parts.group}</em> part and a{' '}
-        <em>between-{parts.group}</em> part. {Math.round(between * 100)}% of the variation in bill length lies
-        between {parts.group} groups, where the slope through the group means is {signed(parts.between_slope)}
-        . Within groups the slope is {signed(parts.within_slope)}, but it carries only{' '}
-        {Math.round(parts.within_weight * 100)}% of the weight.
-      </p>
-      <DecompositionChart parts={parts} />
-      <p className="caption">{parts.note}</p>
-    </section>
-  );
-}
 
 function Activity({ record, onSelect }: { record: RecordData; onSelect: (o: LabObject) => void }) {
   return (
@@ -133,21 +73,15 @@ function Activity({ record, onSelect }: { record: RecordData; onSelect: (o: LabO
 
 export function InstrumentPanel({
   record,
-  referencePoints,
   onSelect,
   arena,
 }: {
   record: RecordData | null;
-  referencePoints: Point[];
   onSelect: (o: LabObject) => void;
   arena: ReactNode;
 }) {
   const source = record?.source ?? null;
   const [tab, setTab] = useState<Tab>('Arena');
-  const results = Object.values(record?.objects ?? {});
-  const result = results.find((o) => o.kind === 'result')?.data as Result | undefined;
-  const followup = results.find((o) => o.kind === 'followup_result')?.data as Result | undefined;
-  const points = result?.points ?? referencePoints;
   return (
     <aside className="instrument" aria-label="Data and provenance">
       <div className="panel-tabs" role="tablist">
@@ -173,27 +107,6 @@ export function InstrumentPanel({
                 PapersResult | undefined
             }
           />
-        )}
-        {tab === 'Data' && source?.kind !== 'papers' && (
-          <>
-            <KeyNumbers result={result} points={points} />
-            {followup && (
-              <p className="followup-line">
-                Follow-up adding sex + year:{' '}
-                <strong className="mint">{signed(followup.adjusted_slope)}</strong>{' '}
-                <span className="muted">[{followup.adjusted_ci95.map((v) => v.toFixed(3)).join(', ')}]</span>
-              </p>
-            )}
-            {points.length ? <Scatter points={points} caption={false} /> : null}
-            {result?.decomposition ? (
-              <WhyItFlips parts={result.decomposition} />
-            ) : (
-              <p className="caption">
-                Every point is a measured bird. Toggle to colour by species and see the trend reverse. The
-                slope decomposition appears after the experiment runs.
-              </p>
-            )}
-          </>
         )}
         {tab === 'Lineage' &&
           (record ? (

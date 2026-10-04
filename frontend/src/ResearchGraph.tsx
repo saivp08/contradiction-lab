@@ -17,8 +17,6 @@ const kinds = [
   'decision',
   'plan_review',
   'safety',
-  'followup_result',
-  'followup_decision',
 ];
 const palette: Record<string, string> = {
   evidence: '#9fcdb7',
@@ -26,7 +24,6 @@ const palette: Record<string, string> = {
   hypothesis: '#b6acd0',
   experiment: '#96bbd1',
   result: '#96bbd1',
-  followup_result: '#96bbd1',
 };
 export function ResearchGraph({
   record,
