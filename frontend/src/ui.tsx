@@ -4,9 +4,17 @@ import { citeShort } from './lib';
 import type { Citation } from './types';
 
 export function Source({ citation }: { citation: Citation }) {
+  const label = `${citeShort(citation)} · ${citation.year ?? 'n.d.'}`;
+  if (!citation.url) {
+    return (
+      <span className="source" title={citation.identifier}>
+        {label} · {citation.identifier}
+      </span>
+    );
+  }
   return (
     <a className="source" href={citation.url} target="_blank" rel="noreferrer">
-      {citeShort(citation)} · {citation.year}
+      {label}
       <ArrowUpRight size={13} />
     </a>
   );

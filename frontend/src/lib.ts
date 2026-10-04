@@ -58,16 +58,33 @@ export function evidenceLabels(e: Evidence, index: number) {
 
 export const experimentTitle = (e: Experiment) => e.title || e.method.replaceAll('_', ' ');
 
-export type Route = { page: 'home' } | { page: 'run'; id: string; replay: boolean };
+export type Route = { page: 'home' } | { page: 'compare' } | { page: 'run'; id: string; replay: boolean };
 
 export function parseRoute(hash: string): Route {
+  if (/^#\/compare$/.test(hash)) return { page: 'compare' };
   const match = hash.match(/^#\/run\/([\w-]+)(\/replay)?$/);
   return match ? { page: 'run', id: match[1], replay: !!match[2] } : { page: 'home' };
 }
 
 export const navigate = (route: Route) => {
-  window.location.hash = route.page === 'home' ? '/' : `/run/${route.id}${route.replay ? '/replay' : ''}`;
+  window.location.hash =
+    route.page === 'home'
+      ? '/'
+      : route.page === 'compare'
+        ? '/compare'
+        : `/run/${route.id}${route.replay ? '/replay' : ''}`;
 };
+
+/** Multipart upload; unlike api(), no JSON content-type so the browser sets the boundary. */
+export async function uploadFile<T>(path: string, file: File): Promise<T> {
+  const body = new FormData();
+  body.append('file', file);
+  const response = await fetch('/api' + path, { method: 'POST', body });
+  const parsed = await response.json();
+  if (!response.ok)
+    throw new Error(typeof parsed.detail === 'string' ? parsed.detail : JSON.stringify(parsed.detail));
+  return parsed;
+}
 
 export const STATUS_LABELS: Record<string, string> = {
   created: 'Starting',

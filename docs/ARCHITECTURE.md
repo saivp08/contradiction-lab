@@ -12,6 +12,7 @@ The repository started empty. Installed Python scientific libraries were reusabl
 - `backend/omnigent_tools.py`: specialist capabilities. No approval tool, arbitrary execution tool, deletion tool or general network tool.
 - `experiments/penguins.py`: pure numerical core with limited approved methods.
 - `backend/store.py`: SQLite WAL persistence, UUID object identities, event log, JSON export and checksum verification.
+- `backend/papers.py` + `experiments/papers_analysis.py` + `backend/paper_science.py`: deterministic PDF ingestion (pypdf), claim extraction with page/section provenance, term-overlap alignment and relationship classes, and the paper-mode specialist logic (template hypotheses from extracted differences, bootstrap/section-sensitivity experiments, generic critic challenges). `workflow.advance` branches per role on `record["source"]`; the state machine, approval gate and sealing are shared with the reference investigation.
 - `data`: original real CSV, checksum manifest, curated evidence catalog and completed real local replay.
 
 ## State and handoffs

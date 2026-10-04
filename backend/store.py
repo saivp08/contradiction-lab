@@ -60,9 +60,16 @@ def summary(record: dict) -> dict:
     row["label"] = record.get("label")
     row["updated_at"] = record.get("updated_at")
     results = {v["kind"]: v["data"] for v in record["objects"].values() if v["kind"] in ("result", "followup_result")}
-    if "result" in results:
+    if "result" in results and "pooled_slope" in results["result"]:
         result = results["result"]
         row["result"] = {k: result[k] for k in ("group", "n", "pooled_slope", "adjusted_slope", "adjusted_ci95")}
+    elif "result" in results and "disagreement_rate" in results["result"]:
+        result = results["result"]
+        row["paper_result"] = {
+            "disagreement_rate": result["disagreement_rate"],
+            "similarity_ci95": result["similarity_ci95"],
+            "robust_disagreement": result["robust_disagreement"],
+        }
     if "followup_result" in results:
         followup = results["followup_result"]
         row["followup"] = {k: followup[k] for k in ("adjusted_slope", "adjusted_ci95")}
@@ -72,10 +79,31 @@ def summary(record: dict) -> dict:
             verdicts[challenge["challenge_id"]] = challenge["verdict"]
     if verdicts:
         row["challenges"] = {v: list(verdicts.values()).count(v) for v in sorted(set(verdicts.values()))}
+    if record.get("source", {}).get("kind") == "papers":
+        row["papers"] = {
+            "titles": [p["meta"]["title"][:90] for p in record["source"]["papers"]],
+            "relationship": record["source"]["relationship"],
+        }
     decisions = by_kind(record, "followup_decision") or by_kind(record, "decision")
     if decisions:
         row["next_decision"] = decisions[0]["data"]["next_decision"]
     return row
+
+
+ANALYSES = ROOT / "artifacts" / "analyses"
+
+
+def save_analysis(report: dict) -> str:
+    ANALYSES.mkdir(parents=True, exist_ok=True)
+    (ANALYSES / f"{report['analysis_id']}.json").write_text(json.dumps(report, allow_nan=False), encoding="utf-8")
+    return report["analysis_id"]
+
+
+def load_analysis(identifier: str) -> dict:
+    path = ANALYSES / f"{identifier}.json"
+    if not path.exists():
+        raise KeyError(identifier)
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def add(record: dict, kind: str, data: dict, inputs: list[str]) -> str:
@@ -127,6 +155,8 @@ def by_kind(record: dict, kind: str) -> list[dict]:
 
 def scientific_digest(record: dict) -> str:
     payload = {k: record[k] for k in ("id", "objective", "mode", "objects", "events", "approval", "metrics")}
+    if record.get("source"):
+        payload["source"] = record["source"]
     if record.get("followup_approval"):
         payload["followup_approval"] = record["followup_approval"]
     if record.get("omnigent_receipts"):

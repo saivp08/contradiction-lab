@@ -3,6 +3,7 @@ import { FlaskConical, X } from 'lucide-react';
 import { REFERENCE_QUESTION, api, freshRuns, navigate, parseRoute, type Route } from './lib';
 import type { Dataset, Evidence, Point, RecordData, Summary } from './types';
 import { Home } from './pages/Home';
+import { Compare } from './pages/Compare';
 import { Investigation } from './pages/Investigation';
 import { NewInvestigationDialog } from './panels/Dialogs';
 
@@ -122,6 +123,8 @@ export default function App() {
           onNew={() => setNewOpen(true)}
           onQuickStart={() => start('')}
         />
+      ) : route.page === 'compare' ? (
+        <Compare />
       ) : (
         <Investigation
           id={route.id}
