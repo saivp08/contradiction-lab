@@ -186,3 +186,63 @@ def test_evidence_marks_unknowns_instead_of_inventing(caffeine_pair):
     assert evidence.citation.authors == ["Author not extracted"]
     assert evidence.citation.identifier.startswith("sha256:")
     assert evidence.sample_size_if_known is None
+
+
+def test_debate_runs_when_papers_phrase_the_shared_outcome_in_different_word_order(caffeine_pair):
+    """Regression: per-paper term ordering made the Contradiction agent see two different outcomes."""
+    young, older = caffeine_pair
+    reordered = json.loads(json.dumps(older))
+    top = reordered["claims"][0]
+    assert top["section"] == "results" and top["direction"] == "null"
+    top["text"] = "Sustained attention scores did not significantly change with caffeine compared with placebo."
+    top["terms"] = papers._terms(top["text"])
+    report = papers.analyze(young, reordered)
+    assert report["defensible_contradiction"]
+    ev_a, ev_b = (Evidence.model_validate(e) for e in report["evidence"])
+    assert ev_a.outcome == ev_b.outcome and ev_a.intervention_or_variable == ev_b.intervention_or_variable
+    store.save_analysis(report)
+    record = workflow.create(NewInvestigation(source_analysis=report["analysis_id"]))
+    workflow.run_local(record["id"])
+    assert store.get(record["id"])["status"] == "awaiting_approval"
+
+
+def test_real_journal_layout_noise_is_handled():
+    page = "jama.com (Reprinted) JAMA March 19, 2019 Volume 321, Number 11 {n}\n"
+    footer = "Downloaded from jamanetwork.com by Reader on 10/04/2026\n"
+    bodies = ["Eggs were common.", "Cohorts differed.", "Risk rose.", "Results held.", "Limits apply."]
+    pages = [page.format(n=i) + bodies[i - 1] + "\n" + footer for i in range(1, 6)]
+    cleaned = papers._strip_boilerplate(pages)
+    assert all("Reprinted" not in p and "Downloaded" not in p for p in cleaned)
+    assert [p.strip() for p in cleaned] == bodies
+    assert papers._header_of("AbstrAct") == "abstract"
+    assert papers._header_of("resul ts") == "results"
+    assert papers._header_of("Statistical methods") == "methods"
+    assert papers._header_of("Results from the three cohorts") is None
+    assert (
+        papers._normalize("supplemen-\ntation and age- and sex-adjusted") == "supplementation and age- and sex-adjusted"
+    )
+    # A ratio whose 95% interval spans 1 is a null finding even if the sentence says "increase".
+    assert (
+        papers._direction("The pooled relative risk for one egg per day increase was 0.98 (95% CI 0.93 to 1.03).")
+        == "null"
+    )
+    assert (
+        papers._direction("Each egg was associated with higher risk (adjusted HR, 1.06 [95% CI, 1.03-1.10]).")
+        == "positive"
+    )
+    assert papers._authorish("Victor W. Zhong, PhD; Linda Van Horn, PhD; Marilyn C. Cornelis, PhD")
+    assert papers._parse_authors("Jean-Philippe Drouin-Chartier,1 Siyu Chen,1 Meir J Stampfer,1,2,3") == [
+        "Jean-Philippe Drouin-Chartier",
+        "Siyu Chen",
+        "Meir J Stampfer",
+    ]
+    assert papers._parse_authors("Victor W. Zhong, PhD; Linda Van Horn, PhD") == ["Victor W. Zhong", "Linda Van Horn"]
+    assert papers._find_year("JAMA. 2019;321(11):1081-1095. doi:10.1001/jama.2019.1572\ndata from 1985", None) == 2019
+    assert (
+        papers.topic_phrase(
+            "Associations of Egg Consumption With Cardiovascular Disease",
+            ["cardiovascular", "consumption", "disease", "egg"],
+            [],
+        )
+        == "egg consumption and cardiovascular disease"
+    )
