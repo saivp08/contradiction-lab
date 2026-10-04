@@ -31,7 +31,7 @@ databricks apps deploy contradiction-lab --source-code-path /Workspace/Users/<yo
   The app has no access control of its own: any of those users can start Claude runs billed to
   the configured key.
 - **Storage:** investigations and uploaded PDFs are written to SQLite and files on the app's
-  local disk. They are lost when the app restarts or is redeployed. The verified penguin record
+  local disk. They are lost when the app restarts or is redeployed. The sample caffeine debate
   is re-seeded on every start.
 - **Workers:** run a single process. The per-investigation locks live in memory; see
   `docs/ARCHITECTURE.md`.

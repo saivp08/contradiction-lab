@@ -67,11 +67,10 @@ test('two uploaded papers → parsed evidence → contradiction → existing wor
   await expect(page.getByRole('button', { name: 'Approve & run follow-up' })).toHaveCount(0);
   await expect(page.locator('.acceleration')).toContainText('Still open');
 
-  // Data panel shows the parsed papers, not the penguin reference data.
+  // Data panel shows the parsed papers.
   await page.getByRole('tab', { name: 'Data', exact: true }).click();
-  await expect(page.getByText('Extracted claims')).toBeVisible();
+  await expect(page.getByText('Extracted claims', { exact: true })).toBeVisible();
   await expect(page.getByText('PAPER A')).toBeVisible();
-  await expect(page.getByText('Bill length')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 

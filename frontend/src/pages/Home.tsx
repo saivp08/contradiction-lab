@@ -1,9 +1,8 @@
 import { useMemo, useState } from 'react';
-import { ArrowRight, Play, RotateCcw, Search } from 'lucide-react';
-import { MiniSlopes } from '../Plots';
+import { Play, RotateCcw, Search } from 'lucide-react';
 import { Floor } from '../arena/Arena';
 import { buildBeats } from '../arena/beats';
-import { REFERENCE_QUESTION, STAGES, navigate, sectionReady, signed, statusLabel } from '../lib';
+import { STAGES, navigate, sectionReady, statusLabel } from '../lib';
 import type { RecordData, Summary } from '../types';
 
 function StageMeter({ stage, status }: { stage: number; status: string }) {
@@ -48,26 +47,7 @@ function InvestigationCard({ item }: { item: Summary }) {
               ? `${item.papers.titles[0].slice(0, 34)}… vs ${item.papers.titles[1].slice(0, 34)}…`
               : `Investigation ${item.id.slice(-6)}`)}
         </h3>
-        {item.result ? (
-          <div className="run-card-result">
-            <MiniSlopes
-              pooled={item.result.pooled_slope}
-              adjusted={item.result.adjusted_slope}
-              followup={item.followup?.adjusted_slope}
-            />
-            <div>
-              <strong>
-                <span className="coral">{signed(item.result.pooled_slope)}</span>
-                <ArrowRight size={14} />
-                <span className="mint">{signed(item.result.adjusted_slope)}</span>
-              </strong>
-              <small>
-                {item.result.group}-adjusted · n = {item.result.n}
-                {item.followup && ` · follow-up ${signed(item.followup.adjusted_slope)}`}
-              </small>
-            </div>
-          </div>
-        ) : item.paper_result ? (
+        {item.paper_result ? (
           <div className="run-card-result">
             <div>
               <strong>
@@ -109,15 +89,11 @@ function InvestigationCard({ item }: { item: Summary }) {
 export function Home({
   history,
   featured,
-  busy,
   onNew,
-  onQuickStart,
 }: {
   history: Summary[];
   featured: RecordData | null;
-  busy: boolean;
   onNew: () => void;
-  onQuickStart: () => void;
 }) {
   const [query, setQuery] = useState('');
   const beats = useMemo(() => buildBeats(featured), [featured]);
@@ -135,37 +111,31 @@ export function Home({
             A laboratory that <em>tries to prove itself wrong.</em>
           </h1>
           <p>
-            Nine specialist agents and one human seat. The lab finds a contradiction, designs a test, runs
-            real computation, attacks its own result, and lets the surviving evidence pick the next
-            experiment.
+            Upload two research papers. Nine specialist agents and one human seat read them, find where they
+            disagree, design a test, run real computation, attack their own result, and let the surviving
+            evidence pick the next experiment.
           </p>
           <div className="hero-facts">
-            <div className="fact">
-              <span>KNOWN CONTRADICTION · WORKFLOW CASE STUDY</span>
-              <strong>
-                <b className="coral">{signed(featuredSummary?.result?.pooled_slope ?? -0.085)}</b> pooled ·{' '}
-                <b className="mint">{signed(featuredSummary?.result?.adjusted_slope ?? 0.2)}</b> within
-                species
-              </strong>
-              <small>{REFERENCE_QUESTION}</small>
-            </div>
-            <div className="fact loop-line-text" aria-label="What happened">
-              Hypotheses → experiment → <b className="mint">result</b> → <b className="coral">critic</b> →
-              follow-up
-            </div>
-            {featuredSummary?.followup && (
+            {featuredSummary?.papers && (
               <div className="fact">
-                <span>CURRENT FINDING · COMPUTED</span>
+                <span>LATEST COMPARISON · {featuredSummary.papers.relationship.toUpperCase()}</span>
                 <strong>
-                  <b className="mint">{signed(featuredSummary.followup.adjusted_slope)}</b> after species +
-                  sex + year
+                  {featuredSummary.paper_result && (
+                    <b className={featuredSummary.paper_result.robust_disagreement ? 'mint' : 'coral'}>
+                      {Math.round(featuredSummary.paper_result.disagreement_rate * 100)}%
+                    </b>
+                  )}{' '}
+                  disagreement rate
                 </strong>
                 <small>
-                  95% CI [{featuredSummary.followup.adjusted_ci95.map((v) => v.toFixed(3)).join(', ')}] · the
-                  critic's sex challenge partly conceded
+                  {featuredSummary.papers.titles[0]} vs {featuredSummary.papers.titles[1]}
                 </small>
               </div>
             )}
+            <div className="fact loop-line-text" aria-label="How a debate runs">
+              Papers → contradiction → experiment → <b className="mint">result</b> →{' '}
+              <b className="coral">critic</b> → next experiment
+            </div>
             {featuredSummary?.next_decision && (
               <div className="fact">
                 <span>NEXT SCIENTIFIC QUESTION</span>
@@ -174,9 +144,9 @@ export function Home({
             )}
           </div>
           <div className="hero-actions">
-            <button className="button primary" disabled={busy} onClick={onQuickStart}>
+            <button className="button primary" onClick={onNew}>
               <Play size={15} />
-              {busy ? 'Starting…' : 'Start a debate'}
+              Compare two papers
             </button>
             {featured && (
               <button
@@ -187,13 +157,6 @@ export function Home({
                 Watch the recorded demo
               </button>
             )}
-            <button className="text-button" onClick={() => navigate({ page: 'compare' })}>
-              Compare two papers
-              <ArrowRight size={15} />
-            </button>
-            <button className="text-button" onClick={onNew}>
-              Name the run first
-            </button>
           </div>
         </div>
         <figure className="hero-floor">
@@ -216,7 +179,7 @@ export function Home({
             </>
           ) : (
             <div className="hero-empty">
-              <p>No debates yet. Start one and watch the agents take their seats.</p>
+              <p>No debates yet. Upload two papers and watch the agents take their seats.</p>
             </div>
           )}
         </figure>
@@ -242,11 +205,8 @@ export function Home({
                 />
               </label>
             )}
-            <button className="button" onClick={() => navigate({ page: 'compare' })}>
-              Compare two papers…
-            </button>
             <button className="button" onClick={onNew}>
-              New reference run…
+              Compare two papers…
             </button>
           </div>
         </div>
@@ -261,7 +221,7 @@ export function Home({
             <p>
               {history.length
                 ? 'No runs match your search.'
-                : 'No investigations yet. Start a debate on the reference question to begin.'}
+                : 'No investigations yet. Upload two papers to start a debate.'}
             </p>
           </div>
         )}

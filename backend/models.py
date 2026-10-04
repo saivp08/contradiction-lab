@@ -66,9 +66,7 @@ class Experiment(Strict):
     experiment_id: str
     hypothesis_targets: list[str] = Field(min_length=1)
     scientific_question: str
-    method: Literal[
-        "species_adjustment", "year_sensitivity", "species_sex_year", "claim_alignment_audit", "condition_scan"
-    ]
+    method: Literal["claim_alignment_audit", "condition_scan"]
     title: str = ""
     required_data: str
     variables: list[str]
@@ -92,11 +90,7 @@ def default_mode():
 
 
 class NewInvestigation(Strict):
-    objective: str = Field(
-        default="Why does the relationship between penguin bill length and depth reverse when species are separated?",
-        min_length=10,
-        max_length=600,
-    )
+    objective: str = Field(default="Compare two uploaded papers", min_length=10, max_length=600)
     label: str | None = Field(default=None, max_length=120)
     source_analysis: str | None = Field(default=None, pattern=r"^analysis-[0-9a-f]{12}$")
     parent_investigation: str | None = Field(default=None, pattern=r"^lab-[0-9a-f]{12}$")
@@ -113,10 +107,6 @@ class PaperPair(Strict):
     paper_a: str = Field(pattern=r"^[0-9a-f]{64}$")
     paper_b: str = Field(pattern=r"^[0-9a-f]{64}$")
     mode: Literal['local', 'omnigent'] = Field(default_factory=default_mode)
-
-
-class FollowupApproval(Strict):
-    approved: Literal[True]
 
 
 class AgentAnnotation(Strict):

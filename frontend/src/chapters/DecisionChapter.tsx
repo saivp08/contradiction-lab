@@ -1,35 +1,23 @@
 import type { ReactNode } from 'react';
-import { ArrowRight, Beaker, GitBranch, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Beaker, GitBranch } from 'lucide-react';
 import type { Challenge } from '../arena/beats';
-import { signed } from '../lib';
-import type { Decision, FollowupDecision, Result } from '../types';
+import type { Decision } from '../types';
 import { Empty, SectionHeading, Tag } from '../ui';
 
-const FOLLOWUP = 'Species + sex + year regression';
 const LOOP_NODES = ['Question', 'Evidence', 'Hypotheses', 'Experiment', 'Result', 'Critique', 'Decision'];
 
 /** The discovery loop with the critique → experiment branch: learning, not a progress bar. */
-function LearningLoop({
-  branched,
-  closed,
-  openCount = 1,
-}: {
-  branched: boolean;
-  closed: boolean;
-  openCount?: number;
-}) {
+function LearningLoop({ branched, openCount = 1 }: { branched: boolean; openCount?: number }) {
   const x = (i: number) => 56 + i * 98;
   return (
     <svg
-      className={'learning-loop ' + (closed ? 'closed' : branched ? 'branched' : '')}
+      className={'learning-loop ' + (branched ? 'branched' : '')}
       viewBox="0 0 700 118"
       role="img"
       aria-label={
-        closed
-          ? 'Discovery loop: the critique branched back into a follow-up experiment, now resolved'
-          : branched
-            ? 'Discovery loop: an open critique branches back into the experiment stage'
-            : 'Discovery loop from question to decision'
+        branched
+          ? 'Discovery loop: an open critique branches back into the experiment stage'
+          : 'Discovery loop from question to decision'
       }
     >
       {LOOP_NODES.slice(0, -1).map((n, i) => (
@@ -43,9 +31,7 @@ function LearningLoop({
             markerEnd="url(#loop-arrow)"
           />
           <text className="loop-back-label" x={(x(3) + x(5)) / 2} y="106" textAnchor="middle">
-            {closed
-              ? 'follow-up run · challenge partly conceded'
-              : `${openCount} open challenge${openCount === 1 ? '' : 's'} → new experiment`}
+            {`${openCount} open challenge${openCount === 1 ? '' : 's'} → new experiment`}
           </text>
           <defs>
             <marker
@@ -74,44 +60,20 @@ function LearningLoop({
   );
 }
 
-/** Evidence chain behind the follow-up decision: inspectable accountability, not narrative. */
-function WhyThisDecision({
-  challenge,
-  approval,
-  followup,
-  followupResult,
-}: {
-  challenge?: Challenge;
-  approval?: { approved_at: string; actor: string } | null;
-  followup?: FollowupDecision;
-  followupResult?: Result;
-}) {
+/** Evidence chain behind the decision: inspectable accountability, not narrative. */
+function WhyThisDecision({ decision, challenge }: { decision: Decision; challenge?: Challenge }) {
   const rows: [string, ReactNode][] = [
-    ['Triggered by', `Critic challenge ${challenge?.challenge_id ?? 'X5'} — sex confounding`],
     [
-      'Evidence for the gap',
-      challenge?.evidence ?? 'The first model adjusts for species only; sex was not controlled.',
+      'Triggered by',
+      challenge ? `Critic challenge ${challenge.challenge_id}: ${challenge.attack}` : 'The computed result',
     ],
-    [
-      'Expected learning',
-      'Does the positive within-species slope survive adjustment for sex and collection year?',
-    ],
-    [
-      'Human approval',
-      approval ? `Approved · ${new Date(approval.approved_at).toLocaleString()}` : 'Awaiting your approval',
-    ],
+    ...(challenge ? [['Evidence for the gap', challenge.evidence] as [string, ReactNode]] : []),
+    ['Reasoning', decision.rationale],
+    ['Expected learning', decision.next_evidence_search],
+    ['Human approval', 'Required again: the next experiment runs only after you approve a new plan'],
   ];
-  if (followupResult) {
-    rows.push([
-      'Computed result',
-      `Slope ${signed(followupResult.adjusted_slope)} · 95% CI [${followupResult.adjusted_ci95
-        .map((v) => v.toFixed(3))
-        .join(', ')}] · n = ${followupResult.n}`,
-    ]);
-  }
-  if (followup) rows.push(['Decision after the result', followup.summary]);
   return (
-    <details className="why-decision" open={!followup}>
+    <details className="why-decision" open>
       <summary>Why this decision? Trace the evidence chain</summary>
       <dl>
         {rows.map(([k, v]) => (
@@ -128,7 +90,6 @@ function WhyThisDecision({
 const METRIC_LABELS: [string, string][] = [
   ['hypotheses_evaluated', 'Hypotheses registered'],
   ['experiments_compared', 'Experiments compared'],
-  ['followup_experiments', 'Follow-ups triggered'],
   ['agent_handoffs', 'Agent handoffs'],
   ['human_approvals', 'Human approval points'],
   ['challenges_raised', 'Challenges raised'],
@@ -169,30 +130,15 @@ function DiscoveryAcceleration({ metrics }: { metrics: Record<string, number | s
 
 export function DecisionChapter({
   decision,
-  followup,
-  followupResult,
   openChallenge,
   openChallenges,
-  resolvedChallenge,
-  followupApproval,
   metrics,
-  canRunFollowup,
-  busy,
-  onRunFollowup,
 }: {
   decision?: Decision;
-  followup?: FollowupDecision;
-  followupResult?: Result;
   openChallenge?: Challenge;
   openChallenges?: Challenge[];
-  resolvedChallenge?: Challenge;
-  followupApproval?: { approved_at: string; actor: string } | null;
   metrics?: Record<string, number | string>;
-  canRunFollowup: boolean;
-  busy: boolean;
-  onRunFollowup: () => void;
 }) {
-  const branched = !!(openChallenge || resolvedChallenge);
   const openCount = openChallenges?.length ?? (openChallenge ? 1 : 0);
   return (
     <section>
@@ -203,7 +149,7 @@ export function DecisionChapter({
       />
       {decision ? (
         <div className="decision-card">
-          <LearningLoop branched={branched} closed={!!followup} openCount={openCount} />
+          <LearningLoop branched={!!openChallenge} openCount={openCount} />
           <div className="decision-columns">
             <div>
               <span className="eyebrow">BEFORE THE EXPERIMENT</span>
@@ -226,58 +172,8 @@ export function DecisionChapter({
               <strong>{decision.next_experiment}</strong>
               <p>{decision.next_evidence_search}</p>
             </div>
-            {canRunFollowup && decision.next_experiment === FOLLOWUP && !followup && (
-              <button className="button primary" disabled={busy} onClick={onRunFollowup}>
-                <ShieldCheck size={16} />
-                {busy ? 'Running…' : 'Approve & run follow-up'}
-              </button>
-            )}
           </div>
-          {decision.next_experiment === FOLLOWUP && (
-            <WhyThisDecision
-              challenge={resolvedChallenge ?? openChallenge}
-              approval={followupApproval}
-              followup={followup}
-              followupResult={followupResult}
-            />
-          )}
-          {followup && followupResult && (
-            <div className="followup">
-              <div className="card-top">
-                <span className="eyebrow">FOLLOW-UP / E3 · {FOLLOWUP.toUpperCase()}</span>
-                <Tag tone="green">Actual result · n = {followupResult.n}</Tag>
-              </div>
-              <h3>{followup.summary}</h3>
-              <div className="result-metrics compact">
-                <div>
-                  <span>Species-only slope</span>
-                  <strong>{signed(followupResult.species_only_slope ?? 0)}</strong>
-                </div>
-                <ArrowRight size={20} />
-                <div>
-                  <span>+ sex + year</span>
-                  <strong className="mint">{signed(followupResult.adjusted_slope)}</strong>
-                </div>
-                <div>
-                  <span>95% bootstrap interval</span>
-                  <strong className="interval">
-                    [{followupResult.adjusted_ci95.map((v) => v.toFixed(3)).join(', ')}]
-                  </strong>
-                </div>
-              </div>
-              <p>
-                {followup.hypothesis_id} support {followup.prior_support} → {followup.updated_support} ·{' '}
-                {followup.result_consistency}. {followup.evidence}
-              </p>
-              <div className="next-test">
-                <GitBranch size={20} />
-                <div>
-                  <span className="eyebrow">UPDATED NEXT STEP</span>
-                  <strong>{followup.next_decision}</strong>
-                </div>
-              </div>
-            </div>
-          )}
+          <WhyThisDecision decision={decision} challenge={openChallenge} />
           {metrics && <DiscoveryAcceleration metrics={metrics} />}
         </div>
       ) : (

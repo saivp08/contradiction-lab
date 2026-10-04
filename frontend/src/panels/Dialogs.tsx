@@ -1,6 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { ArrowUpRight, Play, ShieldCheck, X } from 'lucide-react';
-import { REFERENCE_QUESTION } from '../lib';
+import { ArrowUpRight, ShieldCheck, X } from 'lucide-react';
 import type { LabObject, RecordData } from '../types';
 
 function Dialog({
@@ -69,57 +68,6 @@ function Dialog({
   );
 }
 
-export function NewInvestigationDialog({
-  label,
-  onLabel,
-  mode,
-  onMode,
-  ready,
-  busy,
-  onStart,
-  onClose,
-}: {
-  label: string;
-  onLabel: (value: string) => void;
-  mode: string;
-  onMode: (value: string) => void;
-  ready: boolean;
-  busy: boolean;
-  onStart: () => void;
-  onClose: () => void;
-}) {
-  return (
-    <Dialog id="modal-title" closeLabel="Close" onClose={onClose}>
-      <span className="eyebrow">NEW INVESTIGATION</span>
-      <h2 id="modal-title">Start a new run.</h2>
-      <p>This version investigates one question on the Palmer Penguins dataset:</p>
-      <blockquote className="fixed-question">{REFERENCE_QUESTION}</blockquote>
-      <label htmlFor="run-label">Run name (optional)</label>
-      <input
-        id="run-label"
-        value={label}
-        placeholder="e.g. Seed 42 check"
-        onChange={(e) => onLabel(e.target.value)}
-        maxLength={120}
-      />
-      <p className="caption">The name helps you find this run later. It does not change the analysis.</p>
-      <label htmlFor="engine">Who runs the steps</label>
-      <select id="engine" value={mode} onChange={(e) => onMode(e.target.value)}>
-        <option value="local">Rule-based specialists (no AI) — real computation</option>
-        <option value="omnigent" disabled={!ready}>
-          Live AI agents via Omnigent{!ready ? ' (needs API key)' : ''}
-        </option>
-      </select>
-      {!ready && (
-        <p className="caption">Live agents need ANTHROPIC_API_KEY on the server.</p>
-      )}
-      <button className="button primary full" disabled={busy} onClick={onStart}>
-        <Play size={15} />
-        Start investigation
-      </button>
-    </Dialog>
-  );
-}
 
 export function ApprovalDialog({
   title,

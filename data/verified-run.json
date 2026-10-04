@@ -1,220 +1,221 @@
 {
-  "id": "lab-0cef21077817",
-  "objective": "Why does the relationship between penguin bill length and depth reverse when species are separated?",
-  "label": null,
-  "reference_question": "Why does the bill length\u2013depth association reverse across aggregation choices?",
-  "scope": "Reference investigation only. The dataset, variables and question are fixed; the optional label is for the user.",
+  "id": "lab-e50957d94830",
+  "objective": "Why do \u201cCaffeine improves sustained attention in young adults: a randomized controlled trial\u201d and \u201cNo significant effect of caffeine on sustained attention in older adults\u201d disagree about caffeine, sustained attention and adults?",
+  "label": "Sample: caffeine and attention",
+  "scope": "Comparison of two user-supplied papers via extracted text evidence; the computational experiments quantify extraction robustness, not either paper's truth.",
   "mode": "local",
   "status": "complete",
   "stage": 9,
   "seed": 42,
-  "created_at": "2026-10-04T02:31:05.546852+00:00",
+  "created_at": "2026-10-04T06:46:46.007588+00:00",
   "objects": {
-    "question-bec00405f54e": {
-      "id": "question-bec00405f54e",
+    "question-5a25f09c50fa": {
+      "id": "question-5a25f09c50fa",
       "kind": "question",
       "data": {
-        "objective": "Why does the relationship between penguin bill length and depth reverse when species are separated?",
-        "scope": "Reference investigation only. The dataset, variables and question are fixed; the optional label is for the user."
+        "objective": "Why do \u201cCaffeine improves sustained attention in young adults: a randomized controlled trial\u201d and \u201cNo significant effect of caffeine on sustained attention in older adults\u201d disagree about caffeine, sustained attention and adults?",
+        "scope": "Comparison of two user-supplied papers via extracted text evidence; the computational experiments quantify extraction robustness, not either paper's truth."
       },
       "input_ids": [],
-      "created_at": "2026-10-04T02:31:05.546872+00:00"
+      "created_at": "2026-10-04T06:46:46.007805+00:00"
     },
-    "evidence-b58621e8b457": {
-      "id": "evidence-b58621e8b457",
+    "evidence-d61984ba089d": {
+      "id": "evidence-d61984ba089d",
       "kind": "evidence",
       "data": {
         "evidence_id": "EV1",
-        "source": "Curated literature extract (one article, two analysis contexts)",
+        "source": "Uploaded PDF: caffeine-rct-young.pdf",
         "citation": {
-          "title": "Palmer Archipelago Penguins Data in the palmerpenguins R Package - An Alternative to Anderson's Irises",
+          "title": "Caffeine improves sustained attention in young adults: a randomized controlled trial",
           "authors": [
-            "Allison M. Horst",
-            "Alison Presmanes Hill",
-            "Kristen B. Gorman"
+            "Maria Keller",
+            "Daniel Osei",
+            "Priya Raman"
           ],
-          "year": 2022,
-          "identifier": "10.32614/RJ-2022-020",
-          "url": "https://journal.r-project.org/articles/RJ-2022-020/",
-          "location": "Continuous quantitative variables; discussion of bill dimensions and Simpson's paradox",
-          "retrieved_at": "2026-10-03"
+          "year": 2021,
+          "identifier": "10.9999/jcp.2021.0042",
+          "url": "https://doi.org/10.9999/jcp.2021.0042",
+          "location": "p. 2, results section",
+          "retrieved_at": "2026-10-04"
         },
-        "claim": "Bill length and depth show a negative association when species are pooled.",
-        "direction_of_effect": "negative",
-        "population_or_system": "Palmer Archipelago penguins, 2007\u20132009",
-        "intervention_or_variable": "Bill length (mm)",
-        "outcome": "Bill depth (mm)",
-        "sample_size_if_known": null,
+        "claim": "Caffeine significantly increased sustained attention scores compared with placebo (mean difference 4.2 points, 95% CI 1.5 to 6.9, p = 0.003).",
+        "direction_of_effect": "positive",
+        "population_or_system": "young, adults, adults",
+        "intervention_or_variable": "caffeine",
+        "outcome": "caffeine, sustained attention and adults",
+        "sample_size_if_known": 120,
         "experimental_conditions": {
-          "aggregation": "All species pooled",
-          "system": "Same observational dataset",
-          "measurement": "Bill morphometry",
-          "period": "2007\u20132009"
+          "section": "results",
+          "page": "2",
+          "statistics": "mean difference; 95% CI; p = 0.003"
         },
-        "methodology": "Published exploratory visual comparison; reproduced with regression in this application.",
+        "methodology": "We randomized n = 120 healthy young adults (ages 18-30, 61 female) to 200 mg caffeine or matched placebo in a double-blind parallel design. Sustained attention was measured with the Psychomotor Vigilance Task (PVT) 45 minutes after administration. The prespecified primary outcome was the sustained attention composite score.",
         "limitations": [
-          "Not two independent studies.",
-          "Aggregation changes the estimand; this is an apparent contradiction, not a refutation."
+          "Single dose, single session, young-adult sample only; generalization to older adults is unknown."
         ],
         "confidence": "high",
         "provenance": {
-          "retrieval": "Manually curated from the linked primary article, not live search",
-          "dataset_sha256": "f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
-          "evidence_location": "Continuous quantitative variables; discussion of bill dimensions and Simpson's paradox"
+          "pdf_sha256": "5df3a71521658b2f64722e14b1cb0cb91618bbe203e62c83e128e19d9d20e912",
+          "page": "2",
+          "section": "results",
+          "quote": "Caffeine significantly increased sustained attention scores compared with placebo (mean difference 4.2 points, 95% CI 1.5 to 6.9, p = 0.003).",
+          "extraction": "rule-based parser; exact sentence from the PDF text layer"
         }
       },
       "input_ids": [
-        "question-bec00405f54e"
+        "question-5a25f09c50fa"
       ],
-      "created_at": "2026-10-04T02:31:05.550917+00:00"
+      "created_at": "2026-10-04T06:46:46.012526+00:00"
     },
-    "evidence-cecd01ad724e": {
-      "id": "evidence-cecd01ad724e",
+    "evidence-eb3a8c53cdba": {
+      "id": "evidence-eb3a8c53cdba",
       "kind": "evidence",
       "data": {
         "evidence_id": "EV2",
-        "source": "Curated literature extract (one article, two analysis contexts)",
+        "source": "Uploaded PDF: caffeine-null-older.pdf",
         "citation": {
-          "title": "Palmer Archipelago Penguins Data in the palmerpenguins R Package - An Alternative to Anderson's Irises",
+          "title": "No significant effect of caffeine on sustained attention in older adults",
           "authors": [
-            "Allison M. Horst",
-            "Alison Presmanes Hill",
-            "Kristen B. Gorman"
+            "Thomas Lindqvist",
+            "Amara Diallo"
           ],
-          "year": 2022,
-          "identifier": "10.32614/RJ-2022-020",
-          "url": "https://journal.r-project.org/articles/RJ-2022-020/",
-          "location": "Continuous quantitative variables; discussion of bill dimensions and Simpson's paradox",
-          "retrieved_at": "2026-10-03"
+          "year": 2023,
+          "identifier": "10.9999/gercog.2023.0117",
+          "url": "https://doi.org/10.9999/gercog.2023.0117",
+          "location": "p. 2, results section",
+          "retrieved_at": "2026-10-04"
         },
-        "claim": "Within species, bill length and depth show positive associations.",
-        "direction_of_effect": "positive",
-        "population_or_system": "Palmer Archipelago penguins, 2007\u20132009",
-        "intervention_or_variable": "Bill length (mm)",
-        "outcome": "Bill depth (mm)",
-        "sample_size_if_known": null,
+        "claim": "Caffeine did not significantly change sustained attention scores compared with placebo (mean difference 0.6 points, 95% CI -1.1 to 2.3, p = 0.41).",
+        "direction_of_effect": "unknown",
+        "population_or_system": "adults, older, adults",
+        "intervention_or_variable": "caffeine",
+        "outcome": "caffeine, sustained attention and adults",
+        "sample_size_if_known": 85,
         "experimental_conditions": {
-          "aggregation": "Species separated",
-          "system": "Same observational dataset",
-          "measurement": "Bill morphometry",
-          "period": "2007\u20132009"
+          "section": "results",
+          "page": "2",
+          "reported_effect": "null result (no significant effect reported)",
+          "statistics": "mean difference; 95% CI; p = 0.41"
         },
-        "methodology": "Published exploratory visual comparison; reproduced with regression in this application.",
+        "methodology": "A double-blind crossover design enrolled n = 85 older adults (ages 65-82, 47 female). Sustained attention was measured with the Psychomotor Vigilance Task (PVT) 45 minutes after each administration, one week apart.",
         "limitations": [
-          "Not two independent studies.",
-          "Aggregation changes the estimand; this is an apparent contradiction, not a refutation."
+          "Crossover design with a single dose; habitual caffeine intake was self-reported."
         ],
         "confidence": "high",
         "provenance": {
-          "retrieval": "Manually curated from the linked primary article, not live search",
-          "dataset_sha256": "f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
-          "evidence_location": "Continuous quantitative variables; discussion of bill dimensions and Simpson's paradox"
+          "pdf_sha256": "d3d70d8b7cef2c030be439650f98b10732d7c9ef9250681952388b60a799fd80",
+          "page": "2",
+          "section": "results",
+          "quote": "Caffeine did not significantly change sustained attention scores compared with placebo (mean difference 0.6 points, 95% CI -1.1 to 2.3, p = 0.41).",
+          "extraction": "rule-based parser; exact sentence from the PDF text layer"
         }
       },
       "input_ids": [
-        "question-bec00405f54e"
+        "question-5a25f09c50fa"
       ],
-      "created_at": "2026-10-04T02:31:05.550935+00:00"
+      "created_at": "2026-10-04T06:46:46.012537+00:00"
     },
-    "contradiction-2314022b15a2": {
-      "id": "contradiction-2314022b15a2",
+    "contradiction-c7284280c9f8": {
+      "id": "contradiction-c7284280c9f8",
       "kind": "contradiction",
       "data": {
         "contradiction_id": "C1",
         "evidence_a": "EV1",
         "evidence_b": "EV2",
-        "conflicting_claim": "For Bill depth (mm), source A reports a negative effect while source B reports a positive effect.",
-        "shared_context": "Palmer Archipelago penguins, 2007\u20132009",
+        "conflicting_claim": "For caffeine, sustained attention and adults, source A reports a positive effect while source B reports no significant effect.",
+        "shared_context": "Shared outcome: caffeine, sustained attention and adults",
         "differing_conditions": [
-          "aggregation: All species pooled \u00b7 Species separated"
+          "population: young, adults, adults \u00b7 adults, older, adults",
+          "reported_effect: \u2014 \u00b7 null result (no significant effect reported)",
+          "statistics: mean difference; 95% CI; p = 0.003 \u00b7 mean difference; 95% CI; p = 0.41"
         ],
-        "contradiction_strength": "contextual reversal",
+        "contradiction_strength": "unresolved",
         "uncertainty": "Different contexts or estimands can legitimately yield different signs; a disagreement is a question to investigate, not proof that either source is false.",
-        "explanation": "An apparent contradiction tied to analysis context within one source."
+        "explanation": "A context-dependent disagreement: the sources differ in extracted conditions."
       },
       "input_ids": [
-        "evidence-b58621e8b457",
-        "evidence-cecd01ad724e"
+        "evidence-d61984ba089d",
+        "evidence-eb3a8c53cdba"
       ],
-      "created_at": "2026-10-04T02:31:05.553266+00:00"
+      "created_at": "2026-10-04T06:46:46.016005+00:00"
     },
-    "hypothesis-16dd59a54a02": {
-      "id": "hypothesis-16dd59a54a02",
+    "hypothesis-e27595dabacd": {
+      "id": "hypothesis-e27595dabacd",
       "kind": "hypothesis",
       "data": {
         "hypothesis_id": "H1",
-        "statement": "Species composition explains the reversal",
-        "rationale": "Pooling species may combine between-species differences with within-species variation.",
+        "statement": "Differences in population explain the disagreement",
+        "rationale": "The papers differ in extracted conditions (Paper A: adults, female, young \u00b7 Paper B: adults, female, older); the association may hold in one context and not the other.",
         "supporting_evidence": [
           "EV1",
           "EV2"
         ],
         "conflicting_evidence": [],
         "predictions": [
-          "A species-adjusted slope is positive while the pooled slope is negative."
+          "The disagreement survives extraction resampling while clear condition differences are present."
         ],
-        "falsification_condition": "A nonpositive adjusted slope or an interval spanning zero.",
-        "uncertainty": "Candidate explanation, not a causal conclusion. Initial scores are neutral heuristic values.",
+        "falsification_condition": "No stable condition difference is extracted, or the disagreement disappears when comparable claims are re-sampled.",
+        "uncertainty": "Template explanation filled with extracted values; a heuristic, not a probability.",
         "agent_generated": false,
         "support_score": 50.0
       },
       "input_ids": [
-        "contradiction-2314022b15a2"
+        "contradiction-c7284280c9f8"
       ],
-      "created_at": "2026-10-04T02:31:05.555317+00:00"
+      "created_at": "2026-10-04T06:46:46.019726+00:00"
     },
-    "hypothesis-c89a4c792647": {
-      "id": "hypothesis-c89a4c792647",
+    "hypothesis-0576d0414459": {
+      "id": "hypothesis-0576d0414459",
       "kind": "hypothesis",
       "data": {
         "hypothesis_id": "H2",
-        "statement": "Sampling variability explains the reversal",
-        "rationale": "A small or unstable association might change sign under resampling.",
+        "statement": "Methodological or measurement differences explain the disagreement",
+        "rationale": "Different designs or measures can produce different reported effects for the same question.",
         "supporting_evidence": [
           "EV1",
           "EV2"
         ],
         "conflicting_evidence": [],
         "predictions": [
-          "The adjusted interval spans zero or the sign changes when a year is omitted."
+          "Extracted design terms differ and statistical reporting coverage is uneven between the papers."
         ],
-        "falsification_condition": "A positive interval and stable sign across every omitted year.",
-        "uncertainty": "Candidate explanation, not a causal conclusion. Initial scores are neutral heuristic values.",
+        "falsification_condition": "Designs and measures are extracted as equivalent with high statistical coverage in both papers.",
+        "uncertainty": "Template explanation filled with extracted values; a heuristic, not a probability.",
         "agent_generated": false,
         "support_score": 50.0
       },
       "input_ids": [
-        "contradiction-2314022b15a2"
+        "contradiction-c7284280c9f8"
       ],
-      "created_at": "2026-10-04T02:31:05.555332+00:00"
+      "created_at": "2026-10-04T06:46:46.019739+00:00"
     },
-    "hypothesis-ddba759e0595": {
-      "id": "hypothesis-ddba759e0595",
+    "hypothesis-ae1b5f9b37e0": {
+      "id": "hypothesis-ae1b5f9b37e0",
       "kind": "hypothesis",
       "data": {
         "hypothesis_id": "H3",
-        "statement": "Sex or year differences explain residual association",
-        "rationale": "Species adjustment alone does not account for other measured covariates.",
+        "statement": "Sampling variability or selective extraction explains the disagreement",
+        "rationale": "An apparent disagreement can be an artifact of which sentences were extracted or chance in small samples.",
         "supporting_evidence": [
           "EV1",
           "EV2"
         ],
         "conflicting_evidence": [],
         "predictions": [
-          "Residual association changes after sex/year adjustment."
+          "The disagreement is unstable under claim resampling or disappears when a section is excluded."
         ],
-        "falsification_condition": "Stable adjusted estimates across sex and year controls in a follow-up test.",
-        "uncertainty": "Candidate explanation, not a causal conclusion. Initial scores are neutral heuristic values.",
+        "falsification_condition": "A high bootstrap disagreement rate with the top pair stable across section exclusions.",
+        "uncertainty": "Template explanation filled with extracted values; a heuristic, not a probability.",
         "agent_generated": false,
         "support_score": 50.0
       },
       "input_ids": [
-        "contradiction-2314022b15a2"
+        "contradiction-c7284280c9f8"
       ],
-      "created_at": "2026-10-04T02:31:05.555340+00:00"
+      "created_at": "2026-10-04T06:46:46.019747+00:00"
     },
-    "experiment-33d23eabec7e": {
-      "id": "experiment-33d23eabec7e",
+    "experiment-b6d48119606d": {
+      "id": "experiment-b6d48119606d",
       "kind": "experiment",
       "data": {
         "experiment_id": "E1",
@@ -223,40 +224,41 @@
           "H2",
           "H3"
         ],
-        "scientific_question": "Does controlling for species reverse the pooled relationship?",
-        "method": "species_adjustment",
-        "title": "Species-adjusted regression",
-        "required_data": "Palmer Penguins / f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
+        "scientific_question": "Does the detected disagreement survive resampling of the extracted claims?",
+        "method": "claim_alignment_audit",
+        "title": "Claim-alignment robustness audit",
+        "required_data": "Uploaded papers / 5df3a7152165+d3d70d8b7cef",
         "variables": [
-          "bill_length_mm",
-          "bill_depth_mm",
-          "species",
-          "year"
+          "attention",
+          "caffeine",
+          "placebo",
+          "score",
+          "sustained"
         ],
-        "expected_information_gain": 0.9,
+        "expected_information_gain": 0.85,
         "feasibility": 1.0,
-        "data_availability": 0.9941860465116279,
-        "computational_cost": 0.1,
-        "discrimination": 0.95,
+        "data_availability": 1.0,
+        "computational_cost": 0.05,
+        "discrimination": 0.8,
         "limitations": [
-          "Exploratory, observational reanalysis; no causal identification.",
+          "Operates on extracted text evidence, not the papers' primary data.",
           "Heuristic planning scores, not expected bits of information."
         ],
-        "success_criterion": "Adjusted 95% interval excludes zero with opposite sign to pooled slope; sign survives year exclusions.",
-        "failure_criterion": "Interval includes zero, no reversal, or unstable sensitivity results.",
+        "success_criterion": "Disagreement rate \u2265 0.8 across claim resampling with the top pair stable under section exclusion.",
+        "failure_criterion": "The disagreement disappears under resampling or section exclusion.",
         "seed": 42,
-        "bootstrap_samples": 500,
-        "planning_score": 0.8963
+        "bootstrap_samples": 300,
+        "planning_score": 0.845
       },
       "input_ids": [
-        "hypothesis-16dd59a54a02",
-        "hypothesis-c89a4c792647",
-        "hypothesis-ddba759e0595"
+        "hypothesis-e27595dabacd",
+        "hypothesis-0576d0414459",
+        "hypothesis-ae1b5f9b37e0"
       ],
-      "created_at": "2026-10-04T02:31:05.565191+00:00"
+      "created_at": "2026-10-04T06:46:46.022638+00:00"
     },
-    "experiment-246f75887551": {
-      "id": "experiment-246f75887551",
+    "experiment-e6d6695bf7c6": {
+      "id": "experiment-e6d6695bf7c6",
       "kind": "experiment",
       "data": {
         "experiment_id": "E2",
@@ -265,2232 +267,235 @@
           "H2",
           "H3"
         ],
-        "scientific_question": "Does controlling for collection year resolve the disagreement?",
-        "method": "year_sensitivity",
-        "title": "Year-adjusted sensitivity",
-        "required_data": "Palmer Penguins / f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
+        "scientific_question": "How much of the disagreement coincides with extractable condition differences?",
+        "method": "condition_scan",
+        "title": "Condition-difference scan",
+        "required_data": "Uploaded papers / 5df3a7152165+d3d70d8b7cef",
         "variables": [
-          "bill_length_mm",
-          "bill_depth_mm",
-          "species",
-          "year"
+          "attention",
+          "caffeine",
+          "placebo",
+          "score",
+          "sustained"
         ],
         "expected_information_gain": 0.6,
         "feasibility": 1.0,
-        "data_availability": 0.9941860465116279,
-        "computational_cost": 0.1,
+        "data_availability": 1.0,
+        "computational_cost": 0.05,
         "discrimination": 0.55,
         "limitations": [
-          "Exploratory, observational reanalysis; no causal identification.",
+          "Operates on extracted text evidence, not the papers' primary data.",
           "Heuristic planning scores, not expected bits of information."
         ],
-        "success_criterion": "Adjusted 95% interval excludes zero with opposite sign to pooled slope; sign survives year exclusions.",
-        "failure_criterion": "Interval includes zero, no reversal, or unstable sensitivity results.",
+        "success_criterion": "Disagreement rate \u2265 0.8 across claim resampling with the top pair stable under section exclusion.",
+        "failure_criterion": "The disagreement disappears under resampling or section exclusion.",
         "seed": 42,
-        "bootstrap_samples": 500,
-        "planning_score": 0.6913
+        "bootstrap_samples": 300,
+        "planning_score": 0.695
       },
       "input_ids": [
-        "hypothesis-16dd59a54a02",
-        "hypothesis-c89a4c792647",
-        "hypothesis-ddba759e0595"
+        "hypothesis-e27595dabacd",
+        "hypothesis-0576d0414459",
+        "hypothesis-ae1b5f9b37e0"
       ],
-      "created_at": "2026-10-04T02:31:05.565210+00:00"
+      "created_at": "2026-10-04T06:46:46.022652+00:00"
     },
-    "run-91004e2337cc": {
-      "id": "run-91004e2337cc",
+    "run-4198624dd3ab": {
+      "id": "run-4198624dd3ab",
       "kind": "run",
       "data": {
-        "specification_id": "experiment-33d23eabec7e",
-        "started_at": "2026-10-04T02:31:05.570611+00:00",
+        "specification_id": "experiment-b6d48119606d",
+        "started_at": "2026-10-04T06:46:46.027907+00:00",
         "seed": 42,
         "approval": {
           "experiment_id": "E1",
-          "approved_at": "2026-10-04T02:31:05.567927+00:00",
+          "approved_at": "2026-10-04T06:46:46.024933+00:00",
           "actor": "developer-authorized reproducibility script; not a UI click",
-          "scope": "One allowlisted local computational experiment"
+          "scope": "One allowlisted local computational experiment",
+          "plan_sha256": "be7ea800398032814381df2cb6086484e295f85e564e6d82b7160f83f9ff5e8f"
         }
       },
       "input_ids": [
-        "experiment-33d23eabec7e"
+        "experiment-b6d48119606d"
       ],
-      "created_at": "2026-10-04T02:31:05.570634+00:00"
+      "created_at": "2026-10-04T06:46:46.027919+00:00"
     },
-    "result-4e273da6ac28": {
-      "id": "result-4e273da6ac28",
+    "result-a5950e7245bd": {
+      "id": "result-a5950e7245bd",
       "kind": "result",
       "data": {
-        "method": "species_adjustment",
-        "group": "species",
-        "n": 342,
-        "pooled_slope": -0.08502128077717656,
-        "adjusted_slope": 0.1998942809546958,
-        "adjusted_ci95": [
-          0.16479378601016384,
-          0.23389227420426822
-        ],
-        "subgroups": [
-          {
-            "group": "Adelie",
-            "n": 151,
-            "slope": 0.17883434964257813
-          },
-          {
-            "group": "Chinstrap",
-            "n": 68,
-            "slope": 0.22221172400367145
-          },
-          {
-            "group": "Gentoo",
-            "n": 123,
-            "slope": 0.2048443406214756
-          }
-        ],
-        "sensitivity": [
-          {
-            "excluded_year": 2007,
-            "slope": 0.2090627047014618
-          },
-          {
-            "excluded_year": 2008,
-            "slope": 0.19212713875552334
-          },
-          {
-            "excluded_year": 2009,
-            "slope": 0.1975164104695427
-          }
-        ],
-        "within_group_spearman": 0.5318164099399623,
-        "pooled_rmse": 1.9166562709559614,
-        "adjusted_rmse": 0.9477541264325486,
-        "model_comparison": {
-          "pooled_bic": 462.5026175289133,
-          "adjusted_bic": -7.529503052990396,
-          "delta_bic": 470.03212058190365,
-          "log10_bayes_factor": 102.0661781430023,
-          "favored_model": "species",
-          "note": "Positive \u0394BIC favors the adjusted model. \u0394BIC > 10 is conventionally very strong evidence. BIC approximates the Bayes factor; it is not an exact posterior probability."
+        "method": "claim_alignment_audit",
+        "unit": "extracted claims from two uploaded papers (text evidence, not a shared dataset)",
+        "n_claims": {
+          "a": 5,
+          "b": 5
         },
-        "decomposition": {
-          "group": "species",
-          "pooled_slope": -0.08502128077717656,
-          "within_slope": 0.1998942809546958,
-          "between_slope": -0.2026373492542608,
-          "within_weight": 0.2921908730899698,
-          "within_contribution": 0.058407284477844296,
-          "between_contribution": -0.14342856525502118,
-          "group_means": [
-            {
-              "group": "Adelie",
-              "n": 151,
-              "x": 38.79139072847682,
-              "y": 18.346357615894043
-            },
-            {
-              "group": "Chinstrap",
-              "n": 68,
-              "x": 48.83382352941176,
-              "y": 18.420588235294115
-            },
-            {
-              "group": "Gentoo",
-              "n": 123,
-              "x": 47.50487804878049,
-              "y": 14.982113821138212
-            }
+        "top_pair": {
+          "quote_a": "Caffeine significantly increased sustained attention scores compared with placebo (mean difference 4.2 points, 95% CI 1.5 to 6.9, p = 0.003).",
+          "quote_b": "Caffeine did not significantly change sustained attention scores compared with placebo (mean difference 0.6 points, 95% CI -1.1 to 2.3, p = 0.41).",
+          "location_a": "p. 2 \u00b7 results",
+          "location_b": "p. 2 \u00b7 results",
+          "section_a": "results",
+          "section_b": "results",
+          "directions": [
+            "positive",
+            "null"
           ],
-          "note": "Exact identity: pooled slope = within contribution + between contribution."
+          "similarity": 0.8333,
+          "kind": "tension",
+          "shared_terms": [
+            "attention",
+            "caffeine",
+            "placebo",
+            "score",
+            "sustained"
+          ]
         },
-        "reversal": true,
-        "robust_reversal": true,
-        "points": [
-          {
-            "x": 39.1,
-            "y": 18.7,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 39.5,
-            "y": 17.4,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 40.3,
-            "y": 18.0,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 36.7,
-            "y": 19.3,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 39.3,
-            "y": 20.6,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 38.9,
-            "y": 17.8,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 39.2,
-            "y": 19.6,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 34.1,
-            "y": 18.1,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 42.0,
-            "y": 20.2,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 37.8,
-            "y": 17.1,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 37.8,
-            "y": 17.3,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 41.1,
-            "y": 17.6,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 38.6,
-            "y": 21.2,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 34.6,
-            "y": 21.1,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 36.6,
-            "y": 17.8,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 38.7,
-            "y": 19.0,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 42.5,
-            "y": 20.7,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 34.4,
-            "y": 18.4,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 46.0,
-            "y": 21.5,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 37.8,
-            "y": 18.3,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 37.7,
-            "y": 18.7,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 35.9,
-            "y": 19.2,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 38.2,
-            "y": 18.1,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 38.8,
-            "y": 17.2,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 35.3,
-            "y": 18.9,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 40.6,
-            "y": 18.6,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 40.5,
-            "y": 17.9,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 37.9,
-            "y": 18.6,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 40.5,
-            "y": 18.9,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 39.5,
-            "y": 16.7,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 37.2,
-            "y": 18.1,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 39.5,
-            "y": 17.8,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 40.9,
-            "y": 18.9,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 36.4,
-            "y": 17.0,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 39.2,
-            "y": 21.1,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 38.8,
-            "y": 20.0,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 42.2,
-            "y": 18.5,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 37.6,
-            "y": 19.3,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 39.8,
-            "y": 19.1,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 36.5,
-            "y": 18.0,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 40.8,
-            "y": 18.4,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 36.0,
-            "y": 18.5,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 44.1,
-            "y": 19.7,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 37.0,
-            "y": 16.9,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 39.6,
-            "y": 18.8,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 41.1,
-            "y": 19.0,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 37.5,
-            "y": 18.9,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 36.0,
-            "y": 17.9,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 42.3,
-            "y": 21.2,
-            "species": "Adelie",
-            "year": 2007
-          },
-          {
-            "x": 39.6,
-            "y": 17.7,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 40.1,
-            "y": 18.9,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 35.0,
-            "y": 17.9,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 42.0,
-            "y": 19.5,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 34.5,
-            "y": 18.1,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 41.4,
-            "y": 18.6,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 39.0,
-            "y": 17.5,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 40.6,
-            "y": 18.8,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 36.5,
-            "y": 16.6,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 37.6,
-            "y": 19.1,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 35.7,
-            "y": 16.9,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 41.3,
-            "y": 21.1,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 37.6,
-            "y": 17.0,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 41.1,
-            "y": 18.2,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 36.4,
-            "y": 17.1,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 41.6,
-            "y": 18.0,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 35.5,
-            "y": 16.2,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 41.1,
-            "y": 19.1,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 35.9,
-            "y": 16.6,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 41.8,
-            "y": 19.4,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 33.5,
-            "y": 19.0,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 39.7,
-            "y": 18.4,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 39.6,
-            "y": 17.2,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 45.8,
-            "y": 18.9,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 35.5,
-            "y": 17.5,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 42.8,
-            "y": 18.5,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 40.9,
-            "y": 16.8,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 37.2,
-            "y": 19.4,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 36.2,
-            "y": 16.1,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 42.1,
-            "y": 19.1,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 34.6,
-            "y": 17.2,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 42.9,
-            "y": 17.6,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 36.7,
-            "y": 18.8,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 35.1,
-            "y": 19.4,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 37.3,
-            "y": 17.8,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 41.3,
-            "y": 20.3,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 36.3,
-            "y": 19.5,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 36.9,
-            "y": 18.6,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 38.3,
-            "y": 19.2,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 38.9,
-            "y": 18.8,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 35.7,
-            "y": 18.0,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 41.1,
-            "y": 18.1,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 34.0,
-            "y": 17.1,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 39.6,
-            "y": 18.1,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 36.2,
-            "y": 17.3,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 40.8,
-            "y": 18.9,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 38.1,
-            "y": 18.6,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 40.3,
-            "y": 18.5,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 33.1,
-            "y": 16.1,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 43.2,
-            "y": 18.5,
-            "species": "Adelie",
-            "year": 2008
-          },
-          {
-            "x": 35.0,
-            "y": 17.9,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 41.0,
-            "y": 20.0,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 37.7,
-            "y": 16.0,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 37.8,
-            "y": 20.0,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 37.9,
-            "y": 18.6,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 39.7,
-            "y": 18.9,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 38.6,
-            "y": 17.2,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 38.2,
-            "y": 20.0,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 38.1,
-            "y": 17.0,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 43.2,
-            "y": 19.0,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 38.1,
-            "y": 16.5,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 45.6,
-            "y": 20.3,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 39.7,
-            "y": 17.7,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 42.2,
-            "y": 19.5,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 39.6,
-            "y": 20.7,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 42.7,
-            "y": 18.3,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 38.6,
-            "y": 17.0,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 37.3,
-            "y": 20.5,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 35.7,
-            "y": 17.0,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 41.1,
-            "y": 18.6,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 36.2,
-            "y": 17.2,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 37.7,
-            "y": 19.8,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 40.2,
-            "y": 17.0,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 41.4,
-            "y": 18.5,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 35.2,
-            "y": 15.9,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 40.6,
-            "y": 19.0,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 38.8,
-            "y": 17.6,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 41.5,
-            "y": 18.3,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 39.0,
-            "y": 17.1,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 44.1,
-            "y": 18.0,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 38.5,
-            "y": 17.9,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 43.1,
-            "y": 19.2,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 36.8,
-            "y": 18.5,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 37.5,
-            "y": 18.5,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 38.1,
-            "y": 17.6,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 41.1,
-            "y": 17.5,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 35.6,
-            "y": 17.5,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 40.2,
-            "y": 20.1,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 37.0,
-            "y": 16.5,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 39.7,
-            "y": 17.9,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 40.2,
-            "y": 17.1,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 40.6,
-            "y": 17.2,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 32.1,
-            "y": 15.5,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 40.7,
-            "y": 17.0,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 37.3,
-            "y": 16.8,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 39.0,
-            "y": 18.7,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 39.2,
-            "y": 18.6,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 36.6,
-            "y": 18.4,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 36.0,
-            "y": 17.8,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 37.8,
-            "y": 18.1,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 36.0,
-            "y": 17.1,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 41.5,
-            "y": 18.5,
-            "species": "Adelie",
-            "year": 2009
-          },
-          {
-            "x": 46.1,
-            "y": 13.2,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 50.0,
-            "y": 16.3,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 48.7,
-            "y": 14.1,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 50.0,
-            "y": 15.2,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 47.6,
-            "y": 14.5,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 46.5,
-            "y": 13.5,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 45.4,
-            "y": 14.6,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 46.7,
-            "y": 15.3,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 43.3,
-            "y": 13.4,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 46.8,
-            "y": 15.4,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 40.9,
-            "y": 13.7,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 49.0,
-            "y": 16.1,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 45.5,
-            "y": 13.7,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 48.4,
-            "y": 14.6,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 45.8,
-            "y": 14.6,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 49.3,
-            "y": 15.7,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 42.0,
-            "y": 13.5,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 49.2,
-            "y": 15.2,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 46.2,
-            "y": 14.5,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 48.7,
-            "y": 15.1,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 50.2,
-            "y": 14.3,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 45.1,
-            "y": 14.5,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 46.5,
-            "y": 14.5,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 46.3,
-            "y": 15.8,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 42.9,
-            "y": 13.1,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 46.1,
-            "y": 15.1,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 44.5,
-            "y": 14.3,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 47.8,
-            "y": 15.0,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 48.2,
-            "y": 14.3,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 50.0,
-            "y": 15.3,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 47.3,
-            "y": 15.3,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 42.8,
-            "y": 14.2,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 45.1,
-            "y": 14.5,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 59.6,
-            "y": 17.0,
-            "species": "Gentoo",
-            "year": 2007
-          },
-          {
-            "x": 49.1,
-            "y": 14.8,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 48.4,
-            "y": 16.3,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 42.6,
-            "y": 13.7,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 44.4,
-            "y": 17.3,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 44.0,
-            "y": 13.6,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 48.7,
-            "y": 15.7,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 42.7,
-            "y": 13.7,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 49.6,
-            "y": 16.0,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 45.3,
-            "y": 13.7,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 49.6,
-            "y": 15.0,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 50.5,
-            "y": 15.9,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 43.6,
-            "y": 13.9,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 45.5,
-            "y": 13.9,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 50.5,
-            "y": 15.9,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 44.9,
-            "y": 13.3,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 45.2,
-            "y": 15.8,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 46.6,
-            "y": 14.2,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 48.5,
-            "y": 14.1,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 45.1,
-            "y": 14.4,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 50.1,
-            "y": 15.0,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 46.5,
-            "y": 14.4,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 45.0,
-            "y": 15.4,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 43.8,
-            "y": 13.9,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 45.5,
-            "y": 15.0,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 43.2,
-            "y": 14.5,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 50.4,
-            "y": 15.3,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 45.3,
-            "y": 13.8,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 46.2,
-            "y": 14.9,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 45.7,
-            "y": 13.9,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 54.3,
-            "y": 15.7,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 45.8,
-            "y": 14.2,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 49.8,
-            "y": 16.8,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 46.2,
-            "y": 14.4,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 49.5,
-            "y": 16.2,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 43.5,
-            "y": 14.2,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 50.7,
-            "y": 15.0,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 47.7,
-            "y": 15.0,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 46.4,
-            "y": 15.6,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 48.2,
-            "y": 15.6,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 46.5,
-            "y": 14.8,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 46.4,
-            "y": 15.0,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 48.6,
-            "y": 16.0,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 47.5,
-            "y": 14.2,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 51.1,
-            "y": 16.3,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 45.2,
-            "y": 13.8,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 45.2,
-            "y": 16.4,
-            "species": "Gentoo",
-            "year": 2008
-          },
-          {
-            "x": 49.1,
-            "y": 14.5,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 52.5,
-            "y": 15.6,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 47.4,
-            "y": 14.6,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 50.0,
-            "y": 15.9,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 44.9,
-            "y": 13.8,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 50.8,
-            "y": 17.3,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 43.4,
-            "y": 14.4,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 51.3,
-            "y": 14.2,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 47.5,
-            "y": 14.0,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 52.1,
-            "y": 17.0,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 47.5,
-            "y": 15.0,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 52.2,
-            "y": 17.1,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 45.5,
-            "y": 14.5,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 49.5,
-            "y": 16.1,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 44.5,
-            "y": 14.7,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 50.8,
-            "y": 15.7,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 49.4,
-            "y": 15.8,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 46.9,
-            "y": 14.6,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 48.4,
-            "y": 14.4,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 51.1,
-            "y": 16.5,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 48.5,
-            "y": 15.0,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 55.9,
-            "y": 17.0,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 47.2,
-            "y": 15.5,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 49.1,
-            "y": 15.0,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 47.3,
-            "y": 13.8,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 46.8,
-            "y": 16.1,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 41.7,
-            "y": 14.7,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 53.4,
-            "y": 15.8,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 43.3,
-            "y": 14.0,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 48.1,
-            "y": 15.1,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 50.5,
-            "y": 15.2,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 49.8,
-            "y": 15.9,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 43.5,
-            "y": 15.2,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 51.5,
-            "y": 16.3,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 46.2,
-            "y": 14.1,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 55.1,
-            "y": 16.0,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 44.5,
-            "y": 15.7,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 48.8,
-            "y": 16.2,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 47.2,
-            "y": 13.7,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 46.8,
-            "y": 14.3,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 50.4,
-            "y": 15.7,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 45.2,
-            "y": 14.8,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 49.9,
-            "y": 16.1,
-            "species": "Gentoo",
-            "year": 2009
-          },
-          {
-            "x": 46.5,
-            "y": 17.9,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 50.0,
-            "y": 19.5,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 51.3,
-            "y": 19.2,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 45.4,
-            "y": 18.7,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 52.7,
-            "y": 19.8,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 45.2,
-            "y": 17.8,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 46.1,
-            "y": 18.2,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 51.3,
-            "y": 18.2,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 46.0,
-            "y": 18.9,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 51.3,
-            "y": 19.9,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 46.6,
-            "y": 17.8,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 51.7,
-            "y": 20.3,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 47.0,
-            "y": 17.3,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 52.0,
-            "y": 18.1,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 45.9,
-            "y": 17.1,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 50.5,
-            "y": 19.6,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 50.3,
-            "y": 20.0,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 58.0,
-            "y": 17.8,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 46.4,
-            "y": 18.6,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 49.2,
-            "y": 18.2,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 42.4,
-            "y": 17.3,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 48.5,
-            "y": 17.5,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 43.2,
-            "y": 16.6,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 50.6,
-            "y": 19.4,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 46.7,
-            "y": 17.9,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 52.0,
-            "y": 19.0,
-            "species": "Chinstrap",
-            "year": 2007
-          },
-          {
-            "x": 50.5,
-            "y": 18.4,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 49.5,
-            "y": 19.0,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 46.4,
-            "y": 17.8,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 52.8,
-            "y": 20.0,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 40.9,
-            "y": 16.6,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 54.2,
-            "y": 20.8,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 42.5,
-            "y": 16.7,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 51.0,
-            "y": 18.8,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 49.7,
-            "y": 18.6,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 47.5,
-            "y": 16.8,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 47.6,
-            "y": 18.3,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 52.0,
-            "y": 20.7,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 46.9,
-            "y": 16.6,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 53.5,
-            "y": 19.9,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 49.0,
-            "y": 19.5,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 46.2,
-            "y": 17.5,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 50.9,
-            "y": 19.1,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 45.5,
-            "y": 17.0,
-            "species": "Chinstrap",
-            "year": 2008
-          },
-          {
-            "x": 50.9,
-            "y": 17.9,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 50.8,
-            "y": 18.5,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 50.1,
-            "y": 17.9,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 49.0,
-            "y": 19.6,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 51.5,
-            "y": 18.7,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 49.8,
-            "y": 17.3,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 48.1,
-            "y": 16.4,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 51.4,
-            "y": 19.0,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 45.7,
-            "y": 17.3,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 50.7,
-            "y": 19.7,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 42.5,
-            "y": 17.3,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 52.2,
-            "y": 18.8,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 45.2,
-            "y": 16.6,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 49.3,
-            "y": 19.9,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 50.2,
-            "y": 18.8,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 45.6,
-            "y": 19.4,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 51.9,
-            "y": 19.5,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 46.8,
-            "y": 16.5,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 45.7,
-            "y": 17.0,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 55.8,
-            "y": 19.8,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 43.5,
-            "y": 18.1,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 49.6,
-            "y": 18.2,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 50.8,
-            "y": 19.0,
-            "species": "Chinstrap",
-            "year": 2009
-          },
-          {
-            "x": 50.2,
-            "y": 18.7,
-            "species": "Chinstrap",
-            "year": 2009
+        "similarity_ci95": [
+          0.4286,
+          0.8333
+        ],
+        "disagreement_rate": 0.99,
+        "opposed_pairs": 0,
+        "tension_pairs": 11,
+        "aligned_pairs": 0,
+        "comparable_pairs": 11,
+        "section_sensitivity": [
+          {
+            "excluded_section": "abstract",
+            "holds": true,
+            "similarity": 0.8333,
+            "kind": "tension"
+          },
+          {
+            "excluded_section": "discussion",
+            "holds": true,
+            "similarity": 0.8333,
+            "kind": "tension"
+          },
+          {
+            "excluded_section": "results",
+            "holds": true,
+            "similarity": 0.8333,
+            "kind": "tension"
           }
         ],
-        "bootstrap_samples": 500,
+        "stats_coverage": {
+          "a": 0.4,
+          "b": 0.4
+        },
+        "sample_sizes": {
+          "a": 120,
+          "b": 85
+        },
+        "condition_differences": [
+          {
+            "field": "population",
+            "a": "adults, female, young",
+            "b": "adults, female, older"
+          },
+          {
+            "field": "age range",
+            "a": "ages 18-30",
+            "b": "ages 65-82"
+          },
+          {
+            "field": "design",
+            "a": "double-blind, parallel, placebo, randomized",
+            "b": "crossover, double-blind, placebo"
+          },
+          {
+            "field": "dose",
+            "a": "200 mg",
+            "b": "not extracted"
+          },
+          {
+            "field": "sample size",
+            "a": "n = 120",
+            "b": "n = 85"
+          }
+        ],
+        "robust_disagreement": true,
+        "relationship": "context-dependent disagreement",
+        "topic": "caffeine, sustained attention and adults",
+        "bootstrap_samples": 300,
         "seed": 42,
-        "compute_seconds": 0.032094250000227476,
-        "null": "The within-group linear slope is zero.",
-        "alternative": "The within-group slope is positive despite the negative pooled slope.",
+        "compute_seconds": 0.04524291599955177,
+        "null": "The detected disagreement is an artifact of which sentences were extracted.",
+        "alternative": "The disagreement persists across claim resampling and section exclusion.",
         "assumptions": [
-          "Linear common within-group slope; subgroup slopes shown to assess heterogeneity.",
-          "Bootstrap treats birds as independent within strata; colony clustering may narrow intervals.",
-          "Complete-case analysis; missingness may be informative."
+          "Claims are the sentences matched by the deterministic extraction rules.",
+          "Term-overlap similarity is a proxy for semantic comparability, not a guarantee.",
+          "Bootstrap treats extracted claims as exchangeable within each paper."
         ],
         "limitations": [
-          "Observational association, not causation.",
-          "Exploratory reanalysis of a known reversal, not a new scientific discovery.",
-          "Bootstrap intervals are conditional on grouping and do not adjust for selection.",
-          "In-sample RMSE is descriptive, not held-out predictive performance."
+          "Text-evidence analysis only; no shared primary dataset was re-analysed.",
+          "Extraction rules can miss claims phrased without directional language.",
+          "Robustness here means stability of the extraction, not truth of either paper."
         ],
         "provenance": {
-          "dataset_sha256": "f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
+          "dataset_sha256": "328e99d237db88b1fcb5a79c0a8f3193e3426ea07d19e01a2b1cf057494e039e",
           "dataset": {
-            "name": "Palmer Penguins",
-            "source": "https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv",
-            "license": "CC0-1.0",
-            "license_url": "https://allisonhorst.github.io/palmerpenguins/LICENSE.html",
-            "retrieved_at": "2026-10-03",
-            "sha256": "f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
-            "version": "vendored snapshot 2026-10-03 (content-addressed)",
-            "preprocessing": "Drop only rows missing bill length, bill depth, species or year; no imputation.",
-            "n_raw": 344,
-            "n_complete": 342,
-            "n_dropped": 2
+            "papers": [
+              {
+                "id": "5df3a71521658b2f64722e14b1cb0cb91618bbe203e62c83e128e19d9d20e912",
+                "filename": "caffeine-rct-young.pdf",
+                "pages": 2,
+                "meta": {
+                  "title": "Caffeine improves sustained attention in young adults: a randomized controlled trial",
+                  "authors": [
+                    "Maria Keller",
+                    "Daniel Osei",
+                    "Priya Raman"
+                  ],
+                  "year": 2021,
+                  "journal": "Journal of Cognitive Performance",
+                  "doi": "10.9999/jcp.2021.0042",
+                  "arxiv": null
+                },
+                "sections": [
+                  "abstract",
+                  "discussion",
+                  "introduction",
+                  "limitations",
+                  "methods",
+                  "results"
+                ],
+                "sample_size": 120
+              },
+              {
+                "id": "d3d70d8b7cef2c030be439650f98b10732d7c9ef9250681952388b60a799fd80",
+                "filename": "caffeine-null-older.pdf",
+                "pages": 2,
+                "meta": {
+                  "title": "No significant effect of caffeine on sustained attention in older adults",
+                  "authors": [
+                    "Thomas Lindqvist",
+                    "Amara Diallo"
+                  ],
+                  "year": 2023,
+                  "journal": "Gerontology and Cognition",
+                  "doi": "10.9999/gercog.2023.0117",
+                  "arxiv": null
+                },
+                "sections": [
+                  "abstract",
+                  "discussion",
+                  "limitations",
+                  "methods",
+                  "results"
+                ],
+                "sample_size": 85
+              }
+            ],
+            "pdf_sha256": [
+              "5df3a71521658b2f64722e14b1cb0cb91618bbe203e62c83e128e19d9d20e912",
+              "d3d70d8b7cef2c030be439650f98b10732d7c9ef9250681952388b60a799fd80"
+            ]
           },
-          "code_sha256": "e3491038954ece1233b730757912dd40279a69eb49d251ce68455c3fd70b0f39",
-          "tool": "experiments.penguins.compute",
-          "timestamp": "2026-10-04T02:31:05.607242+00:00",
+          "code_sha256": "877a19a55dbb4e9ba100f6dc129311808a4d9faef723c5b6ee78f4492f872732",
+          "tool": "experiments.papers_analysis.compute_papers",
+          "timestamp": "2026-10-04T06:46:46.074521+00:00",
           "parameters": {
             "experiment_id": "E1",
             "hypothesis_targets": [
@@ -2498,29 +503,30 @@
               "H2",
               "H3"
             ],
-            "scientific_question": "Does controlling for species reverse the pooled relationship?",
-            "method": "species_adjustment",
-            "title": "Species-adjusted regression",
-            "required_data": "Palmer Penguins / f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
+            "scientific_question": "Does the detected disagreement survive resampling of the extracted claims?",
+            "method": "claim_alignment_audit",
+            "title": "Claim-alignment robustness audit",
+            "required_data": "Uploaded papers / 5df3a7152165+d3d70d8b7cef",
             "variables": [
-              "bill_length_mm",
-              "bill_depth_mm",
-              "species",
-              "year"
+              "attention",
+              "caffeine",
+              "placebo",
+              "score",
+              "sustained"
             ],
-            "expected_information_gain": 0.9,
+            "expected_information_gain": 0.85,
             "feasibility": 1.0,
-            "data_availability": 0.9941860465116279,
-            "computational_cost": 0.1,
-            "discrimination": 0.95,
+            "data_availability": 1.0,
+            "computational_cost": 0.05,
+            "discrimination": 0.8,
             "limitations": [
-              "Exploratory, observational reanalysis; no causal identification.",
+              "Operates on extracted text evidence, not the papers' primary data.",
               "Heuristic planning scores, not expected bits of information."
             ],
-            "success_criterion": "Adjusted 95% interval excludes zero with opposite sign to pooled slope; sign survives year exclusions.",
-            "failure_criterion": "Interval includes zero, no reversal, or unstable sensitivity results.",
+            "success_criterion": "Disagreement rate \u2265 0.8 across claim resampling with the top pair stable under section exclusion.",
+            "failure_criterion": "The disagreement disappears under resampling or section exclusion.",
             "seed": 42,
-            "bootstrap_samples": 500
+            "bootstrap_samples": 300
           },
           "runtime": {
             "python": "3.12.13",
@@ -2531,107 +537,100 @@
         }
       },
       "input_ids": [
-        "run-91004e2337cc"
+        "run-4198624dd3ab"
       ],
-      "created_at": "2026-10-04T02:31:05.607286+00:00"
+      "created_at": "2026-10-04T06:46:46.295863+00:00"
     },
-    "analysis-99f9b68247ad": {
-      "id": "analysis-99f9b68247ad",
+    "analysis-75221f80bb46": {
+      "id": "analysis-75221f80bb46",
       "kind": "analysis",
       "data": {
         "updates": [
           {
             "hypothesis_id": "H1",
             "prior_support": 50,
+            "updated_support": 75,
             "result_consistency": "better supported",
-            "updated_support": 85,
-            "evidence_for": "Adjusted slope 0.200; 95% CI [0.165, 0.234]; stable across year exclusions: True.",
-            "evidence_against": "This test does not isolate all correlated variables.",
-            "remaining_uncertainty": "Scores follow a disclosed heuristic, are not probabilities, and do not establish causation."
+            "evidence_for": "Disagreement rate 0.99 over 300 resamples; top-pair similarity 95% CI [0.43, 0.83]; 5 extracted condition differences; section exclusions hold: True.",
+            "evidence_against": "Text-evidence robustness cannot adjudicate which paper is correct.",
+            "remaining_uncertainty": "Scores follow a disclosed heuristic rubric over computed robustness numbers."
           },
           {
             "hypothesis_id": "H2",
             "prior_support": 50,
-            "result_consistency": "weakened",
-            "updated_support": 20,
-            "evidence_for": "Adjusted slope 0.200; 95% CI [0.165, 0.234]; stable across year exclusions: True.",
-            "evidence_against": "This test does not isolate all correlated variables.",
-            "remaining_uncertainty": "Scores follow a disclosed heuristic, are not probabilities, and do not establish causation."
+            "updated_support": 55,
+            "result_consistency": "remains plausible",
+            "evidence_for": "Disagreement rate 0.99 over 300 resamples; top-pair similarity 95% CI [0.43, 0.83]; 5 extracted condition differences; section exclusions hold: True.",
+            "evidence_against": "Text-evidence robustness cannot adjudicate which paper is correct.",
+            "remaining_uncertainty": "Scores follow a disclosed heuristic rubric over computed robustness numbers."
           },
           {
             "hypothesis_id": "H3",
             "prior_support": 50,
-            "result_consistency": "unresolved",
-            "updated_support": 50,
-            "evidence_for": "Adjusted slope 0.200; 95% CI [0.165, 0.234]; stable across year exclusions: True.",
-            "evidence_against": "This test does not isolate all correlated variables.",
-            "remaining_uncertainty": "Scores follow a disclosed heuristic, are not probabilities, and do not establish causation."
+            "updated_support": 25,
+            "result_consistency": "weakened",
+            "evidence_for": "Disagreement rate 0.99 over 300 resamples; top-pair similarity 95% CI [0.43, 0.83]; 5 extracted condition differences; section exclusions hold: True.",
+            "evidence_against": "Text-evidence robustness cannot adjudicate which paper is correct.",
+            "remaining_uncertainty": "Scores follow a disclosed heuristic rubric over computed robustness numbers."
           }
         ],
         "score_label": "Heuristic support score, not probability",
-        "model_comparison": {
-          "pooled_bic": 462.5026175289133,
-          "adjusted_bic": -7.529503052990396,
-          "delta_bic": 470.03212058190365,
-          "log10_bayes_factor": 102.0661781430023,
-          "favored_model": "species",
-          "note": "Positive \u0394BIC favors the adjusted model. \u0394BIC > 10 is conventionally very strong evidence. BIC approximates the Bayes factor; it is not an exact posterior probability."
-        }
+        "model_comparison": null
       },
       "input_ids": [
-        "result-4e273da6ac28",
-        "hypothesis-16dd59a54a02",
-        "hypothesis-c89a4c792647",
-        "hypothesis-ddba759e0595"
+        "result-a5950e7245bd",
+        "hypothesis-e27595dabacd",
+        "hypothesis-0576d0414459",
+        "hypothesis-ae1b5f9b37e0"
       ],
-      "created_at": "2026-10-04T02:31:05.611825+00:00"
+      "created_at": "2026-10-04T06:46:46.301679+00:00"
     },
-    "critique-81fd103a5895": {
-      "id": "critique-81fd103a5895",
+    "critique-51c4722c3713": {
+      "id": "critique-51c4722c3713",
       "kind": "critique",
       "data": {
         "challenges": [
           {
             "challenge_id": "X1",
-            "attack": "The reversal is sampling noise.",
-            "test": "Does the 95% bootstrap interval for the adjusted slope exclude zero?",
-            "evidence": "95% CI [0.165, 0.234] from 500 stratified resamples.",
+            "attack": "The headline disagreement is cherry-picked from one section.",
+            "test": "Does a disagreement pair survive excluding each section in turn?",
+            "evidence": "minus abstract: holds (0.83); minus discussion: holds (0.83); minus results: holds (0.83).",
             "verdict": "rebutted",
             "challenger": "CriticAgent",
             "defender": "AnalysisAgent"
           },
           {
             "challenge_id": "X2",
-            "attack": "A single collection year drives the result.",
-            "test": "Does the adjusted slope keep its sign when each year is left out?",
-            "evidence": "omit 2007: +0.209; omit 2008: +0.192; omit 2009: +0.198.",
+            "attack": "The comparison leans on abstracts rather than reported results.",
+            "test": "Do the compared claims come from the papers' results sections?",
+            "evidence": "Top pair locations: p. 2 \u00b7 results and p. 2 \u00b7 results.",
             "verdict": "rebutted",
             "challenger": "CriticAgent",
             "defender": "AnalysisAgent"
           },
           {
             "challenge_id": "X3",
-            "attack": "One species carries the whole effect.",
-            "test": "Does every species subgroup slope share the adjusted slope's sign?",
-            "evidence": "Adelie: +0.179; Chinstrap: +0.222; Gentoo: +0.205.",
+            "attack": "The papers' terminology barely overlaps; they are not comparable.",
+            "test": "Is the bootstrap lower bound of top-pair similarity above the comparability floor (0.15)?",
+            "evidence": "Similarity 95% CI lower bound 0.43; shared terms: attention, caffeine, placebo, score, sustained.",
             "verdict": "rebutted",
             "challenger": "CriticAgent",
             "defender": "AnalysisAgent"
           },
           {
             "challenge_id": "X4",
-            "attack": "The adjusted model only fits better because it has more parameters.",
-            "test": "Does BIC, which penalises extra parameters, still favour the adjusted model by more than 10?",
-            "evidence": "\u0394BIC +470.0 (positive favours the adjusted model).",
+            "attack": "Evidence strength cannot be weighed without sample sizes.",
+            "test": "Were sample sizes extracted from both papers?",
+            "evidence": "Extracted n: paper A 120, paper B 85.",
             "verdict": "rebutted",
             "challenger": "CriticAgent",
             "defender": "AnalysisAgent"
           },
           {
             "challenge_id": "X5",
-            "attack": "Sex differences within each group could be confounding the slope.",
-            "test": "Was sex adjusted for in this experiment?",
-            "evidence": "Not tested: this model adjusts for species only.",
+            "attack": "No shared primary dataset was analysed; text evidence cannot settle who is right.",
+            "test": "Does a dataset exist in this record covering both papers' conditions?",
+            "evidence": "Not tested: this investigation compares extracted claims only.",
             "verdict": "open",
             "challenger": "CriticAgent",
             "defender": "AnalysisAgent"
@@ -2639,72 +638,72 @@
         ]
       },
       "input_ids": [
-        "result-4e273da6ac28",
-        "analysis-99f9b68247ad"
+        "result-a5950e7245bd",
+        "analysis-75221f80bb46"
       ],
-      "created_at": "2026-10-04T02:31:05.614957+00:00"
+      "created_at": "2026-10-04T06:46:46.305942+00:00"
     },
-    "decision-6e0c89097d89": {
-      "id": "decision-6e0c89097d89",
+    "decision-f8cffed10de2": {
+      "id": "decision-f8cffed10de2",
       "kind": "decision",
       "data": {
-        "previous_plan": "Compare species composition with sampling variability",
+        "previous_plan": "Compare context, methodology and extraction-stability explanations",
         "new_evidence": {
-          "adjusted_slope": 0.1998942809546958,
-          "adjusted_ci95": [
-            0.16479378601016384,
-            0.23389227420426822
+          "disagreement_rate": 0.99,
+          "similarity_ci95": [
+            0.4286,
+            0.8333
           ],
-          "pooled_slope": -0.08502128077717656,
-          "reversal": true
+          "robust_disagreement": true,
+          "relationship": "context-dependent disagreement"
         },
         "changed_belief": [
           {
             "hypothesis_id": "H1",
             "prior_support": 50,
+            "updated_support": 75,
             "result_consistency": "better supported",
-            "updated_support": 85,
-            "evidence_for": "Adjusted slope 0.200; 95% CI [0.165, 0.234]; stable across year exclusions: True.",
-            "evidence_against": "This test does not isolate all correlated variables.",
-            "remaining_uncertainty": "Scores follow a disclosed heuristic, are not probabilities, and do not establish causation."
+            "evidence_for": "Disagreement rate 0.99 over 300 resamples; top-pair similarity 95% CI [0.43, 0.83]; 5 extracted condition differences; section exclusions hold: True.",
+            "evidence_against": "Text-evidence robustness cannot adjudicate which paper is correct.",
+            "remaining_uncertainty": "Scores follow a disclosed heuristic rubric over computed robustness numbers."
           },
           {
             "hypothesis_id": "H2",
             "prior_support": 50,
-            "result_consistency": "weakened",
-            "updated_support": 20,
-            "evidence_for": "Adjusted slope 0.200; 95% CI [0.165, 0.234]; stable across year exclusions: True.",
-            "evidence_against": "This test does not isolate all correlated variables.",
-            "remaining_uncertainty": "Scores follow a disclosed heuristic, are not probabilities, and do not establish causation."
+            "updated_support": 55,
+            "result_consistency": "remains plausible",
+            "evidence_for": "Disagreement rate 0.99 over 300 resamples; top-pair similarity 95% CI [0.43, 0.83]; 5 extracted condition differences; section exclusions hold: True.",
+            "evidence_against": "Text-evidence robustness cannot adjudicate which paper is correct.",
+            "remaining_uncertainty": "Scores follow a disclosed heuristic rubric over computed robustness numbers."
           },
           {
             "hypothesis_id": "H3",
             "prior_support": 50,
-            "result_consistency": "unresolved",
-            "updated_support": 50,
-            "evidence_for": "Adjusted slope 0.200; 95% CI [0.165, 0.234]; stable across year exclusions: True.",
-            "evidence_against": "This test does not isolate all correlated variables.",
-            "remaining_uncertainty": "Scores follow a disclosed heuristic, are not probabilities, and do not establish causation."
+            "updated_support": 25,
+            "result_consistency": "weakened",
+            "evidence_for": "Disagreement rate 0.99 over 300 resamples; top-pair similarity 95% CI [0.43, 0.83]; 5 extracted condition differences; section exclusions hold: True.",
+            "evidence_against": "Text-evidence robustness cannot adjudicate which paper is correct.",
+            "remaining_uncertainty": "Scores follow a disclosed heuristic rubric over computed robustness numbers."
           }
         ],
-        "next_decision": "Test sex and year effects within species",
-        "rationale": "Species adjustment reverses the pooled sign with a positive interval and stable year exclusions; investigate what remains within species.",
-        "next_evidence_search": "Retrieve sex-specific bill morphometry and measurement-protocol evidence.",
-        "next_experiment": "Species + sex + year regression",
+        "next_decision": "Design a comparison holding population constant",
+        "rationale": "The disagreement is stable under resampling and section exclusion and coincides with extracted condition differences; a study varying only population would discriminate the explanations.",
+        "next_evidence_search": "Retrieve studies of caffeine, sustained attention and adults that report both conditions (adults, female, young vs adults, female, older).",
+        "next_experiment": "Obtain or construct comparable primary data on caffeine, sustained attention and adults across population",
         "requires_new_approval": true,
         "open_challenges": [
           "X5"
         ]
       },
       "input_ids": [
-        "result-4e273da6ac28",
-        "analysis-99f9b68247ad",
-        "critique-81fd103a5895"
+        "result-a5950e7245bd",
+        "analysis-75221f80bb46",
+        "critique-51c4722c3713"
       ],
-      "created_at": "2026-10-04T02:31:05.618030+00:00"
+      "created_at": "2026-10-04T06:46:46.309800+00:00"
     },
-    "safety-ae7e205cbf0e": {
-      "id": "safety-ae7e205cbf0e",
+    "safety-6e046495f71f": {
+      "id": "safety-6e046495f71f",
       "kind": "safety",
       "data": {
         "status": "passed",
@@ -2716,111 +715,111 @@
         ],
         "flags": [
           "No causal or clinical claims permitted",
-          "Known contextual reversal, not independent-study disagreement",
+          "Text-evidence comparison; no shared primary dataset was re-analysed",
           "No measured speedup baseline"
         ]
       },
       "input_ids": [
-        "decision-6e0c89097d89"
+        "decision-f8cffed10de2"
       ],
-      "created_at": "2026-10-04T02:31:05.621183+00:00"
+      "created_at": "2026-10-04T06:46:46.313419+00:00"
     }
   },
   "events": [
     {
-      "id": "event-c31f516feed1",
-      "timestamp": "2026-10-04T02:31:05.550946+00:00",
+      "id": "event-f25b1a7b6cd4",
+      "timestamp": "2026-10-04T06:46:46.012552+00:00",
       "agent": "LiteratureAgent",
-      "action": "Retrieved 2 curated claims from 1 cited article; offline reference catalog.",
+      "action": "Parsed 2 uploaded PDFs (4 pages); extracted 10 candidate claims; selected the top aligned pair with page-level provenance.",
       "input_ids": [
-        "question-bec00405f54e"
+        "question-5a25f09c50fa"
       ],
       "output_ids": [
-        "evidence-b58621e8b457",
-        "evidence-cecd01ad724e"
+        "evidence-d61984ba089d",
+        "evidence-eb3a8c53cdba"
       ],
-      "tool": "retrieve_evidence",
-      "elapsed_seconds": 0.0002720000002227607,
+      "tool": "ingest_papers",
+      "elapsed_seconds": 3.137499879812822e-05,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     },
     {
-      "id": "event-2cef9a32474e",
-      "timestamp": "2026-10-04T02:31:05.553276+00:00",
+      "id": "event-66267527e47a",
+      "timestamp": "2026-10-04T06:46:46.016017+00:00",
       "agent": "ContradictionAgent",
-      "action": "An apparent contradiction tied to analysis context within one source.",
+      "action": "A context-dependent disagreement: the sources differ in extracted conditions.",
       "input_ids": [
-        "evidence-b58621e8b457",
-        "evidence-cecd01ad724e"
+        "evidence-d61984ba089d",
+        "evidence-eb3a8c53cdba"
       ],
       "output_ids": [
-        "contradiction-2314022b15a2"
+        "contradiction-c7284280c9f8"
       ],
       "tool": "compare_claims",
-      "elapsed_seconds": 8.029099990380928e-05,
+      "elapsed_seconds": 0.00010637499872245826,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     },
     {
-      "id": "event-d81730fa3313",
-      "timestamp": "2026-10-04T02:31:05.555346+00:00",
+      "id": "event-f193a505072a",
+      "timestamp": "2026-10-04T06:46:46.019753+00:00",
       "agent": "HypothesisAgent",
       "action": "Registered 3 testable candidate explanations with falsification criteria.",
       "input_ids": [
-        "contradiction-2314022b15a2"
+        "contradiction-c7284280c9f8"
       ],
       "output_ids": [
-        "hypothesis-16dd59a54a02",
-        "hypothesis-c89a4c792647",
-        "hypothesis-ddba759e0595"
+        "hypothesis-e27595dabacd",
+        "hypothesis-0576d0414459",
+        "hypothesis-ae1b5f9b37e0"
       ],
       "tool": "propose_hypotheses",
-      "elapsed_seconds": 7.408400006170268e-05,
+      "elapsed_seconds": 7.441599882440642e-05,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     },
     {
-      "id": "event-e651cd650f9e",
-      "timestamp": "2026-10-04T02:31:05.565226+00:00",
+      "id": "event-7b29044aa1ad",
+      "timestamp": "2026-10-04T06:46:46.022668+00:00",
       "agent": "ExperimentPlanner",
       "action": "Compared 2 tests; selected E1. Waiting for human approval.",
       "input_ids": [
-        "hypothesis-16dd59a54a02",
-        "hypothesis-c89a4c792647",
-        "hypothesis-ddba759e0595"
+        "hypothesis-e27595dabacd",
+        "hypothesis-0576d0414459",
+        "hypothesis-ae1b5f9b37e0"
       ],
       "output_ids": [
-        "experiment-33d23eabec7e",
-        "experiment-246f75887551"
+        "experiment-b6d48119606d",
+        "experiment-e6d6695bf7c6"
       ],
       "tool": "rank_experiments",
-      "elapsed_seconds": 0.007608500000060303,
+      "elapsed_seconds": 7.437499880325049e-05,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     },
     {
-      "id": "event-cbebad96d056",
-      "timestamp": "2026-10-04T02:31:05.567946+00:00",
+      "id": "event-c4eb8214b803",
+      "timestamp": "2026-10-04T06:46:46.024978+00:00",
       "agent": "Seed script",
       "action": "Approved E1 (developer-authorized reproducibility script; not a UI click)",
       "input_ids": [],
@@ -2830,18 +829,18 @@
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     },
     {
-      "id": "event-cedb712935a6",
-      "timestamp": "2026-10-04T02:31:05.570642+00:00",
+      "id": "event-db5676d53baa",
+      "timestamp": "2026-10-04T06:46:46.027927+00:00",
       "agent": "ExperimentRunner",
-      "action": "Loading dataset",
+      "action": "Loading extracted claims",
       "input_ids": [
-        "run-91004e2337cc"
+        "run-4198624dd3ab"
       ],
       "output_ids": [],
       "tool": "scientific_python",
@@ -2849,18 +848,18 @@
       "status": "running",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     },
     {
-      "id": "event-1bbf961b060c",
-      "timestamp": "2026-10-04T02:31:05.573936+00:00",
+      "id": "event-de08fd0116e1",
+      "timestamp": "2026-10-04T06:46:46.041169+00:00",
       "agent": "ExperimentRunner",
-      "action": "Validating schema",
+      "action": "Re-ranking aligned claim pairs",
       "input_ids": [
-        "run-91004e2337cc"
+        "run-4198624dd3ab"
       ],
       "output_ids": [],
       "tool": "scientific_python",
@@ -2868,18 +867,18 @@
       "status": "running",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     },
     {
-      "id": "event-eb5e6f346163",
-      "timestamp": "2026-10-04T02:31:05.575208+00:00",
+      "id": "event-4ad2b9715566",
+      "timestamp": "2026-10-04T06:46:46.042531+00:00",
       "agent": "ExperimentRunner",
-      "action": "Preparing variables",
+      "action": "Bootstrapping claim extraction",
       "input_ids": [
-        "run-91004e2337cc"
+        "run-4198624dd3ab"
       ],
       "output_ids": [],
       "tool": "scientific_python",
@@ -2887,18 +886,18 @@
       "status": "running",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     },
     {
-      "id": "event-d7c8d4f76237",
-      "timestamp": "2026-10-04T02:31:05.577784+00:00",
+      "id": "event-d0e4716d2914",
+      "timestamp": "2026-10-04T06:46:46.071665+00:00",
       "agent": "ExperimentRunner",
-      "action": "Running analysis",
+      "action": "Section-exclusion sensitivity",
       "input_ids": [
-        "run-91004e2337cc"
+        "run-4198624dd3ab"
       ],
       "output_ids": [],
       "tool": "scientific_python",
@@ -2906,18 +905,18 @@
       "status": "running",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     },
     {
-      "id": "event-4d94abb155cb",
-      "timestamp": "2026-10-04T02:31:05.580823+00:00",
+      "id": "event-63e9c0fc6eb0",
+      "timestamp": "2026-10-04T06:46:46.073047+00:00",
       "agent": "ExperimentRunner",
-      "action": "Computing uncertainty",
+      "action": "Measuring evidence quality",
       "input_ids": [
-        "run-91004e2337cc"
+        "run-4198624dd3ab"
       ],
       "output_ids": [],
       "tool": "scientific_python",
@@ -2925,37 +924,18 @@
       "status": "running",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     },
     {
-      "id": "event-3920f0caa058",
-      "timestamp": "2026-10-04T02:31:05.603089+00:00",
-      "agent": "ExperimentRunner",
-      "action": "Generating visualization",
-      "input_ids": [
-        "run-91004e2337cc"
-      ],
-      "output_ids": [],
-      "tool": "scientific_python",
-      "elapsed_seconds": 0,
-      "status": "running",
-      "confidence": "bounded by source and method",
-      "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
-      ],
-      "engine": "local"
-    },
-    {
-      "id": "event-e482a403c5a0",
-      "timestamp": "2026-10-04T02:31:05.607296+00:00",
+      "id": "event-b17ddb431529",
+      "timestamp": "2026-10-04T06:46:46.295881+00:00",
       "agent": "ExperimentRunner",
       "action": "Saving run artifact",
       "input_ids": [
-        "run-91004e2337cc"
+        "run-4198624dd3ab"
       ],
       "output_ids": [],
       "tool": "scientific_python",
@@ -2963,138 +943,139 @@
       "status": "running",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     },
     {
-      "id": "event-bfdffa3aedc7",
-      "timestamp": "2026-10-04T02:31:05.608756+00:00",
+      "id": "event-c1ab71fb05c8",
+      "timestamp": "2026-10-04T06:46:46.297678+00:00",
       "agent": "ExperimentRunner",
-      "action": "Computed real regression and 500 stratified bootstrap draws on 342 birds.",
+      "action": "Computed alignment robustness over 5 + 5 extracted claims with 300 bootstrap resamples and section-exclusion sensitivity.",
       "input_ids": [
-        "experiment-33d23eabec7e"
+        "experiment-b6d48119606d"
       ],
       "output_ids": [
-        "result-4e273da6ac28"
+        "result-a5950e7245bd"
       ],
-      "tool": "experiments.penguins.compute",
-      "elapsed_seconds": 0.038164665999829595,
+      "tool": "experiments.papers_analysis.compute_papers",
+      "elapsed_seconds": 0.26977158400040935,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     },
     {
-      "id": "event-198af2a7f4c1",
-      "timestamp": "2026-10-04T02:31:05.611838+00:00",
+      "id": "event-46f7fb817b1b",
+      "timestamp": "2026-10-04T06:46:46.301693+00:00",
       "agent": "AnalysisAgent",
-      "action": "H1: better supported; H2: weakened; H3: unresolved",
+      "action": "H1: better supported; H2: remains plausible; H3: weakened",
       "input_ids": [
-        "result-4e273da6ac28",
-        "hypothesis-16dd59a54a02",
-        "hypothesis-c89a4c792647",
-        "hypothesis-ddba759e0595"
+        "result-a5950e7245bd",
+        "hypothesis-e27595dabacd",
+        "hypothesis-0576d0414459",
+        "hypothesis-ae1b5f9b37e0"
       ],
       "output_ids": [
-        "analysis-99f9b68247ad"
+        "analysis-75221f80bb46"
       ],
       "tool": "evaluate_result",
-      "elapsed_seconds": 3.600000036385609e-05,
+      "elapsed_seconds": 4.7792000259505585e-05,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     },
     {
-      "id": "event-b88e7dfaaaab",
-      "timestamp": "2026-10-04T02:31:05.614971+00:00",
+      "id": "event-80eafc2d1abe",
+      "timestamp": "2026-10-04T06:46:46.305959+00:00",
       "agent": "CriticAgent",
       "action": "Raised 5 challenges: 4 rebutted by the data, 0 standing, 1 open.",
       "input_ids": [
-        "result-4e273da6ac28",
-        "analysis-99f9b68247ad"
+        "result-a5950e7245bd",
+        "analysis-75221f80bb46"
       ],
       "output_ids": [
-        "critique-81fd103a5895"
+        "critique-51c4722c3713"
       ],
       "tool": "challenge_result",
-      "elapsed_seconds": 4.0624999655847205e-05,
+      "elapsed_seconds": 4.8541998694418e-05,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     },
     {
-      "id": "event-d90662687858",
-      "timestamp": "2026-10-04T02:31:05.618045+00:00",
+      "id": "event-4838e2921eec",
+      "timestamp": "2026-10-04T06:46:46.309821+00:00",
       "agent": "DecisionAgent",
-      "action": "Research plan updated: Test sex and year effects within species",
+      "action": "Research plan updated: Design a comparison holding population constant",
       "input_ids": [
-        "result-4e273da6ac28",
-        "analysis-99f9b68247ad",
-        "critique-81fd103a5895"
+        "result-a5950e7245bd",
+        "analysis-75221f80bb46",
+        "critique-51c4722c3713"
       ],
       "output_ids": [
-        "decision-6e0c89097d89"
+        "decision-f8cffed10de2"
       ],
       "tool": "choose_next_decision",
-      "elapsed_seconds": 2.7499999760038918e-05,
+      "elapsed_seconds": 3.670799924293533e-05,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     },
     {
-      "id": "event-638cacc4e1f9",
-      "timestamp": "2026-10-04T02:31:05.621192+00:00",
+      "id": "event-39e54108705d",
+      "timestamp": "2026-10-04T06:46:46.313430+00:00",
       "agent": "SafetyAgent",
       "action": "Validated provenance, approval and lineage. Research record sealed for replay.",
       "input_ids": [
-        "decision-6e0c89097d89"
+        "decision-f8cffed10de2"
       ],
       "output_ids": [
-        "safety-ae7e205cbf0e"
+        "safety-6e046495f71f"
       ],
       "tool": "rigor_audit",
-      "elapsed_seconds": 6.008299988025101e-05,
+      "elapsed_seconds": 7.337499846471474e-05,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
-        "https://journal.r-project.org/articles/RJ-2022-020/",
-        "https://journal.r-project.org/articles/RJ-2022-020/"
+        "https://doi.org/10.9999/jcp.2021.0042",
+        "https://doi.org/10.9999/gercog.2023.0117"
       ],
       "engine": "local"
     }
   ],
   "approval": {
     "experiment_id": "E1",
-    "approved_at": "2026-10-04T02:31:05.567927+00:00",
+    "approved_at": "2026-10-04T06:46:46.024933+00:00",
     "actor": "developer-authorized reproducibility script; not a UI click",
-    "scope": "One allowlisted local computational experiment"
+    "scope": "One allowlisted local computational experiment",
+    "plan_sha256": "be7ea800398032814381df2cb6086484e295f85e564e6d82b7160f83f9ff5e8f"
   },
   "metrics": {
-    "question_to_spec_seconds": 0.018364,
-    "compute_seconds": 0.032094250000227476,
-    "result_to_decision_seconds": 0.010749,
+    "question_to_spec_seconds": 0.015071,
+    "compute_seconds": 0.04524291599955177,
+    "result_to_decision_seconds": 0.013945,
     "claims_retrieved": 2,
-    "unique_sources": 1,
+    "unique_sources": 2,
     "hypotheses_evaluated": 3,
     "experiments_compared": 2,
-    "total_wall_seconds": 0.075845,
+    "total_wall_seconds": 0.307035,
     "human_approvals": 0,
     "agent_handoffs": 9,
     "followup_experiments": 0,
@@ -3105,8 +1086,692 @@
     "baseline": "No manual baseline measured; wall time includes approval wait."
   },
   "error": null,
-  "updated_at": "2026-10-04T02:31:05.623289+00:00",
+  "source": {
+    "kind": "papers",
+    "analysis_id": "analysis-85557d6a6812",
+    "engine": "rule-based parser (no LLM); exact quotes with page provenance",
+    "papers": [
+      {
+        "id": "5df3a71521658b2f64722e14b1cb0cb91618bbe203e62c83e128e19d9d20e912",
+        "filename": "caffeine-rct-young.pdf",
+        "pages": 2,
+        "meta": {
+          "title": "Caffeine improves sustained attention in young adults: a randomized controlled trial",
+          "authors": [
+            "Maria Keller",
+            "Daniel Osei",
+            "Priya Raman"
+          ],
+          "year": 2021,
+          "journal": "Journal of Cognitive Performance",
+          "doi": "10.9999/jcp.2021.0042",
+          "arxiv": null
+        },
+        "sections": [
+          "abstract",
+          "discussion",
+          "introduction",
+          "limitations",
+          "methods",
+          "results"
+        ],
+        "sample_size": 120
+      },
+      {
+        "id": "d3d70d8b7cef2c030be439650f98b10732d7c9ef9250681952388b60a799fd80",
+        "filename": "caffeine-null-older.pdf",
+        "pages": 2,
+        "meta": {
+          "title": "No significant effect of caffeine on sustained attention in older adults",
+          "authors": [
+            "Thomas Lindqvist",
+            "Amara Diallo"
+          ],
+          "year": 2023,
+          "journal": "Gerontology and Cognition",
+          "doi": "10.9999/gercog.2023.0117",
+          "arxiv": null
+        },
+        "sections": [
+          "abstract",
+          "discussion",
+          "limitations",
+          "methods",
+          "results"
+        ],
+        "sample_size": 85
+      }
+    ],
+    "relationship": "context-dependent disagreement",
+    "analysis": {
+      "analysis_id": "analysis-85557d6a6812",
+      "created_at": "2026-10-04",
+      "engine": "rule-based parser (no LLM); exact quotes with page provenance",
+      "papers": [
+        {
+          "id": "5df3a71521658b2f64722e14b1cb0cb91618bbe203e62c83e128e19d9d20e912",
+          "filename": "caffeine-rct-young.pdf",
+          "pages": 2,
+          "meta": {
+            "title": "Caffeine improves sustained attention in young adults: a randomized controlled trial",
+            "authors": [
+              "Maria Keller",
+              "Daniel Osei",
+              "Priya Raman"
+            ],
+            "year": 2021,
+            "journal": "Journal of Cognitive Performance",
+            "doi": "10.9999/jcp.2021.0042",
+            "arxiv": null
+          },
+          "sample_size": 120,
+          "sections": [
+            "abstract",
+            "discussion",
+            "introduction",
+            "limitations",
+            "methods",
+            "results"
+          ],
+          "warnings": []
+        },
+        {
+          "id": "d3d70d8b7cef2c030be439650f98b10732d7c9ef9250681952388b60a799fd80",
+          "filename": "caffeine-null-older.pdf",
+          "pages": 2,
+          "meta": {
+            "title": "No significant effect of caffeine on sustained attention in older adults",
+            "authors": [
+              "Thomas Lindqvist",
+              "Amara Diallo"
+            ],
+            "year": 2023,
+            "journal": "Gerontology and Cognition",
+            "doi": "10.9999/gercog.2023.0117",
+            "arxiv": null
+          },
+          "sample_size": 85,
+          "sections": [
+            "abstract",
+            "discussion",
+            "limitations",
+            "methods",
+            "results"
+          ],
+          "warnings": []
+        }
+      ],
+      "claims_a": [
+        {
+          "text": "Caffeine significantly increased sustained attention scores compared with placebo (mean difference 4.2 points, 95% CI 1.5 to 6.9, p = 0.003).",
+          "section": "results",
+          "page": 2,
+          "direction": "positive",
+          "stats": [
+            "mean difference",
+            "95% CI",
+            "p = 0.003"
+          ],
+          "terms": [
+            "attention",
+            "caffeine",
+            "increased",
+            "placebo",
+            "score",
+            "sustained"
+          ],
+          "score": 4.8
+        },
+        {
+          "text": "Reaction-time lapses decreased in the caffeine group (p = 0.01).",
+          "section": "results",
+          "page": 2,
+          "direction": "negative",
+          "stats": [
+            "p = 0.01"
+          ],
+          "terms": [
+            "caffeine",
+            "decreased",
+            "lapse",
+            "reaction-time"
+          ],
+          "score": 4.8
+        },
+        {
+          "text": "In this randomized placebo-controlled trial we examined whether a 200 mg dose of caffeine improves sustained attention in healthy young adults.",
+          "section": "abstract",
+          "page": 1,
+          "direction": "positive",
+          "stats": [],
+          "terms": [
+            "adult",
+            "attention",
+            "caffeine",
+            "dose",
+            "examined",
+            "healthy",
+            "improve",
+            "placebo-controlled",
+            "randomized",
+            "sustained",
+            "whether",
+            "young"
+          ],
+          "score": 2.0
+        },
+        {
+          "text": "Caffeine significantly increased sustained attention scores relative to placebo.",
+          "section": "abstract",
+          "page": 1,
+          "direction": "positive",
+          "stats": [],
+          "terms": [
+            "attention",
+            "caffeine",
+            "increased",
+            "placebo",
+            "score",
+            "sustained"
+          ],
+          "score": 2.0
+        },
+        {
+          "text": "A moderate caffeine dose produced a reliable improvement in sustained attention among young adults.",
+          "section": "discussion",
+          "page": 2,
+          "direction": "positive",
+          "stats": [],
+          "terms": [
+            "adult",
+            "attention",
+            "caffeine",
+            "dose",
+            "improvement",
+            "moderate",
+            "produced",
+            "reliable",
+            "sustained",
+            "young"
+          ],
+          "score": 1.3
+        }
+      ],
+      "claims_b": [
+        {
+          "text": "Caffeine did not significantly change sustained attention scores compared with placebo (mean difference 0.6 points, 95% CI -1.1 to 2.3, p = 0.41).",
+          "section": "results",
+          "page": 2,
+          "direction": "null",
+          "stats": [
+            "mean difference",
+            "95% CI",
+            "p = 0.41"
+          ],
+          "terms": [
+            "attention",
+            "caffeine",
+            "placebo",
+            "score",
+            "sustained"
+          ],
+          "score": 4.8
+        },
+        {
+          "text": "Self-reported alertness increased modestly (p = 0.04) without a corresponding performance change.",
+          "section": "results",
+          "page": 2,
+          "direction": "positive",
+          "stats": [
+            "p = 0.04"
+          ],
+          "terms": [
+            "alertness",
+            "increased",
+            "performance",
+            "self-reported"
+          ],
+          "score": 4.8
+        },
+        {
+          "text": "Caffeine did not significantly change sustained attention scores relative to placebo.",
+          "section": "abstract",
+          "page": 1,
+          "direction": "null",
+          "stats": [],
+          "terms": [
+            "attention",
+            "caffeine",
+            "placebo",
+            "score",
+            "sustained"
+          ],
+          "score": 2.0
+        },
+        {
+          "text": "Routine caffeine supplementation to support attention in older adults is not supported by these data.",
+          "section": "abstract",
+          "page": 1,
+          "direction": "null",
+          "stats": [],
+          "terms": [
+            "adult",
+            "attention",
+            "caffeine",
+            "older",
+            "routine",
+            "supplementation",
+            "support"
+          ],
+          "score": 2.0
+        },
+        {
+          "text": "In contrast with reports in younger samples, caffeine produced no measurable sustained-attention benefit in older adults.",
+          "section": "discussion",
+          "page": 2,
+          "direction": "null",
+          "stats": [],
+          "terms": [
+            "adult",
+            "benefit",
+            "caffeine",
+            "contrast",
+            "older",
+            "produced",
+            "report",
+            "sample",
+            "sustained-attention",
+            "younger"
+          ],
+          "score": 1.3
+        }
+      ],
+      "methods": {
+        "a": "We randomized n = 120 healthy young adults (ages 18-30, 61 female) to 200 mg caffeine or matched placebo in a double-blind parallel design. Sustained attention was measured with the Psychomotor Vigilance Task (PVT) 45 minutes after administration. The prespecified primary outcome was the sustained attention composite score.",
+        "b": "A double-blind crossover design enrolled n = 85 older adults (ages 65-82, 47 female). Sustained attention was measured with the Psychomotor Vigilance Task (PVT) 45 minutes after each administration, one week apart."
+      },
+      "limitations": {
+        "a": [
+          "Single dose, single session, young-adult sample only; generalization to older adults is unknown."
+        ],
+        "b": [
+          "Crossover design with a single dose; habitual caffeine intake was self-reported."
+        ]
+      },
+      "pairs": [
+        {
+          "a": 0,
+          "b": 0,
+          "similarity": 0.8333,
+          "kind": "tension",
+          "shared_terms": [
+            "attention",
+            "caffeine",
+            "placebo",
+            "score",
+            "sustained"
+          ],
+          "rank_score": 1.2661
+        },
+        {
+          "a": 0,
+          "b": 2,
+          "similarity": 0.8333,
+          "kind": "tension",
+          "shared_terms": [
+            "attention",
+            "caffeine",
+            "placebo",
+            "score",
+            "sustained"
+          ],
+          "rank_score": 1.1201
+        },
+        {
+          "a": 3,
+          "b": 0,
+          "similarity": 0.8333,
+          "kind": "tension",
+          "shared_terms": [
+            "attention",
+            "caffeine",
+            "placebo",
+            "score",
+            "sustained"
+          ],
+          "rank_score": 1.1201
+        },
+        {
+          "a": 3,
+          "b": 2,
+          "similarity": 0.8333,
+          "kind": "tension",
+          "shared_terms": [
+            "attention",
+            "caffeine",
+            "placebo",
+            "score",
+            "sustained"
+          ],
+          "rank_score": 0.974
+        },
+        {
+          "a": 2,
+          "b": 0,
+          "similarity": 0.5,
+          "kind": "tension",
+          "shared_terms": [
+            "attention",
+            "caffeine",
+            "sustained"
+          ],
+          "rank_score": 0.672
+        },
+        {
+          "a": 4,
+          "b": 0,
+          "similarity": 0.5,
+          "kind": "tension",
+          "shared_terms": [
+            "attention",
+            "caffeine",
+            "sustained"
+          ],
+          "rank_score": 0.672
+        },
+        {
+          "a": 2,
+          "b": 2,
+          "similarity": 0.5,
+          "kind": "tension",
+          "shared_terms": [
+            "attention",
+            "caffeine",
+            "sustained"
+          ],
+          "rank_score": 0.5844
+        },
+        {
+          "a": 4,
+          "b": 2,
+          "similarity": 0.5,
+          "kind": "tension",
+          "shared_terms": [
+            "attention",
+            "caffeine",
+            "sustained"
+          ],
+          "rank_score": 0.5844
+        },
+        {
+          "a": 2,
+          "b": 3,
+          "similarity": 0.4286,
+          "kind": "tension",
+          "shared_terms": [
+            "adult",
+            "attention",
+            "caffeine"
+          ],
+          "rank_score": 0.5009
+        },
+        {
+          "a": 4,
+          "b": 3,
+          "similarity": 0.4286,
+          "kind": "tension",
+          "shared_terms": [
+            "adult",
+            "attention",
+            "caffeine"
+          ],
+          "rank_score": 0.5009
+        },
+        {
+          "a": 0,
+          "b": 3,
+          "similarity": 0.3333,
+          "kind": "tension",
+          "shared_terms": [
+            "attention",
+            "caffeine"
+          ],
+          "rank_score": 0.4073
+        },
+        {
+          "a": 3,
+          "b": 3,
+          "similarity": 0.3333,
+          "kind": "tension",
+          "shared_terms": [
+            "attention",
+            "caffeine"
+          ],
+          "rank_score": 0.3542
+        }
+      ],
+      "focus_terms": [
+        "adult",
+        "attention",
+        "caffeine",
+        "sustained"
+      ],
+      "topic": "caffeine, sustained attention and adults",
+      "best_pair": {
+        "a": 0,
+        "b": 0,
+        "similarity": 0.8333,
+        "kind": "tension",
+        "shared_terms": [
+          "attention",
+          "caffeine",
+          "placebo",
+          "score",
+          "sustained"
+        ],
+        "rank_score": 1.2661
+      },
+      "condition_differences": [
+        {
+          "field": "population",
+          "a": "adults, female, young",
+          "b": "adults, female, older"
+        },
+        {
+          "field": "age range",
+          "a": "ages 18-30",
+          "b": "ages 65-82"
+        },
+        {
+          "field": "design",
+          "a": "double-blind, parallel, placebo, randomized",
+          "b": "crossover, double-blind, placebo"
+        },
+        {
+          "field": "dose",
+          "a": "200 mg",
+          "b": "not extracted"
+        },
+        {
+          "field": "sample size",
+          "a": "n = 120",
+          "b": "n = 85"
+        }
+      ],
+      "relationship": "context-dependent disagreement",
+      "defensible_contradiction": true,
+      "caveats": [
+        "Claims are extracted by deterministic text rules; verify quotes against the PDFs.",
+        "Comparability is judged from terminology overlap, not deep semantics."
+      ],
+      "evidence": [
+        {
+          "evidence_id": "EV1",
+          "source": "Uploaded PDF: caffeine-rct-young.pdf",
+          "citation": {
+            "title": "Caffeine improves sustained attention in young adults: a randomized controlled trial",
+            "authors": [
+              "Maria Keller",
+              "Daniel Osei",
+              "Priya Raman"
+            ],
+            "year": 2021,
+            "identifier": "10.9999/jcp.2021.0042",
+            "url": "https://doi.org/10.9999/jcp.2021.0042",
+            "location": "p. 2, results section",
+            "retrieved_at": "2026-10-04"
+          },
+          "claim": "Caffeine significantly increased sustained attention scores compared with placebo (mean difference 4.2 points, 95% CI 1.5 to 6.9, p = 0.003).",
+          "direction_of_effect": "positive",
+          "population_or_system": "young, adults, adults",
+          "intervention_or_variable": "caffeine",
+          "outcome": "caffeine, sustained attention and adults",
+          "sample_size_if_known": 120,
+          "experimental_conditions": {
+            "section": "results",
+            "page": "2",
+            "statistics": "mean difference; 95% CI; p = 0.003"
+          },
+          "methodology": "We randomized n = 120 healthy young adults (ages 18-30, 61 female) to 200 mg caffeine or matched placebo in a double-blind parallel design. Sustained attention was measured with the Psychomotor Vigilance Task (PVT) 45 minutes after administration. The prespecified primary outcome was the sustained attention composite score.",
+          "limitations": [
+            "Single dose, single session, young-adult sample only; generalization to older adults is unknown."
+          ],
+          "confidence": "high",
+          "provenance": {
+            "pdf_sha256": "5df3a71521658b2f64722e14b1cb0cb91618bbe203e62c83e128e19d9d20e912",
+            "page": "2",
+            "section": "results",
+            "quote": "Caffeine significantly increased sustained attention scores compared with placebo (mean difference 4.2 points, 95% CI 1.5 to 6.9, p = 0.003).",
+            "extraction": "rule-based parser; exact sentence from the PDF text layer"
+          }
+        },
+        {
+          "evidence_id": "EV2",
+          "source": "Uploaded PDF: caffeine-null-older.pdf",
+          "citation": {
+            "title": "No significant effect of caffeine on sustained attention in older adults",
+            "authors": [
+              "Thomas Lindqvist",
+              "Amara Diallo"
+            ],
+            "year": 2023,
+            "identifier": "10.9999/gercog.2023.0117",
+            "url": "https://doi.org/10.9999/gercog.2023.0117",
+            "location": "p. 2, results section",
+            "retrieved_at": "2026-10-04"
+          },
+          "claim": "Caffeine did not significantly change sustained attention scores compared with placebo (mean difference 0.6 points, 95% CI -1.1 to 2.3, p = 0.41).",
+          "direction_of_effect": "unknown",
+          "population_or_system": "adults, older, adults",
+          "intervention_or_variable": "caffeine",
+          "outcome": "caffeine, sustained attention and adults",
+          "sample_size_if_known": 85,
+          "experimental_conditions": {
+            "section": "results",
+            "page": "2",
+            "reported_effect": "null result (no significant effect reported)",
+            "statistics": "mean difference; 95% CI; p = 0.41"
+          },
+          "methodology": "A double-blind crossover design enrolled n = 85 older adults (ages 65-82, 47 female). Sustained attention was measured with the Psychomotor Vigilance Task (PVT) 45 minutes after each administration, one week apart.",
+          "limitations": [
+            "Crossover design with a single dose; habitual caffeine intake was self-reported."
+          ],
+          "confidence": "high",
+          "provenance": {
+            "pdf_sha256": "d3d70d8b7cef2c030be439650f98b10732d7c9ef9250681952388b60a799fd80",
+            "page": "2",
+            "section": "results",
+            "quote": "Caffeine did not significantly change sustained attention scores compared with placebo (mean difference 0.6 points, 95% CI -1.1 to 2.3, p = 0.41).",
+            "extraction": "rule-based parser; exact sentence from the PDF text layer"
+          }
+        }
+      ]
+    },
+    "evidence": [
+      {
+        "evidence_id": "EV1",
+        "source": "Uploaded PDF: caffeine-rct-young.pdf",
+        "citation": {
+          "title": "Caffeine improves sustained attention in young adults: a randomized controlled trial",
+          "authors": [
+            "Maria Keller",
+            "Daniel Osei",
+            "Priya Raman"
+          ],
+          "year": 2021,
+          "identifier": "10.9999/jcp.2021.0042",
+          "url": "https://doi.org/10.9999/jcp.2021.0042",
+          "location": "p. 2, results section",
+          "retrieved_at": "2026-10-04"
+        },
+        "claim": "Caffeine significantly increased sustained attention scores compared with placebo (mean difference 4.2 points, 95% CI 1.5 to 6.9, p = 0.003).",
+        "direction_of_effect": "positive",
+        "population_or_system": "young, adults, adults",
+        "intervention_or_variable": "caffeine",
+        "outcome": "caffeine, sustained attention and adults",
+        "sample_size_if_known": 120,
+        "experimental_conditions": {
+          "section": "results",
+          "page": "2",
+          "statistics": "mean difference; 95% CI; p = 0.003"
+        },
+        "methodology": "We randomized n = 120 healthy young adults (ages 18-30, 61 female) to 200 mg caffeine or matched placebo in a double-blind parallel design. Sustained attention was measured with the Psychomotor Vigilance Task (PVT) 45 minutes after administration. The prespecified primary outcome was the sustained attention composite score.",
+        "limitations": [
+          "Single dose, single session, young-adult sample only; generalization to older adults is unknown."
+        ],
+        "confidence": "high",
+        "provenance": {
+          "pdf_sha256": "5df3a71521658b2f64722e14b1cb0cb91618bbe203e62c83e128e19d9d20e912",
+          "page": "2",
+          "section": "results",
+          "quote": "Caffeine significantly increased sustained attention scores compared with placebo (mean difference 4.2 points, 95% CI 1.5 to 6.9, p = 0.003).",
+          "extraction": "rule-based parser; exact sentence from the PDF text layer"
+        }
+      },
+      {
+        "evidence_id": "EV2",
+        "source": "Uploaded PDF: caffeine-null-older.pdf",
+        "citation": {
+          "title": "No significant effect of caffeine on sustained attention in older adults",
+          "authors": [
+            "Thomas Lindqvist",
+            "Amara Diallo"
+          ],
+          "year": 2023,
+          "identifier": "10.9999/gercog.2023.0117",
+          "url": "https://doi.org/10.9999/gercog.2023.0117",
+          "location": "p. 2, results section",
+          "retrieved_at": "2026-10-04"
+        },
+        "claim": "Caffeine did not significantly change sustained attention scores compared with placebo (mean difference 0.6 points, 95% CI -1.1 to 2.3, p = 0.41).",
+        "direction_of_effect": "unknown",
+        "population_or_system": "adults, older, adults",
+        "intervention_or_variable": "caffeine",
+        "outcome": "caffeine, sustained attention and adults",
+        "sample_size_if_known": 85,
+        "experimental_conditions": {
+          "section": "results",
+          "page": "2",
+          "reported_effect": "null result (no significant effect reported)",
+          "statistics": "mean difference; 95% CI; p = 0.41"
+        },
+        "methodology": "A double-blind crossover design enrolled n = 85 older adults (ages 65-82, 47 female). Sustained attention was measured with the Psychomotor Vigilance Task (PVT) 45 minutes after each administration, one week apart.",
+        "limitations": [
+          "Crossover design with a single dose; habitual caffeine intake was self-reported."
+        ],
+        "confidence": "high",
+        "provenance": {
+          "pdf_sha256": "d3d70d8b7cef2c030be439650f98b10732d7c9ef9250681952388b60a799fd80",
+          "page": "2",
+          "section": "results",
+          "quote": "Caffeine did not significantly change sustained attention scores compared with placebo (mean difference 0.6 points, 95% CI -1.1 to 2.3, p = 0.41).",
+          "extraction": "rule-based parser; exact sentence from the PDF text layer"
+        }
+      }
+    ]
+  },
+  "updated_at": "2026-10-04T06:46:46.315018+00:00",
   "selected_experiment": "E1",
-  "selection_rationale": "Species adjustment directly tests the differing aggregation condition. Weighted learning, discrimination, coverage, feasibility and cost scores favor it over year adjustment; scores are explicit heuristics.",
-  "verified_sha256": "38b91bf14c377bd672e6e4f3f6b499ab2e3e336c37b2943b7bb607020c54a312"
+  "selection_rationale": "The robustness audit directly tests whether the detected disagreement survives resampling and section exclusion; scores are explicit heuristics.",
+  "verified_sha256": "774fb4b47fb846c84cb323f07e8ce97a9dbb017b8634638410cba7dc3c358f78"
 }
