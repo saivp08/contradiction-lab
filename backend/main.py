@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from backend import store, workflow
-from backend.models import Approval, FollowupApproval, NewInvestigation, PaperPair
+from backend.models import Approval, FollowupApproval, NewInvestigation, PaperPair, default_mode
 
 ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT / ".env")
@@ -24,7 +24,9 @@ async def local_security(request: Request, call_next):
         request.method in {"POST", "PUT", "DELETE", "PATCH"}
         and origin
         and origin
-        not in {"http://localhost:8000", "http://127.0.0.1:8000", "http://localhost:5173", "http://127.0.0.1:5173"}
+        not in {f"http://localhost:{os.getenv('LAB_PORT', '8000')}",
+                f"http://127.0.0.1:{os.getenv('LAB_PORT', '8000')}",
+                "http://localhost:5173", "http://127.0.0.1:5173"}
     ):
         return JSONResponse({"detail": "Cross-origin writes are not allowed"}, status_code=403)
     response = await call_next(request)
@@ -52,6 +54,7 @@ def health():
     configured = bool(os.getenv("OPENAI_API_KEY"))
     return {
         "status": "ok",
+        "default_mode": default_mode(),
         "omnigent_installed": installed,
         "omnigent_configured": configured,
         "omnigent_ready": installed and configured,
@@ -105,7 +108,7 @@ async def upload_paper(file: UploadFile):
 
 
 @app.post("/api/papers/analyze")
-def analyze_papers(request: PaperPair):
+def analyze_papers(request: PaperPair, background: BackgroundTasks):
     import json as _json
 
     from backend import papers
@@ -119,6 +122,20 @@ def analyze_papers(request: PaperPair):
             raise HTTPException(404, f"Uploaded paper {identifier[:12]}… was not found; upload it again.")
         loaded.append(_json.loads(path.read_text(encoding="utf-8")))
     report = papers.analyze(loaded[0], loaded[1])
+    if request.mode == 'omnigent':
+        if not health()['omnigent_ready']:
+            raise HTTPException(503, 'Model mode requires Omnigent and OPENAI_API_KEY; no fallback was run.')
+        # Rule-based output is preprocessing only; model context does not expose its conclusion.
+        report['source_documents'] = loaded
+        report['analysis_id'] = store.uid('analysis')
+        store.save_analysis(report)
+        record = workflow.create(NewInvestigation(mode='omnigent', source_analysis=report['analysis_id']))
+        record['objective'] = 'Assess whether the uploaded papers disagree, explain any disagreement and propose a bounded test.'
+        for paper in loaded:
+            store.add(record, 'paper', {k: paper[k] for k in ('id', 'filename', 'meta', 'pages')}, [])
+        store.save(record)
+        background.add_task(launch, record['id'])
+        return record
     store.save_analysis(report)
     return report
 
@@ -140,7 +157,7 @@ def investigation(identifier: str):
     return store.get(identifier)
 
 
-TERMINAL = {"awaiting_approval", "complete", "failed", "no_contradiction"}
+TERMINAL = {"awaiting_approval", "complete", "failed", "no_contradiction", "blocked"}
 
 
 @app.get("/api/investigations/{identifier}/stream")

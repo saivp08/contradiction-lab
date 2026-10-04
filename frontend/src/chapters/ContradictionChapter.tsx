@@ -5,7 +5,7 @@ import { SectionHeading } from '../ui';
 const ARROWS: Record<string, [string, string]> = {
   positive: ['↗ Positive effect', 'mint'],
   negative: ['↘ Negative effect', 'coral'],
-  unknown: ['⌀ No significant effect', 'muted-strong'],
+  unknown: ['Unknown effect direction', 'muted-strong'],
   mixed: ['⇅ Mixed effects', 'muted-strong'],
 };
 
@@ -15,13 +15,23 @@ export function ContradictionChapter({
   papers = false,
   evidence = [],
   contradiction,
+  model = false,
 }: {
   canTrace: boolean;
   onTrace: () => void;
   papers?: boolean;
   evidence?: Evidence[];
-  contradiction?: { conflicting_claim: string; differing_conditions: string[]; uncertainty: string };
+  contradiction?: { conflicting_claim: string; differing_conditions: string[]; uncertainty: string; explanation?: string; disposition?: string };
+  model?: boolean;
 }) {
+  if (model) return <section>
+    <SectionHeading eyebrow="03 / SCIENTIFIC COMPARISON" title={contradiction?.disposition?.replaceAll('_', ' ') ?? 'Assessing the evidence'} />
+    <p>{contradiction?.conflicting_claim}</p>
+    <p>{contradiction?.explanation}</p>
+    <ul className="differs-list">{contradiction?.differing_conditions.map(condition => <li key={condition}>{condition}</li>)}</ul>
+    <p className="caption">{contradiction?.uncertainty}</p>
+    <button className="text-button" onClick={onTrace} disabled={!canTrace}>Inspect comparison and provenance <ArrowUpRight size={16} /></button>
+  </section>;
   if (papers && evidence.length === 2) {
     const [a, b] = evidence;
     const [labelA, toneA] = ARROWS[a.direction_of_effect] ?? ARROWS.unknown;

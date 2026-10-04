@@ -101,19 +101,10 @@ def test_dataset_tampering_and_missing_data_fail_closed(tmp_path, monkeypatch):
         runner.load_data()
 
 
-def test_sponsor_generated_hypotheses_reject_malformed_contract():
+def test_model_mode_rejects_legacy_deterministic_handoffs():
     record = workflow.create(NewInvestigation(mode="omnigent"))
-    workflow.advance(record["id"], "LiteratureAgent", "Retrieve the attributed reference claims.")
-    workflow.advance(record["id"], "ContradictionAgent", "Compare the two aggregation contexts.")
-    with pytest.raises(ValueError, match="structured AI-generated"):
-        workflow.advance(record["id"], "HypothesisAgent", "Generate falsifiable competing explanations.")
-    with pytest.raises(ValidationError):
-        workflow.advance(
-            record["id"],
-            "HypothesisAgent",
-            "Generate falsifiable competing explanations.",
-            [{"statement": "Incomplete"}],
-        )
+    with pytest.raises(ValueError, match="validated structured artifacts"):
+        workflow.advance(record["id"], "LiteratureAgent", "Retrieve the reference claims.")
 
 
 def test_alternative_experiment_changes_full_loop_decision():

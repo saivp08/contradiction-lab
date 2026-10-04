@@ -33,7 +33,7 @@ test('debate: dashboard → arena playback → approval → critic → follow-up
   await expect(page.getByRole('tab', { name: /Experiment/ })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByText('Nothing runs without you.')).toBeVisible();
   await expect(page.locator('.status-pill', { hasText: 'Needs approval' })).toBeVisible();
-  await page.screenshot({ path: '../docs/redesign-approval.png', animations: 'disabled' });
+  await page.screenshot({ path: '../artifacts/browser-tests/redesign-approval.png', animations: 'disabled' });
 
   // The data panel shows the real measurements before any experiment.
   await page.getByRole('tab', { name: 'Data', exact: true }).click();
@@ -51,7 +51,7 @@ test('debate: dashboard → arena playback → approval → critic → follow-up
   const challenges = page.getByLabel('Critic challenges');
   await expect(challenges).toBeVisible({ timeout: 60000 });
   await expect(challenges).toContainText('under fire');
-  await page.screenshot({ path: '../docs/redesign-arena.png', animations: 'disabled' });
+  await page.screenshot({ path: '../artifacts/browser-tests/redesign-arena.png', animations: 'disabled' });
   await page.getByRole('button', { name: 'Skip to end' }).click();
   await expect(challenges.locator('.challenge.rebutted')).toHaveCount(4);
   await expect(challenges.locator('.challenge.open')).toHaveCount(1);
@@ -102,7 +102,7 @@ test('debate: dashboard → arena playback → approval → critic → follow-up
   await expect(
     page.getByRole('img', { name: 'Pooled slope split into within-group and between-group contributions' }),
   ).toBeVisible();
-  await page.screenshot({ path: '../docs/redesign-result.png', animations: 'disabled' });
+  await page.screenshot({ path: '../artifacts/browser-tests/redesign-result.png', animations: 'disabled' });
 
   // Stage tabs step through the record.
   await page.getByRole('tab', { name: /Evidence/ }).click();
@@ -136,7 +136,7 @@ test('debate: dashboard → arena playback → approval → critic → follow-up
   await expect(acceleration).toContainText('Follow-ups triggered');
   await expect(acceleration).toContainText('Rebutted by data');
   await noCardOverflow(page);
-  await page.screenshot({ path: '../docs/redesign-followup.png', animations: 'disabled' });
+  await page.screenshot({ path: '../artifacts/browser-tests/redesign-followup.png', animations: 'disabled' });
   await page.getByRole('tab', { name: 'Data', exact: true }).click();
   await expect(page.getByText(/Follow-up adding sex \+ year/)).toBeVisible();
   await page.getByRole('button', { name: 'Color by species', exact: true }).click();
@@ -149,7 +149,7 @@ test('debate: dashboard → arena playback → approval → critic → follow-up
   await page.getByRole('button', { name: /^Inspect result / }).click();
   await expect(page.getByRole('dialog')).toContainText('dataset_sha256');
   await page.getByRole('button', { name: 'Close provenance' }).click();
-  await page.screenshot({ path: '../docs/redesign-research-graph.png', animations: 'disabled' });
+  await page.screenshot({ path: '../artifacts/browser-tests/redesign-research-graph.png', animations: 'disabled' });
   await page.getByRole('tab', { name: 'Record', exact: true }).click();
   await expect(page.locator('.activity').first()).toBeVisible();
   await expect(page.getByRole('link', { name: 'Export JSON' })).toBeVisible();
@@ -166,7 +166,7 @@ test('debate: dashboard → arena playback → approval → critic → follow-up
   await expect(page.locator('.run-card').first()).toContainText('+0.200');
   await expect(page.locator('.run-card').first()).toContainText('4 rebutted');
   await expect(page.locator('.hero-floor svg.floor')).toBeVisible();
-  await page.screenshot({ path: '../docs/redesign-home.png', animations: 'disabled' });
+  await page.screenshot({ path: '../artifacts/browser-tests/redesign-home.png', animations: 'disabled' });
 
   for (const width of [1024, 768, 390]) {
     await page.setViewportSize({ width, height: 900 });
@@ -175,7 +175,7 @@ test('debate: dashboard → arena playback → approval → critic → follow-up
     await expect(page.getByRole('tablist', { name: 'Investigation stages' })).toBeVisible();
     expect(await noHorizontalScroll(page)).toBeTruthy();
     await noCardOverflow(page);
-    if (width === 390) await page.screenshot({ path: '../docs/redesign-mobile.png', animations: 'disabled' });
+    if (width === 390) await page.screenshot({ path: '../artifacts/browser-tests/redesign-mobile.png', animations: 'disabled' });
     await page.goBack();
   }
   expect(errors).toEqual([]);

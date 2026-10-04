@@ -12,7 +12,7 @@ export const STAGES = [
   'Next move',
 ];
 /** Statuses where nothing more happens without a person acting. */
-export const RESTING = ['complete', 'failed', 'no_contradiction', 'awaiting_approval'];
+export const RESTING = ['complete', 'failed', 'no_contradiction', 'blocked', 'awaiting_approval'];
 
 export async function api<T>(path: string, options?: RequestInit): Promise<T> {
   const r = await fetch('/api' + path, {

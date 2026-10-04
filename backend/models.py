@@ -1,5 +1,6 @@
 """Validated scientific contracts. No model-generated executable code."""
 
+import os
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
@@ -83,6 +84,13 @@ class Experiment(Strict):
     bootstrap_samples: int = Field(ge=100, le=2000)
 
 
+def default_mode():
+    mode = os.getenv('AGENT_MODE', 'model')
+    if mode not in {'model', 'deterministic'}:
+        raise ValueError('AGENT_MODE must be model or deterministic')
+    return 'local' if mode == 'deterministic' else 'omnigent'
+
+
 class NewInvestigation(Strict):
     objective: str = Field(
         default="Why does the relationship between penguin bill length and depth reverse when species are separated?",
@@ -91,7 +99,8 @@ class NewInvestigation(Strict):
     )
     label: str | None = Field(default=None, max_length=120)
     source_analysis: str | None = Field(default=None, pattern=r"^analysis-[0-9a-f]{12}$")
-    mode: Literal["local", "omnigent"] = "local"
+    parent_investigation: str | None = Field(default=None, pattern=r"^lab-[0-9a-f]{12}$")
+    mode: Literal["local", "omnigent"] = Field(default_factory=default_mode)
     seed: int = Field(default=42, ge=0, le=2**32 - 1)
 
 
@@ -103,6 +112,7 @@ class Approval(Strict):
 class PaperPair(Strict):
     paper_a: str = Field(pattern=r"^[0-9a-f]{64}$")
     paper_b: str = Field(pattern=r"^[0-9a-f]{64}$")
+    mode: Literal['local', 'omnigent'] = Field(default_factory=default_mode)
 
 
 class FollowupApproval(Strict):

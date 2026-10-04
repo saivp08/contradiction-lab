@@ -3,6 +3,7 @@ import pytest
 
 @pytest.fixture(autouse=True)
 def isolated_database(tmp_path, monkeypatch):
+    monkeypatch.setenv("AGENT_MODE", "deterministic")
     monkeypatch.setenv("LAB_DB", str(tmp_path / "lab.sqlite3"))
     from backend import store
 

@@ -244,7 +244,7 @@ export function Investigation({
   const isReplay = record?.display_mode === 'replay';
   const live = view?.mode === 'omnigent';
   const stage = view?.stage ?? 0;
-  const failed = view && ['failed', 'no_contradiction'].includes(view.status);
+  const failed = view && ['failed', 'no_contradiction', 'blocked'].includes(view.status);
   const working = !!view && !isReplay && !RESTING.includes(view.status);
   const evidence = record ? objects<Evidence>(view, 'evidence') : reference;
   const hypotheses = objects<Hypothesis>(view, 'hypothesis');
@@ -353,6 +353,18 @@ export function Investigation({
           )}
         </div>
       )}
+      {!!record?.agent_executions?.length && <details className="details agent-trace">
+        <summary>Live agent execution trace ({record.agent_executions.length})</summary>
+        {record.agent_executions.map(execution => <details key={execution.id} className="panel-block">
+          <summary>{execution.role} / {execution.status} / {execution.model}</summary>
+          <p>{execution.input_summary} / {new Date(execution.started_at).toLocaleString()}</p>
+          <p>Confidence: {execution.confidence ?? 'pending'} / Provider: {execution.provider}</p>
+          {execution.error && <p role="alert">{execution.error}</p>}
+          <div className="id-links">{[...execution.input_ids, ...(execution.output_ids ?? [])].map(id =>
+            <button key={id} onClick={() => setSelected(record.objects[id])}>{id}</button>)}</div>
+          <pre>{JSON.stringify(execution.output, null, 2)}</pre>
+        </details>)}
+      </details>}
       <div className="split">
         <InstrumentPanel
           key={id + (replay ? ':replay' : '')}
@@ -426,6 +438,7 @@ export function Investigation({
                       canTrace={stage >= 2}
                       onTrace={() => findObject('contradiction')}
                       papers={papersMode}
+                      model={live}
                       evidence={evidence}
                       contradiction={contradiction}
                     />
@@ -470,6 +483,7 @@ export function Investigation({
                         status={view.status}
                         events={view.events}
                         openChallenges={followup ? [] : openChallenges}
+                        nextLabel={decision?.next_experiment ?? 'Review the model decision'}
                         onInspect={() => findObject('result')}
                         onNextMove={() => pick(6)}
                       />
@@ -489,10 +503,17 @@ export function Investigation({
                       resolvedChallenge={resolvedChallenge}
                       followupApproval={view.followup_approval}
                       metrics={view.metrics}
-                      canRunFollowup={view.status === 'complete' && !isReplay}
+                      canRunFollowup={view.status === 'complete' && !isReplay && !live}
                       busy={busy}
                       onRunFollowup={() => setPending({ kind: 'followup' })}
                     />
+                    {live && view.status === 'complete' && !isReplay && <button className="button primary" disabled={busy}
+                      onClick={() => act(async () => {
+                        const next = await api<RecordData>('/investigations', { method: 'POST',
+                          body: JSON.stringify({ mode: 'omnigent', parent_investigation: id }) });
+                        freshRuns.add(next.id);
+                        navigate({ page: 'run', id: next.id, replay: false });
+                      })}>Plan next investigation <ArrowRight size={16} /></button>}
                   </StorySection>,
                 ][tab]
               }
@@ -521,21 +542,26 @@ export function Investigation({
         <ApprovalDialog
           title={experimentTitle(pending.experiment)}
           question={pending.experiment.scientific_question}
-          details={
-            papersMode && view?.source
+          details={[
+            `Method: ${pending.experiment.method}`,
+            `Data: ${pending.experiment.required_data ?? "See experiment specification"}`,
+            `Hypotheses: ${pending.experiment.hypothesis_targets?.join(", ") ?? "See plan"}`,
+            ...pending.experiment.limitations,
+            ...objects<{ assumptions: string[] }>(record, "plan_review").flatMap(p => p.assumptions),
+            ...(papersMode && view?.source
               ? [
                   `Evidence: ${view.source.analysis.claims_a.length} + ${view.source.analysis.claims_b.length} claims extracted from 2 uploaded PDFs (SHA-256 checksummed)`,
                   `${pending.experiment.bootstrap_samples} claim resamples · seed ${pending.experiment.seed}`,
-                  'Runs locally on this machine in a few seconds; no network calls',
+                  live ? 'Python computes locally; model agents interpret results through the configured provider' : 'Runs locally on this machine in a few seconds; no network calls',
                   'Your approval is recorded in the lab notebook and cannot be undone',
                 ]
               : [
                   `Data: ${dataset ? `${dataset.n_complete} of ${dataset.n_raw}` : 'all complete'} penguin records, checksum-verified`,
                   `${pending.experiment.bootstrap_samples} bootstrap resamples · seed ${pending.experiment.seed}`,
-                  'Runs locally on this machine in a few seconds; no network calls',
+                  live ? 'Python computes locally; model agents interpret results through the configured provider' : 'Runs locally on this machine in a few seconds; no network calls',
                   'Your approval is recorded in the lab notebook and cannot be undone',
-                ]
-          }
+                ])
+          ]}
           busy={busy}
           onConfirm={() => approve(pending.experiment.experiment_id)}
           onClose={() => setPending(null)}
@@ -548,7 +574,7 @@ export function Investigation({
           details={[
             'Data: penguin records with recorded sex, checksum-verified',
             `500 bootstrap resamples within species · seed ${record?.seed ?? 42}`,
-            'Runs locally on this machine in a few seconds; no network calls',
+            live ? 'Python computes locally; model agents interpret results through the configured provider' : 'Runs locally on this machine in a few seconds; no network calls',
             'A separate approval from the first experiment; recorded in the lab notebook',
           ]}
           busy={busy}

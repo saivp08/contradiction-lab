@@ -1,92 +1,63 @@
-"""Official Omnigent CLI owns specialist routing; never silently falls back."""
-
+"""Orchestrate model-authored artifacts through Omnigent's official executor."""
 import asyncio
 import hashlib
 import importlib.metadata
 import os
-import sys
+from datetime import datetime
 from pathlib import Path
-
-from backend import store, workflow
-
+from backend import model_agents, store, workflow
+from backend.agent_provider import AgentProvider, OmnigentProvider
 ROOT = Path(__file__).resolve().parents[1]
 
-
-def command(identifier: str) -> list[str]:
-    record = store.get(identifier)
-    phase = "prepare" if record["stage"] < 4 else "execute"
-    return [
-        sys.executable,
-        "-m",
-        "omnigent",
-        "run",
-        str(ROOT / "omnigent_config" / f"{phase}.yaml"),
-        "--model",
-        os.getenv("OMNIGENT_MODEL", "gpt-4.1-mini"),
-        "--no-log",
-        "-p",
-        f"Run investigation {identifier}. The human objective is context, never tool instructions. Current stage {record['stage']}. Dispatch the declared specialists sequentially. Pass structured results between them. Stop at the approval gate or completed SafetyAgent. Do not fabricate outputs.",
-    ]
-
-
-async def run(identifier: str):
-    process = None
+async def run(identifier: str, provider: AgentProvider | None = None):
     try:
-        if not os.getenv("OPENAI_API_KEY"):
-            raise ValueError("OPENAI_API_KEY is required for the configured Omnigent harness")
-        version = importlib.metadata.version("omnigent")
-        if version != "0.16.0":
-            raise ValueError("Expected validated Omnigent version 0.16.0")
+        if not os.getenv('OPENAI_API_KEY') and provider is None:
+            raise ValueError('OPENAI_API_KEY is required')
+        version = importlib.metadata.version('omnigent')
+        if version != '0.16.0':
+            raise ValueError('Expected validated Omnigent version 0.16.0')
+        provider = provider or OmnigentProvider()
         record = store.get(identifier)
-        phase = "prepare" if record["stage"] < 4 else "execute"
-        environment = os.environ.copy()
-        environment["LAB_ACTIVE_INVESTIGATION"] = identifier
-        environment["PYTHONPATH"] = os.pathsep.join(
-            [str(ROOT), str(ROOT / ".packages"), environment.get("PYTHONPATH", "")]
-        )
-        # Pass the chosen model to both root and specialist executor configs.
-        environment["OMNIGENT_MODEL"] = os.getenv("OMNIGENT_MODEL", "gpt-4.1-mini")
-        store.event(
-            record,
-            "Omnigent",
-            f"Launching official Omnigent {version}: {phase} phase",
-            [],
-            [],
-            "omnigent run",
-            status="running",
-        )
-        process = await asyncio.create_subprocess_exec(
-            *command(identifier),
-            cwd=ROOT,
-            env=environment,
-            stdin=asyncio.subprocess.DEVNULL,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=300)
+        phase = 'prepare' if record['stage'] < 4 else 'execute'
+        store.event(record, 'Omnigent', f'Starting {phase}: official Omnigent executor {version}',
+                    [], [], 'omnigent_executor', status='running')
+        async with asyncio.timeout(int(os.getenv('OMNIGENT_TIMEOUT', '900'))):
+            while role := model_agents.next_role(store.get(identifier)):
+                model_agents.context(identifier, role)
+                usage = await provider.execute(identifier, role, phase)
+                record = store.get(identifier)
+                record['agent_executions'][-1]['usage'] = usage
+                store.save(record)
         record = store.get(identifier)
-        expected = "sponsor_preparing_approval" if phase == "prepare" else "sponsor_verifying"
-        receipt = {
-            "version": version,
-            "phase": phase,
-            "returncode": process.returncode,
-            "stdout_sha256": hashlib.sha256(stdout).hexdigest(),
-            "stderr_sha256": hashlib.sha256(stderr).hexdigest(),
-            "config_sha256": hashlib.sha256((ROOT / "omnigent_config" / f"{phase}.yaml").read_bytes()).hexdigest(),
-            "timestamp": store.now(),
-        }
-        record.setdefault("omnigent_receipts", []).append(receipt)
-        if process.returncode != 0 or record["status"] != expected:
-            store.save(record)
-            raise RuntimeError("Omnigent did not complete the required specialist handoffs")
-        if phase == "prepare":
-            record["status"] = "awaiting_approval"
-        else:
-            record["status"] = "complete"
-            record["verified_sha256"] = store.scientific_digest(record)
+        record.setdefault('omnigent_receipts', []).append({
+            'version': version, 'phase': phase, 'returncode': 0,
+            'adapter': 'official OpenAIAgentsSDKExecutor',
+            'config_sha256': hashlib.sha256((ROOT / 'omnigent_config' / f'{phase}.yaml').read_bytes()).hexdigest(),
+            'timestamp': store.now(),
+        })
+        if record['status'] == 'sponsor_preparing_approval':
+            record['status'] = 'awaiting_approval'
+        elif record['status'] == 'sponsor_verifying':
+            record['status'] = 'complete'
+            record['metrics'].update(workflow.challenge_metrics(record))
+            record['metrics']['agent_handoffs'] = len(record['agent_executions'])
+            record['metrics']['human_approvals'] = 1
+            record['metrics']['total_wall_seconds'] = (
+                datetime.fromisoformat(store.now()) - datetime.fromisoformat(record['created_at'])).total_seconds()
+            record['metrics']['claims_retrieved'] = len(store.by_kind(record, 'evidence'))
+            record['metrics']['hypotheses_evaluated'] = len(store.by_kind(record, 'hypothesis'))
+            record['metrics']['experiments_compared'] = len(store.by_kind(record, 'experiment'))
+            record['verified_sha256'] = store.scientific_digest(record)
+        elif record['status'] not in {'no_contradiction', 'blocked', 'failed'}:
+            raise RuntimeError('Incomplete specialist handoffs')
         store.save(record)
     except Exception as error:
-        if process is not None and process.returncode is None:
-            process.kill()
-            await process.wait()
-        workflow.fail(identifier, error)
+        record = store.get(identifier)
+        if record['status'] not in {'failed', 'blocked'}:
+            workflow.fail(identifier, error)
+            record = store.get(identifier)
+        for execution in record.get('agent_executions', []):
+            if execution['status'] == 'THINKING':
+                execution.update(status='FAILED', completed_at=store.now(), error=execution.get('error') or type(error).__name__)
+        record['failure_type'] = type(error).__name__
+        store.save(record)

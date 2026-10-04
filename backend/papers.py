@@ -476,6 +476,7 @@ def ingest(blob: bytes, filename: str = "paper.pdf") -> dict:
         or None,
         "limitations": [s for c in chunks if c["section"] == "limitations" for s in _sentences(c["text"])][:3],
         "claims": claims[:MAX_CLAIMS],
+        "passages": chunks,
         "warnings": warnings,
     }
 

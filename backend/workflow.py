@@ -1,4 +1,5 @@
 import hashlib
+import json
 import threading
 from datetime import datetime
 from time import perf_counter
@@ -31,18 +32,29 @@ def lock_for(identifier: str):
 def create(request: NewInvestigation) -> dict:
     source = None
     objective = request.objective
+    parent = None
+    if request.parent_investigation:
+        parent = store.get(request.parent_investigation)
+        if request.mode != 'omnigent' or parent['mode'] != 'omnigent' or parent['status'] != 'complete':
+            raise ValueError('Model follow-up planning requires a completed model investigation')
+        if request.source_analysis:
+            raise ValueError('Follow-up source is inherited from the parent investigation')
+        decision = store.by_kind(parent, 'decision')[0]['data']
+        objective = f"Follow up: {decision['next_experiment']}. {decision['rationale']}"
+        source = parent.get('source')
     if request.source_analysis:
-        if request.mode == "omnigent":
-            raise ValueError(
-                "Paper-comparison investigations currently run with the local deterministic specialists; "
-                "Omnigent mode remains tied to the reference case study."
-            )
         analysis = store.load_analysis(request.source_analysis)
-        if not analysis.get("defensible_contradiction") or "evidence" not in analysis:
+        if request.mode == 'omnigent' and not analysis.get('source_documents'):
+            raise ValueError('Re-analyze the uploaded papers in model mode to provide their full source passages')
+        if request.mode == 'local' and (not analysis.get("defensible_contradiction") or "evidence" not in analysis):
             raise ValueError(
                 "The paper analysis found no defensible contradiction; an investigation will not be fabricated."
             )
         objective = paper_science.objective(analysis)
+        if request.mode == 'omnigent':
+            objective = 'Assess whether the uploaded papers disagree, explain any disagreement and propose a bounded test.'
+            analysis.update(relationship='Pending model assessment', best_pair=None, pairs=[],
+                            defensible_contradiction=False, evidence=[], engine='Model assessment pending')
         source = {
             "kind": "papers",
             "analysis_id": analysis["analysis_id"],
@@ -56,7 +68,7 @@ def create(request: NewInvestigation) -> dict:
             ],
             "relationship": analysis["relationship"],
             "analysis": analysis,
-            "evidence": analysis["evidence"],
+            "evidence": analysis.get("evidence", []),
         }
     record = {
         "id": store.uid("lab"),
@@ -82,11 +94,23 @@ def create(request: NewInvestigation) -> dict:
             "the computational experiments quantify extraction robustness, not either paper's truth."
         )
     store.add(record, "question", {"objective": objective, "scope": record["scope"]}, [])
+    if parent:
+        record['parent_investigation'] = parent['id']
+        for kind in ('result', 'decision', 'critique'):
+            for artifact in store.by_kind(parent, kind):
+                store.add(record, 'prior_' + kind, {'parent_investigation': parent['id'],
+                          'artifact_id': artifact['id'], 'artifact': artifact['data']}, [])
     store.save(record)
     return record
 
 
 def advance(identifier: str, role: str, rationale: str = "", candidates: list[dict] | None = None) -> dict:
+    if store.get(identifier)['mode'] != 'local':
+        raise ValueError('Model agents must submit validated structured artifacts through omnigent_tools')
+    return _advance_deterministic(identifier, role, rationale, candidates)
+
+
+def _advance_deterministic(identifier: str, role: str, rationale: str = "", candidates: list[dict] | None = None) -> dict:
     with lock_for(identifier):
         record = store.get(identifier)
         if record["status"] in {"complete", "failed", "no_contradiction"}:
@@ -393,11 +417,17 @@ def approve(identifier: str, experiment_id: str, actor: str = "local human opera
         valid = [v["data"]["experiment_id"] for v in store.by_kind(record, "experiment")]
         if experiment_id not in valid:
             raise ValueError("Unknown experiment")
+        if record['mode'] == 'omnigent':
+            from backend.model_agents import plan_digest
+            if record.get('verified_plan_sha256') != plan_digest(record):
+                raise ValueError('Plan has changed since verification')
         record["approval"] = {
             "experiment_id": experiment_id,
             "approved_at": store.now(),
             "actor": actor,
             "scope": "One allowlisted local computational experiment",
+            "plan_sha256": hashlib.sha256(json.dumps(
+                store.by_kind(record, 'experiment'), sort_keys=True, allow_nan=False).encode()).hexdigest(),
         }
         record["status"] = "approved"
         store.event(
@@ -417,6 +447,8 @@ def run_followup(identifier: str, actor: str = "local human operator") -> dict:
         record = store.get(identifier)
         if record["status"] != "complete":
             raise ValueError("Follow-up requires a completed investigation")
+        if record['mode'] == 'omnigent':
+            raise ValueError('Model follow-ups require a new planned investigation and approval; this shortcut is deterministic-only')
         if record.get("source", {}).get("kind") == "papers":
             raise ValueError(
                 "Follow-up execution needs an executable dataset; a paper comparison records the proposed "
