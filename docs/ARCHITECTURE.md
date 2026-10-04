@@ -4,7 +4,7 @@ The repository started empty. Installed Python scientific libraries were reusabl
 
 ## Components
 
-- `frontend/src`: React/TypeScript dashboard, real-data SVG plots, progress rail, modal object inspector, graph and notebook. No frontend provider credentials. Polls persisted state every 700 ms while work is active; no staged fake event text.
+- `frontend/src`: React/TypeScript app with hash routing. `pages/Home.tsx` is the investigation dashboard (key numbers, stage progress, replay links). `pages/Investigation.tsx` is a split view: `panels/InstrumentPanel.tsx` (sticky panel: the agent arena from `arena/`, which expands recorded events and critique objects into paced beats and derives the record as of the current beat; data with slope decomposition; research graph; raw record) beside the investigation stages as tabs, one per component in `chapters/`, with approval confirmation dialogs. The page switches to the Experiment tab when approval is needed and to the Result tab when the result arrives. Real-data SVG plots, no frontend provider credentials. Subscribes to a server-sent event stream while work is active (polling fallback); no staged fake event text.
 - `backend/main.py`: typed FastAPI routes, background execution, approval endpoint, export/replay, local-origin write guard, static frontend serving.
 - `backend/models.py`: strict Pydantic scientific contracts. Reject extra fields, invalid URLs, unbounded bootstrap requests and unknown experiment methods.
 - `backend/workflow.py`: validates stage progression, records handoffs and approval, invokes scientific functions, seals completed records. This is the local runner and the permission boundary for sponsor-issued tool calls; it is not advertised as Omnigent.
@@ -12,6 +12,7 @@ The repository started empty. Installed Python scientific libraries were reusabl
 - `backend/omnigent_tools.py`: specialist capabilities. No approval tool, arbitrary execution tool, deletion tool or general network tool.
 - `experiments/penguins.py`: pure numerical core with limited approved methods.
 - `backend/store.py`: SQLite WAL persistence, UUID object identities, event log, JSON export and checksum verification.
+- `backend/papers.py` + `experiments/papers_analysis.py` + `backend/paper_science.py`: deterministic PDF ingestion (pypdf), claim extraction with page/section provenance, term-overlap alignment and relationship classes, and the paper-mode specialist logic (template hypotheses from extracted differences, bootstrap/section-sensitivity experiments, generic critic challenges). `workflow.advance` branches per role on `record["source"]`; the state machine, approval gate and sealing are shared with the reference investigation.
 - `data`: original real CSV, checksum manifest, curated evidence catalog and completed real local replay.
 
 ## State and handoffs

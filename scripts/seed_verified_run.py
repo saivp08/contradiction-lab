@@ -1,4 +1,5 @@
 """Run actual computation and export a portable, clearly labeled local replay."""
+
 import json
 import sys
 from pathlib import Path
@@ -17,4 +18,14 @@ if __name__ == "__main__":
     assert record["status"] == "complete", record["error"]
     assert store.verify(record)
     (ROOT / "data" / "verified-run.json").write_text(json.dumps(record, indent=2), encoding="utf-8")
-    print(json.dumps({"id": record["id"], "mode": record["mode"], "metrics": record["metrics"], "verified_sha256": record["verified_sha256"]}, indent=2))
+    print(
+        json.dumps(
+            {
+                "id": record["id"],
+                "mode": record["mode"],
+                "metrics": record["metrics"],
+                "verified_sha256": record["verified_sha256"],
+            },
+            indent=2,
+        )
+    )

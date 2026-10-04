@@ -11,10 +11,10 @@ Built for Databricks × Hack-Nation — Agentic Scientific Discovery.
 ## What works, and what is credential-dependent
 
 - **Local development:** complete, tested discovery loop on a real open dataset. Deterministic specialist functions, explicitly labeled **not Omnigent and not an LLM**.
-- **Omnigent live:** official `omnigent==0.16.0` CLI orchestrates eight declared specialist agents using role-specific function tools. The actual package loads both supplied graphs in tests. A model-backed end-to-end execution **has not been verified** because no model credentials were supplied. This remains a submission acceptance dependency, not a claim of sponsor compliance already achieved.
+- **Omnigent live:** official `omnigent==0.16.0` CLI orchestrates nine declared specialist agents using role-specific function tools. The actual package loads both supplied graphs in tests. A model-backed end-to-end execution **has not been verified** because no model credentials were supplied. The orchestration contract itself is tested end-to-end: a pytest drives the exact function-tool surface Omnigent calls (all nine specialists in order, structured state passing, the enforced approval gate, sealing) without a model. This remains a submission acceptance dependency, not a claim of sponsor compliance already achieved.
 - **Verified replay:** checksum-validated records of completed real computation. A portable local run ships in `data/verified-run.json`; replay retains its original engine label. Never presented as a live run.
 
-![Completed investigation](docs/demo-desktop.png)
+![Completed investigation: data panel with slope decomposition beside the investigation story](docs/redesign-result.png)
 
 ## The scientific problem
 
@@ -48,7 +48,19 @@ cd ..
 .venv\Scripts\python scripts/run.py
 ```
 
-Open **http://127.0.0.1:8000**. Click **Run demo investigation**, review the hypotheses and experiments, then **Approve & run experiment**. Scroll to the result and the before/after decision. Use **Research graph** or **Lab notebook** to inspect lineage. Click **Replay verified run** to load the sealed record.
+macOS / Linux (the macOS system Python is 3.9, which is too old; install 3.12 with `uv` or Homebrew):
+
+```bash
+uv venv --python 3.12 .venv
+uv pip install --python .venv/bin/python -r requirements.txt
+# without uv: python3.12 -m venv .venv && .venv/bin/python -m pip install -r requirements.txt
+(cd frontend && npm ci && npm run build)
+.venv/bin/python scripts/run.py
+```
+
+Open **http://127.0.0.1:8000**. The home page shows the latest debate on the agent floor and your investigations with their slopes and challenge verdicts. Click **Start a debate**: the **Arena** plays the run back exchange by exchange (specialists passing claims, hypotheses and test specs to each other), then pauses at your seat for approval. Approve the experiment and watch the Critic attack the result while Analysis answers each challenge with the computed number. The stage tabs on the right follow the action. The open challenge (sex confounding) becomes the follow-up, which you can approve on **Next move**. The left panel also has **Data** (scatter, slope decomposition), **Research graph** and **Record** (raw events, export). **Replay verified run** replays the sealed record.
+
+The arena is a playback of real recorded events and computed challenge verdicts, paced for reading (1×/2×/4×, skip). Local specialists are rule-based; no dialogue is generated.
 
 In this prepared workspace, dependencies already exist in `.packages` and `frontend/node_modules`; launch directly with `python scripts/run.py`. The launcher recognizes `.packages`. Standard installations should use the virtual environment above. Windows PowerShell execution-policy restrictions are avoided with `npm.cmd` and the venv's Python executable; activation is unnecessary.
 
@@ -77,7 +89,7 @@ flowchart LR
   API --> Mode{Explicit engine}
   Mode --> OM[Official Omnigent CLI]
   Mode --> Local[Local deterministic development loop]
-  OM --> Agents[Eight specialist agents]
+  OM --> Agents[Nine specialist agents]
   Agents --> Tools[Role-specific scientific tools]
   Local --> Tools
   Gate --> Tools
@@ -96,6 +108,7 @@ flowchart LR
 | ExperimentPlanner | Score two allowlisted tests; explain selection and await approval |
 | ExperimentRunner | Execute approved code; record data/code hashes, parameters and results |
 | AnalysisAgent | Evaluate actual intervals and sensitivity; update heuristic support |
+| CriticAgent | Attack the result with five challenges (noise, single year, single group, overfitting, sex confounding); each is rebutted, standing or left open by a computed number. Open challenges drive the next experiment |
 | DecisionAgent | Select follow-up based on the computed evidence |
 | SafetyAgent | Validate citations, approval, lineage and experiment provenance |
 
@@ -107,7 +120,21 @@ The selected experiment fits pooled and species-adjusted linear slopes, computes
 
 The reference gives approximately **−0.085 pooled** versus **+0.200 species-adjusted** mm/mm. The result leads to a proposed follow-up on sex and year within species. If uncertainty spans zero or sensitivity is unstable, the system prioritizes replication. If the reversal criterion fails otherwise, it reconsiders covariates. Tests recompute the experiment on perturbed data and verify that the decision changes.
 
-Support scores are a transparent heuristic, not Bayesian probabilities. The test is exploratory and observational; it does not establish causation. The proposed next experiment is recorded but requires a separate future approval; the shipped investigation completes one experimental cycle.
+Support scores are a transparent heuristic, not Bayesian probabilities. Alongside them, every result reports a BIC model comparison (pooled versus adjusted model); the BIC difference approximates twice the log Bayes factor. The species-adjusted model is favoured by ΔBIC ≈ 470; the year-adjusted model is not (ΔBIC ≈ −7).
+
+**Why the sign flips.** Each result includes an exact decomposition of the pooled slope: pooled = w × within-group slope + (1 − w) × between-group slope, where w is the within-group share of bill-length variance. For species: −0.085 = 0.29 × (+0.200) + 0.71 × (−0.203), i.e. +0.058 from within species and −0.143 between species. 71% of bill-length variation lies between species, and species with longer bills have shallower bills, which outweighs the positive within-species relationship. This is the explainability view for these linear models; SHAP would reduce to the same coefficients and is not used. The test is exploratory and observational; it does not establish causation.
+
+**Follow-up cycle.** When the decision proposes it, the user can run the follow-up (species + sex + year regression, 333 birds with recorded sex) under a second, separate approval (`POST /api/investigations/{id}/followup`). Adjusting for sex and year shrinks the within-species slope by about 65% (0.200 → 0.070, 95% CI [0.031, 0.108]) but it stays positive, so H3 is better supported and the next step becomes sex-specific slopes. The follow-up's approval, result and interpretation are included in the replay checksum.
+
+**Any two papers (new).** Besides the reference case study, the lab now ingests **any two user-supplied research-paper PDFs** (`#/compare`, `POST /api/papers`): a deterministic parser extracts metadata (title, authors, year, journal, DOI), sections, and claim sentences with exact quotes and page/section provenance from the full text. Claims are aligned by term overlap, ranked, and classified — direct contradiction, context-dependent disagreement, complementary findings, insufficiently comparable, or no meaningful contradiction. A defensible disagreement feeds the **same nine-agent workflow** (paper-derived evidence, difference-templated hypotheses, two allowlisted text-evidence experiments: claim-alignment robustness audit with seeded bootstrap resampling and section-exclusion sensitivity, plus a condition scan; generic critic challenges, each settled by computed numbers). If the papers do not meaningfully contradict each other, the app says so and **refuses to fabricate an investigation**. Extraction is rule-based (no LLM): quotes are verbatim sentences, unknown fields stay null, and scanned/malformed PDFs fail loudly. Executable follow-ups are penguin-only; a paper run records its proposed next experiment without running it.
+
+**The lab tries to prove itself wrong.** The breakthrough claim is the workflow, not the penguin result: the case study is a known, published reversal used because it is small, real and reproducible. The same loop — contradiction → hypotheses → approved experiment → computed result → adversarial critique → unresolved gap → follow-up → updated decision — is what would be pointed at genuinely novel questions.
+
+**Discovery acceleration (measured, no invented multiplier).** The Next-move stage shows a Workflow compression · prototype measurement panel built only from the run's recorded events: hypotheses registered, experiments compared, follow-ups triggered, agent handoffs, human approval points, challenges raised / rebutted by data / still open, and the measured question→spec, compute and result→decision times. No manual baseline was measured, so no speed multiplier is claimed.
+
+**Why this decision?** Every follow-up decision carries an inspectable evidence chain: the critic challenge that triggered it, the evidence for the gap, the expected learning, the human approval timestamp, the computed result and the decision taken after it. A compact learning-loop diagram shows the critique branching back into the experiment stage and closing when the follow-up resolves it.
+
+**Live updates.** While a run is in progress the UI listens to a server-sent event stream (`GET /api/investigations/{id}/stream`) and falls back to polling if the stream fails.
 
 ## Tests and verification
 
@@ -124,7 +151,9 @@ npx.cmd playwright install chromium
 npm.cmd test
 ```
 
-The frontend lint script runs TypeScript validation; there is no separate ESLint ruleset. Browser testing covers approval, actual results, changed decision, graph provenance, verified replay, and mobile overflow. Screenshots are generated in `docs/demo-desktop.png` and `docs/demo-mobile.png`.
+On macOS / Linux use `.venv/bin/python` and plain `npm` / `npx`. Format code with `.venv/bin/ruff format backend experiments scripts tests` and `npm run format` in `frontend`.
+
+The frontend lint script runs TypeScript validation; there is no separate ESLint ruleset. Browser testing covers the paper upload/compare flow (contradiction, no-contradiction, complementary, malformed and image-only PDFs), the dashboard, arena playback, critic challenges, the unresolved-gap callout, the learning loop, the acceleration panel, approval, actual results, slope decomposition, changed decision, follow-up, graph provenance, verified replay, mobile overflow, and a per-card text-overflow audit at desktop and narrow widths. Screenshots are generated as `docs/redesign-*.png`. Run it against a scratch database (`LAB_DB=/tmp/e2e.sqlite3 python scripts/run.py`) so test runs do not appear in your own workspace.
 
 See [verification report](docs/VERIFICATION.md) for commands actually executed and limitations. Test fixtures alone use synthetic counterfactual data or dummy credentials for configuration parsing. No mocked sponsor run is counted as live execution.
 
@@ -132,7 +161,7 @@ See [verification report](docs/VERIFICATION.md) for commands actually executed a
 
 `python scripts/seed_verified_run.py` executes a real local run and writes the portable replay. The script's approval is explicitly identified as developer-authorized automation, not a UI click. The production launcher imports that record only when the database is empty.
 
-Each run records two evidence claims, three hypotheses, two candidates, time to experiment specification, CPU analysis wall time, result-to-decision time, total wall time, seed, data/code hashes and numerical-library versions. The UI displays measured values from the selected run. There is **no invented speedup or unmeasured human-time baseline**.
+Each run records two evidence claims, three hypotheses, two candidates, nine agent handoffs, five critic challenges with their latest verdicts, time to experiment specification, CPU analysis wall time, result-to-decision time, total wall time, seed, data/code hashes and numerical-library versions. The UI displays measured values from the selected run. There is **no invented speedup or unmeasured human-time baseline**.
 
 ## Documentation and submission
 
@@ -145,4 +174,4 @@ Each run records two evidence claims, three hypotheses, two candidates, time to 
 
 The initial repository was empty: no infrastructure, tests, datasets, credentials interface or sponsor configuration existed. React/Vite + FastAPI were chosen for a responsive scientific UI and typed Python computation, with SQLite keeping deployment simple. No existing work was replaced.
 
-Future work: verify live sponsor execution with credentials; independent datasets and literature retrieval APIs; held-out validation; follow-up execution under a fresh approval; stronger semantic checks on generated hypotheses; authenticated multi-user deployment. This prototype is intended for local trusted use and should not be exposed publicly without authentication and deployment hardening.
+Future work: verify live sponsor execution with credentials; independent datasets and literature retrieval APIs; held-out validation; generalising the pipeline beyond one dataset (CSV upload with user-chosen outcome, predictor and grouping columns); stronger semantic checks on generated hypotheses; authenticated multi-user deployment. This prototype is intended for local trusted use and should not be exposed publicly without authentication and deployment hardening.

@@ -1,26 +1,27 @@
 {
-  "id": "lab-f693a1441158",
+  "id": "lab-0cef21077817",
   "objective": "Why does the relationship between penguin bill length and depth reverse when species are separated?",
+  "label": null,
   "reference_question": "Why does the bill length\u2013depth association reverse across aggregation choices?",
-  "scope": "Reference investigation only. Custom objective is contextual; variables and dataset remain the approved penguin analysis.",
+  "scope": "Reference investigation only. The dataset, variables and question are fixed; the optional label is for the user.",
   "mode": "local",
   "status": "complete",
-  "stage": 8,
+  "stage": 9,
   "seed": 42,
-  "created_at": "2026-10-03T18:59:32.367893+00:00",
+  "created_at": "2026-10-04T02:31:05.546852+00:00",
   "objects": {
-    "question-13d5e8dad035": {
-      "id": "question-13d5e8dad035",
+    "question-bec00405f54e": {
+      "id": "question-bec00405f54e",
       "kind": "question",
       "data": {
         "objective": "Why does the relationship between penguin bill length and depth reverse when species are separated?",
-        "scope": "Reference investigation only. Custom objective is contextual; variables and dataset remain the approved penguin analysis."
+        "scope": "Reference investigation only. The dataset, variables and question are fixed; the optional label is for the user."
       },
       "input_ids": [],
-      "created_at": "2026-10-03T18:59:32.367908+00:00"
+      "created_at": "2026-10-04T02:31:05.546872+00:00"
     },
-    "evidence-ab5f06129d2d": {
-      "id": "evidence-ab5f06129d2d",
+    "evidence-b58621e8b457": {
+      "id": "evidence-b58621e8b457",
       "kind": "evidence",
       "data": {
         "evidence_id": "EV1",
@@ -63,12 +64,12 @@
         }
       },
       "input_ids": [
-        "question-13d5e8dad035"
+        "question-bec00405f54e"
       ],
-      "created_at": "2026-10-03T18:59:32.376863+00:00"
+      "created_at": "2026-10-04T02:31:05.550917+00:00"
     },
-    "evidence-637d487cba2d": {
-      "id": "evidence-637d487cba2d",
+    "evidence-cecd01ad724e": {
+      "id": "evidence-cecd01ad724e",
       "kind": "evidence",
       "data": {
         "evidence_id": "EV2",
@@ -111,34 +112,34 @@
         }
       },
       "input_ids": [
-        "question-13d5e8dad035"
+        "question-bec00405f54e"
       ],
-      "created_at": "2026-10-03T18:59:32.376882+00:00"
+      "created_at": "2026-10-04T02:31:05.550935+00:00"
     },
-    "contradiction-1b89f94f1ade": {
-      "id": "contradiction-1b89f94f1ade",
+    "contradiction-2314022b15a2": {
+      "id": "contradiction-2314022b15a2",
       "kind": "contradiction",
       "data": {
         "contradiction_id": "C1",
         "evidence_a": "EV1",
         "evidence_b": "EV2",
-        "conflicting_claim": "Bill length and depth have opposite association directions across aggregation choices.",
-        "shared_context": "Palmer Archipelago penguin bill measurements, 2007\u20132009.",
+        "conflicting_claim": "For Bill depth (mm), source A reports a negative effect while source B reports a positive effect.",
+        "shared_context": "Palmer Archipelago penguins, 2007\u20132009",
         "differing_conditions": [
-          "Species pooled versus species separated"
+          "aggregation: All species pooled \u00b7 Species separated"
         ],
         "contradiction_strength": "contextual reversal",
-        "uncertainty": "Same dataset, not independent replications. Different estimands can legitimately have different signs.",
-        "explanation": "An apparent contradiction due to analysis context; not evidence that either source is false."
+        "uncertainty": "Different contexts or estimands can legitimately yield different signs; a disagreement is a question to investigate, not proof that either source is false.",
+        "explanation": "An apparent contradiction tied to analysis context within one source."
       },
       "input_ids": [
-        "evidence-ab5f06129d2d",
-        "evidence-637d487cba2d"
+        "evidence-b58621e8b457",
+        "evidence-cecd01ad724e"
       ],
-      "created_at": "2026-10-03T18:59:32.385254+00:00"
+      "created_at": "2026-10-04T02:31:05.553266+00:00"
     },
-    "hypothesis-83bafc73d14f": {
-      "id": "hypothesis-83bafc73d14f",
+    "hypothesis-16dd59a54a02": {
+      "id": "hypothesis-16dd59a54a02",
       "kind": "hypothesis",
       "data": {
         "hypothesis_id": "H1",
@@ -158,12 +159,12 @@
         "support_score": 50.0
       },
       "input_ids": [
-        "contradiction-1b89f94f1ade"
+        "contradiction-2314022b15a2"
       ],
-      "created_at": "2026-10-03T18:59:32.392060+00:00"
+      "created_at": "2026-10-04T02:31:05.555317+00:00"
     },
-    "hypothesis-6b18b39b86dc": {
-      "id": "hypothesis-6b18b39b86dc",
+    "hypothesis-c89a4c792647": {
+      "id": "hypothesis-c89a4c792647",
       "kind": "hypothesis",
       "data": {
         "hypothesis_id": "H2",
@@ -183,12 +184,12 @@
         "support_score": 50.0
       },
       "input_ids": [
-        "contradiction-1b89f94f1ade"
+        "contradiction-2314022b15a2"
       ],
-      "created_at": "2026-10-03T18:59:32.392076+00:00"
+      "created_at": "2026-10-04T02:31:05.555332+00:00"
     },
-    "hypothesis-a70d7c9a8699": {
-      "id": "hypothesis-a70d7c9a8699",
+    "hypothesis-ddba759e0595": {
+      "id": "hypothesis-ddba759e0595",
       "kind": "hypothesis",
       "data": {
         "hypothesis_id": "H3",
@@ -208,12 +209,12 @@
         "support_score": 50.0
       },
       "input_ids": [
-        "contradiction-1b89f94f1ade"
+        "contradiction-2314022b15a2"
       ],
-      "created_at": "2026-10-03T18:59:32.392082+00:00"
+      "created_at": "2026-10-04T02:31:05.555340+00:00"
     },
-    "experiment-a7221fb48495": {
-      "id": "experiment-a7221fb48495",
+    "experiment-33d23eabec7e": {
+      "id": "experiment-33d23eabec7e",
       "kind": "experiment",
       "data": {
         "experiment_id": "E1",
@@ -224,6 +225,7 @@
         ],
         "scientific_question": "Does controlling for species reverse the pooled relationship?",
         "method": "species_adjustment",
+        "title": "Species-adjusted regression",
         "required_data": "Palmer Penguins / f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
         "variables": [
           "bill_length_mm",
@@ -247,14 +249,14 @@
         "planning_score": 0.8963
       },
       "input_ids": [
-        "hypothesis-83bafc73d14f",
-        "hypothesis-6b18b39b86dc",
-        "hypothesis-a70d7c9a8699"
+        "hypothesis-16dd59a54a02",
+        "hypothesis-c89a4c792647",
+        "hypothesis-ddba759e0595"
       ],
-      "created_at": "2026-10-03T18:59:32.406653+00:00"
+      "created_at": "2026-10-04T02:31:05.565191+00:00"
     },
-    "experiment-2e6f211db764": {
-      "id": "experiment-2e6f211db764",
+    "experiment-246f75887551": {
+      "id": "experiment-246f75887551",
       "kind": "experiment",
       "data": {
         "experiment_id": "E2",
@@ -265,6 +267,7 @@
         ],
         "scientific_question": "Does controlling for collection year resolve the disagreement?",
         "method": "year_sensitivity",
+        "title": "Year-adjusted sensitivity",
         "required_data": "Palmer Penguins / f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
         "variables": [
           "bill_length_mm",
@@ -288,54 +291,54 @@
         "planning_score": 0.6913
       },
       "input_ids": [
-        "hypothesis-83bafc73d14f",
-        "hypothesis-6b18b39b86dc",
-        "hypothesis-a70d7c9a8699"
+        "hypothesis-16dd59a54a02",
+        "hypothesis-c89a4c792647",
+        "hypothesis-ddba759e0595"
       ],
-      "created_at": "2026-10-03T18:59:32.406668+00:00"
+      "created_at": "2026-10-04T02:31:05.565210+00:00"
     },
-    "run-3c74ba936fad": {
-      "id": "run-3c74ba936fad",
+    "run-91004e2337cc": {
+      "id": "run-91004e2337cc",
       "kind": "run",
       "data": {
-        "specification_id": "experiment-a7221fb48495",
-        "started_at": "2026-10-03T18:59:32.422349+00:00",
+        "specification_id": "experiment-33d23eabec7e",
+        "started_at": "2026-10-04T02:31:05.570611+00:00",
         "seed": 42,
         "approval": {
           "experiment_id": "E1",
-          "approved_at": "2026-10-03T18:59:32.415693+00:00",
+          "approved_at": "2026-10-04T02:31:05.567927+00:00",
           "actor": "developer-authorized reproducibility script; not a UI click",
           "scope": "One allowlisted local computational experiment"
         }
       },
       "input_ids": [
-        "experiment-a7221fb48495"
+        "experiment-33d23eabec7e"
       ],
-      "created_at": "2026-10-03T18:59:32.422369+00:00"
+      "created_at": "2026-10-04T02:31:05.570634+00:00"
     },
-    "result-593bc1c648f3": {
-      "id": "result-593bc1c648f3",
+    "result-4e273da6ac28": {
+      "id": "result-4e273da6ac28",
       "kind": "result",
       "data": {
         "method": "species_adjustment",
         "group": "species",
         "n": 342,
-        "pooled_slope": -0.0850212807771766,
-        "adjusted_slope": 0.19989428095469577,
+        "pooled_slope": -0.08502128077717656,
+        "adjusted_slope": 0.1998942809546958,
         "adjusted_ci95": [
-          0.16479378601016387,
+          0.16479378601016384,
           0.23389227420426822
         ],
         "subgroups": [
           {
             "group": "Adelie",
             "n": 151,
-            "slope": 0.17883434964257802
+            "slope": 0.17883434964257813
           },
           {
             "group": "Chinstrap",
             "n": 68,
-            "slope": 0.2222117240036715
+            "slope": 0.22221172400367145
           },
           {
             "group": "Gentoo",
@@ -346,20 +349,58 @@
         "sensitivity": [
           {
             "excluded_year": 2007,
-            "slope": 0.20906270470146182
+            "slope": 0.2090627047014618
           },
           {
             "excluded_year": 2008,
-            "slope": 0.19212713875552337
+            "slope": 0.19212713875552334
           },
           {
             "excluded_year": 2009,
-            "slope": 0.19751641046954277
+            "slope": 0.1975164104695427
           }
         ],
         "within_group_spearman": 0.5318164099399623,
-        "pooled_rmse": 1.9166562709559611,
+        "pooled_rmse": 1.9166562709559614,
         "adjusted_rmse": 0.9477541264325486,
+        "model_comparison": {
+          "pooled_bic": 462.5026175289133,
+          "adjusted_bic": -7.529503052990396,
+          "delta_bic": 470.03212058190365,
+          "log10_bayes_factor": 102.0661781430023,
+          "favored_model": "species",
+          "note": "Positive \u0394BIC favors the adjusted model. \u0394BIC > 10 is conventionally very strong evidence. BIC approximates the Bayes factor; it is not an exact posterior probability."
+        },
+        "decomposition": {
+          "group": "species",
+          "pooled_slope": -0.08502128077717656,
+          "within_slope": 0.1998942809546958,
+          "between_slope": -0.2026373492542608,
+          "within_weight": 0.2921908730899698,
+          "within_contribution": 0.058407284477844296,
+          "between_contribution": -0.14342856525502118,
+          "group_means": [
+            {
+              "group": "Adelie",
+              "n": 151,
+              "x": 38.79139072847682,
+              "y": 18.346357615894043
+            },
+            {
+              "group": "Chinstrap",
+              "n": 68,
+              "x": 48.83382352941176,
+              "y": 18.420588235294115
+            },
+            {
+              "group": "Gentoo",
+              "n": 123,
+              "x": 47.50487804878049,
+              "y": 14.982113821138212
+            }
+          ],
+          "note": "Exact identity: pooled slope = within contribution + between contribution."
+        },
         "reversal": true,
         "robust_reversal": true,
         "points": [
@@ -2418,7 +2459,7 @@
         ],
         "bootstrap_samples": 500,
         "seed": 42,
-        "compute_seconds": 0.8751786000011634,
+        "compute_seconds": 0.032094250000227476,
         "null": "The within-group linear slope is zero.",
         "alternative": "The within-group slope is positive despite the negative pooled slope.",
         "assumptions": [
@@ -2447,9 +2488,9 @@
             "n_complete": 342,
             "n_dropped": 2
           },
-          "code_sha256": "aec6b3275ecb56fec18101cd38f7661d3b6d2e0072a729da9761a37d0015fe33",
+          "code_sha256": "e3491038954ece1233b730757912dd40279a69eb49d251ce68455c3fd70b0f39",
           "tool": "experiments.penguins.compute",
-          "timestamp": "2026-10-03T18:59:33.307410+00:00",
+          "timestamp": "2026-10-04T02:31:05.607242+00:00",
           "parameters": {
             "experiment_id": "E1",
             "hypothesis_targets": [
@@ -2459,6 +2500,7 @@
             ],
             "scientific_question": "Does controlling for species reverse the pooled relationship?",
             "method": "species_adjustment",
+            "title": "Species-adjusted regression",
             "required_data": "Palmer Penguins / f204db2c753b0937caac3cb35258562c14f073e4bbc76be24b4c51ce22767a93",
             "variables": [
               "bill_length_mm",
@@ -2481,20 +2523,20 @@
             "bootstrap_samples": 500
           },
           "runtime": {
-            "python": "3.14.6",
-            "numpy": "2.5.1",
-            "pandas": "3.0.3",
-            "scipy": "1.18.0"
+            "python": "3.12.13",
+            "numpy": "2.5.3",
+            "pandas": "3.0.6",
+            "scipy": "1.18.1"
           }
         }
       },
       "input_ids": [
-        "run-3c74ba936fad"
+        "run-91004e2337cc"
       ],
-      "created_at": "2026-10-03T18:59:33.307467+00:00"
+      "created_at": "2026-10-04T02:31:05.607286+00:00"
     },
-    "analysis-01b172cceb38": {
-      "id": "analysis-01b172cceb38",
+    "analysis-99f9b68247ad": {
+      "id": "analysis-99f9b68247ad",
       "kind": "analysis",
       "data": {
         "updates": [
@@ -2526,28 +2568,94 @@
             "remaining_uncertainty": "Scores follow a disclosed heuristic, are not probabilities, and do not establish causation."
           }
         ],
-        "score_label": "Heuristic support score, not probability"
+        "score_label": "Heuristic support score, not probability",
+        "model_comparison": {
+          "pooled_bic": 462.5026175289133,
+          "adjusted_bic": -7.529503052990396,
+          "delta_bic": 470.03212058190365,
+          "log10_bayes_factor": 102.0661781430023,
+          "favored_model": "species",
+          "note": "Positive \u0394BIC favors the adjusted model. \u0394BIC > 10 is conventionally very strong evidence. BIC approximates the Bayes factor; it is not an exact posterior probability."
+        }
       },
       "input_ids": [
-        "result-593bc1c648f3",
-        "hypothesis-83bafc73d14f",
-        "hypothesis-6b18b39b86dc",
-        "hypothesis-a70d7c9a8699"
+        "result-4e273da6ac28",
+        "hypothesis-16dd59a54a02",
+        "hypothesis-c89a4c792647",
+        "hypothesis-ddba759e0595"
       ],
-      "created_at": "2026-10-03T18:59:33.320534+00:00"
+      "created_at": "2026-10-04T02:31:05.611825+00:00"
     },
-    "decision-0e68bde280af": {
-      "id": "decision-0e68bde280af",
+    "critique-81fd103a5895": {
+      "id": "critique-81fd103a5895",
+      "kind": "critique",
+      "data": {
+        "challenges": [
+          {
+            "challenge_id": "X1",
+            "attack": "The reversal is sampling noise.",
+            "test": "Does the 95% bootstrap interval for the adjusted slope exclude zero?",
+            "evidence": "95% CI [0.165, 0.234] from 500 stratified resamples.",
+            "verdict": "rebutted",
+            "challenger": "CriticAgent",
+            "defender": "AnalysisAgent"
+          },
+          {
+            "challenge_id": "X2",
+            "attack": "A single collection year drives the result.",
+            "test": "Does the adjusted slope keep its sign when each year is left out?",
+            "evidence": "omit 2007: +0.209; omit 2008: +0.192; omit 2009: +0.198.",
+            "verdict": "rebutted",
+            "challenger": "CriticAgent",
+            "defender": "AnalysisAgent"
+          },
+          {
+            "challenge_id": "X3",
+            "attack": "One species carries the whole effect.",
+            "test": "Does every species subgroup slope share the adjusted slope's sign?",
+            "evidence": "Adelie: +0.179; Chinstrap: +0.222; Gentoo: +0.205.",
+            "verdict": "rebutted",
+            "challenger": "CriticAgent",
+            "defender": "AnalysisAgent"
+          },
+          {
+            "challenge_id": "X4",
+            "attack": "The adjusted model only fits better because it has more parameters.",
+            "test": "Does BIC, which penalises extra parameters, still favour the adjusted model by more than 10?",
+            "evidence": "\u0394BIC +470.0 (positive favours the adjusted model).",
+            "verdict": "rebutted",
+            "challenger": "CriticAgent",
+            "defender": "AnalysisAgent"
+          },
+          {
+            "challenge_id": "X5",
+            "attack": "Sex differences within each group could be confounding the slope.",
+            "test": "Was sex adjusted for in this experiment?",
+            "evidence": "Not tested: this model adjusts for species only.",
+            "verdict": "open",
+            "challenger": "CriticAgent",
+            "defender": "AnalysisAgent"
+          }
+        ]
+      },
+      "input_ids": [
+        "result-4e273da6ac28",
+        "analysis-99f9b68247ad"
+      ],
+      "created_at": "2026-10-04T02:31:05.614957+00:00"
+    },
+    "decision-6e0c89097d89": {
+      "id": "decision-6e0c89097d89",
       "kind": "decision",
       "data": {
         "previous_plan": "Compare species composition with sampling variability",
         "new_evidence": {
-          "adjusted_slope": 0.19989428095469577,
+          "adjusted_slope": 0.1998942809546958,
           "adjusted_ci95": [
-            0.16479378601016387,
+            0.16479378601016384,
             0.23389227420426822
           ],
-          "pooled_slope": -0.0850212807771766,
+          "pooled_slope": -0.08502128077717656,
           "reversal": true
         },
         "changed_belief": [
@@ -2583,16 +2691,20 @@
         "rationale": "Species adjustment reverses the pooled sign with a positive interval and stable year exclusions; investigate what remains within species.",
         "next_evidence_search": "Retrieve sex-specific bill morphometry and measurement-protocol evidence.",
         "next_experiment": "Species + sex + year regression",
-        "requires_new_approval": true
+        "requires_new_approval": true,
+        "open_challenges": [
+          "X5"
+        ]
       },
       "input_ids": [
-        "result-593bc1c648f3",
-        "analysis-01b172cceb38"
+        "result-4e273da6ac28",
+        "analysis-99f9b68247ad",
+        "critique-81fd103a5895"
       ],
-      "created_at": "2026-10-03T18:59:33.327813+00:00"
+      "created_at": "2026-10-04T02:31:05.618030+00:00"
     },
-    "safety-9bb2cd0ff45a": {
-      "id": "safety-9bb2cd0ff45a",
+    "safety-ae7e205cbf0e": {
+      "id": "safety-ae7e205cbf0e",
       "kind": "safety",
       "data": {
         "status": "passed",
@@ -2609,26 +2721,26 @@
         ]
       },
       "input_ids": [
-        "decision-0e68bde280af"
+        "decision-6e0c89097d89"
       ],
-      "created_at": "2026-10-03T18:59:33.335965+00:00"
+      "created_at": "2026-10-04T02:31:05.621183+00:00"
     }
   },
   "events": [
     {
-      "id": "event-46f1cd85352b",
-      "timestamp": "2026-10-03T18:59:32.376891+00:00",
+      "id": "event-c31f516feed1",
+      "timestamp": "2026-10-04T02:31:05.550946+00:00",
       "agent": "LiteratureAgent",
       "action": "Retrieved 2 curated claims from 1 cited article; offline reference catalog.",
       "input_ids": [
-        "question-13d5e8dad035"
+        "question-bec00405f54e"
       ],
       "output_ids": [
-        "evidence-ab5f06129d2d",
-        "evidence-637d487cba2d"
+        "evidence-b58621e8b457",
+        "evidence-cecd01ad724e"
       ],
       "tool": "retrieve_evidence",
-      "elapsed_seconds": 0.0003628000013122801,
+      "elapsed_seconds": 0.0002720000002227607,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
@@ -2638,19 +2750,19 @@
       "engine": "local"
     },
     {
-      "id": "event-fc2e91139cff",
-      "timestamp": "2026-10-03T18:59:32.385273+00:00",
+      "id": "event-2cef9a32474e",
+      "timestamp": "2026-10-04T02:31:05.553276+00:00",
       "agent": "ContradictionAgent",
-      "action": "An apparent contradiction due to analysis context; not evidence that either source is false.",
+      "action": "An apparent contradiction tied to analysis context within one source.",
       "input_ids": [
-        "evidence-ab5f06129d2d",
-        "evidence-637d487cba2d"
+        "evidence-b58621e8b457",
+        "evidence-cecd01ad724e"
       ],
       "output_ids": [
-        "contradiction-1b89f94f1ade"
+        "contradiction-2314022b15a2"
       ],
       "tool": "compare_claims",
-      "elapsed_seconds": 0.00013249999938125256,
+      "elapsed_seconds": 8.029099990380928e-05,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
@@ -2660,20 +2772,20 @@
       "engine": "local"
     },
     {
-      "id": "event-72ebb9e132f9",
-      "timestamp": "2026-10-03T18:59:32.392087+00:00",
+      "id": "event-d81730fa3313",
+      "timestamp": "2026-10-04T02:31:05.555346+00:00",
       "agent": "HypothesisAgent",
       "action": "Registered 3 testable candidate explanations with falsification criteria.",
       "input_ids": [
-        "contradiction-1b89f94f1ade"
+        "contradiction-2314022b15a2"
       ],
       "output_ids": [
-        "hypothesis-83bafc73d14f",
-        "hypothesis-6b18b39b86dc",
-        "hypothesis-a70d7c9a8699"
+        "hypothesis-16dd59a54a02",
+        "hypothesis-c89a4c792647",
+        "hypothesis-ddba759e0595"
       ],
       "tool": "propose_hypotheses",
-      "elapsed_seconds": 0.00010180000026593916,
+      "elapsed_seconds": 7.408400006170268e-05,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
@@ -2683,21 +2795,21 @@
       "engine": "local"
     },
     {
-      "id": "event-4941261e9633",
-      "timestamp": "2026-10-03T18:59:32.406684+00:00",
+      "id": "event-e651cd650f9e",
+      "timestamp": "2026-10-04T02:31:05.565226+00:00",
       "agent": "ExperimentPlanner",
       "action": "Compared 2 tests; selected E1. Waiting for human approval.",
       "input_ids": [
-        "hypothesis-83bafc73d14f",
-        "hypothesis-6b18b39b86dc",
-        "hypothesis-a70d7c9a8699"
+        "hypothesis-16dd59a54a02",
+        "hypothesis-c89a4c792647",
+        "hypothesis-ddba759e0595"
       ],
       "output_ids": [
-        "experiment-a7221fb48495",
-        "experiment-2e6f211db764"
+        "experiment-33d23eabec7e",
+        "experiment-246f75887551"
       ],
       "tool": "rank_experiments",
-      "elapsed_seconds": 0.007729799999651732,
+      "elapsed_seconds": 0.007608500000060303,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
@@ -2707,8 +2819,8 @@
       "engine": "local"
     },
     {
-      "id": "event-44d3ca38f143",
-      "timestamp": "2026-10-03T18:59:32.415720+00:00",
+      "id": "event-cbebad96d056",
+      "timestamp": "2026-10-04T02:31:05.567946+00:00",
       "agent": "Seed script",
       "action": "Approved E1 (developer-authorized reproducibility script; not a UI click)",
       "input_ids": [],
@@ -2724,12 +2836,12 @@
       "engine": "local"
     },
     {
-      "id": "event-38e259414ada",
-      "timestamp": "2026-10-03T18:59:32.422376+00:00",
+      "id": "event-cedb712935a6",
+      "timestamp": "2026-10-04T02:31:05.570642+00:00",
       "agent": "ExperimentRunner",
       "action": "Loading dataset",
       "input_ids": [
-        "run-3c74ba936fad"
+        "run-91004e2337cc"
       ],
       "output_ids": [],
       "tool": "scientific_python",
@@ -2743,12 +2855,12 @@
       "engine": "local"
     },
     {
-      "id": "event-555146fb49f5",
-      "timestamp": "2026-10-03T18:59:32.428234+00:00",
+      "id": "event-1bbf961b060c",
+      "timestamp": "2026-10-04T02:31:05.573936+00:00",
       "agent": "ExperimentRunner",
       "action": "Validating schema",
       "input_ids": [
-        "run-3c74ba936fad"
+        "run-91004e2337cc"
       ],
       "output_ids": [],
       "tool": "scientific_python",
@@ -2762,12 +2874,12 @@
       "engine": "local"
     },
     {
-      "id": "event-b2cab160dc3c",
-      "timestamp": "2026-10-03T18:59:32.432321+00:00",
+      "id": "event-eb5e6f346163",
+      "timestamp": "2026-10-04T02:31:05.575208+00:00",
       "agent": "ExperimentRunner",
       "action": "Preparing variables",
       "input_ids": [
-        "run-3c74ba936fad"
+        "run-91004e2337cc"
       ],
       "output_ids": [],
       "tool": "scientific_python",
@@ -2781,12 +2893,12 @@
       "engine": "local"
     },
     {
-      "id": "event-0a3c8f1d7230",
-      "timestamp": "2026-10-03T18:59:32.438087+00:00",
+      "id": "event-d7c8d4f76237",
+      "timestamp": "2026-10-04T02:31:05.577784+00:00",
       "agent": "ExperimentRunner",
       "action": "Running analysis",
       "input_ids": [
-        "run-3c74ba936fad"
+        "run-91004e2337cc"
       ],
       "output_ids": [],
       "tool": "scientific_python",
@@ -2800,12 +2912,12 @@
       "engine": "local"
     },
     {
-      "id": "event-a19c55acb7d5",
-      "timestamp": "2026-10-03T18:59:32.444618+00:00",
+      "id": "event-4d94abb155cb",
+      "timestamp": "2026-10-04T02:31:05.580823+00:00",
       "agent": "ExperimentRunner",
       "action": "Computing uncertainty",
       "input_ids": [
-        "run-3c74ba936fad"
+        "run-91004e2337cc"
       ],
       "output_ids": [],
       "tool": "scientific_python",
@@ -2819,12 +2931,12 @@
       "engine": "local"
     },
     {
-      "id": "event-85dcd3352129",
-      "timestamp": "2026-10-03T18:59:33.297167+00:00",
+      "id": "event-3920f0caa058",
+      "timestamp": "2026-10-04T02:31:05.603089+00:00",
       "agent": "ExperimentRunner",
       "action": "Generating visualization",
       "input_ids": [
-        "run-3c74ba936fad"
+        "run-91004e2337cc"
       ],
       "output_ids": [],
       "tool": "scientific_python",
@@ -2838,12 +2950,12 @@
       "engine": "local"
     },
     {
-      "id": "event-8285cddd0aef",
-      "timestamp": "2026-10-03T18:59:33.307475+00:00",
+      "id": "event-e482a403c5a0",
+      "timestamp": "2026-10-04T02:31:05.607296+00:00",
       "agent": "ExperimentRunner",
       "action": "Saving run artifact",
       "input_ids": [
-        "run-3c74ba936fad"
+        "run-91004e2337cc"
       ],
       "output_ids": [],
       "tool": "scientific_python",
@@ -2857,18 +2969,18 @@
       "engine": "local"
     },
     {
-      "id": "event-d225169f186b",
-      "timestamp": "2026-10-03T18:59:33.312791+00:00",
+      "id": "event-bfdffa3aedc7",
+      "timestamp": "2026-10-04T02:31:05.608756+00:00",
       "agent": "ExperimentRunner",
       "action": "Computed real regression and 500 stratified bootstrap draws on 342 birds.",
       "input_ids": [
-        "experiment-a7221fb48495"
+        "experiment-33d23eabec7e"
       ],
       "output_ids": [
-        "result-593bc1c648f3"
+        "result-4e273da6ac28"
       ],
       "tool": "experiments.penguins.compute",
-      "elapsed_seconds": 0.8904647999988811,
+      "elapsed_seconds": 0.038164665999829595,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
@@ -2878,21 +2990,21 @@
       "engine": "local"
     },
     {
-      "id": "event-f1e7737f34f7",
-      "timestamp": "2026-10-03T18:59:33.320552+00:00",
+      "id": "event-198af2a7f4c1",
+      "timestamp": "2026-10-04T02:31:05.611838+00:00",
       "agent": "AnalysisAgent",
       "action": "H1: better supported; H2: weakened; H3: unresolved",
       "input_ids": [
-        "result-593bc1c648f3",
-        "hypothesis-83bafc73d14f",
-        "hypothesis-6b18b39b86dc",
-        "hypothesis-a70d7c9a8699"
+        "result-4e273da6ac28",
+        "hypothesis-16dd59a54a02",
+        "hypothesis-c89a4c792647",
+        "hypothesis-ddba759e0595"
       ],
       "output_ids": [
-        "analysis-01b172cceb38"
+        "analysis-99f9b68247ad"
       ],
       "tool": "evaluate_result",
-      "elapsed_seconds": 5.060000148660038e-05,
+      "elapsed_seconds": 3.600000036385609e-05,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
@@ -2902,19 +3014,42 @@
       "engine": "local"
     },
     {
-      "id": "event-175c960085eb",
-      "timestamp": "2026-10-03T18:59:33.327832+00:00",
+      "id": "event-b88e7dfaaaab",
+      "timestamp": "2026-10-04T02:31:05.614971+00:00",
+      "agent": "CriticAgent",
+      "action": "Raised 5 challenges: 4 rebutted by the data, 0 standing, 1 open.",
+      "input_ids": [
+        "result-4e273da6ac28",
+        "analysis-99f9b68247ad"
+      ],
+      "output_ids": [
+        "critique-81fd103a5895"
+      ],
+      "tool": "challenge_result",
+      "elapsed_seconds": 4.0624999655847205e-05,
+      "status": "complete",
+      "confidence": "bounded by source and method",
+      "citations": [
+        "https://journal.r-project.org/articles/RJ-2022-020/",
+        "https://journal.r-project.org/articles/RJ-2022-020/"
+      ],
+      "engine": "local"
+    },
+    {
+      "id": "event-d90662687858",
+      "timestamp": "2026-10-04T02:31:05.618045+00:00",
       "agent": "DecisionAgent",
       "action": "Research plan updated: Test sex and year effects within species",
       "input_ids": [
-        "result-593bc1c648f3",
-        "analysis-01b172cceb38"
+        "result-4e273da6ac28",
+        "analysis-99f9b68247ad",
+        "critique-81fd103a5895"
       ],
       "output_ids": [
-        "decision-0e68bde280af"
+        "decision-6e0c89097d89"
       ],
       "tool": "choose_next_decision",
-      "elapsed_seconds": 3.6499999623629265e-05,
+      "elapsed_seconds": 2.7499999760038918e-05,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
@@ -2924,18 +3059,18 @@
       "engine": "local"
     },
     {
-      "id": "event-8053605f3a39",
-      "timestamp": "2026-10-03T18:59:33.335983+00:00",
+      "id": "event-638cacc4e1f9",
+      "timestamp": "2026-10-04T02:31:05.621192+00:00",
       "agent": "SafetyAgent",
       "action": "Validated provenance, approval and lineage. Research record sealed for replay.",
       "input_ids": [
-        "decision-0e68bde280af"
+        "decision-6e0c89097d89"
       ],
       "output_ids": [
-        "safety-9bb2cd0ff45a"
+        "safety-ae7e205cbf0e"
       ],
       "tool": "rigor_audit",
-      "elapsed_seconds": 9.239999963028822e-05,
+      "elapsed_seconds": 6.008299988025101e-05,
       "status": "complete",
       "confidence": "bounded by source and method",
       "citations": [
@@ -2947,25 +3082,31 @@
   ],
   "approval": {
     "experiment_id": "E1",
-    "approved_at": "2026-10-03T18:59:32.415693+00:00",
+    "approved_at": "2026-10-04T02:31:05.567927+00:00",
     "actor": "developer-authorized reproducibility script; not a UI click",
     "scope": "One allowlisted local computational experiment"
   },
   "metrics": {
-    "question_to_spec_seconds": 0.038782,
-    "compute_seconds": 0.8751786000011634,
-    "result_to_decision_seconds": 0.020356,
+    "question_to_spec_seconds": 0.018364,
+    "compute_seconds": 0.032094250000227476,
+    "result_to_decision_seconds": 0.010749,
     "claims_retrieved": 2,
     "unique_sources": 1,
     "hypotheses_evaluated": 3,
     "experiments_compared": 2,
-    "total_wall_seconds": 0.971452,
+    "total_wall_seconds": 0.075845,
     "human_approvals": 0,
+    "agent_handoffs": 9,
+    "followup_experiments": 0,
+    "challenges_raised": 5,
+    "challenges_rebutted": 4,
+    "challenges_open": 1,
+    "challenges_partly_conceded": 0,
     "baseline": "No manual baseline measured; wall time includes approval wait."
   },
   "error": null,
-  "updated_at": "2026-10-03T18:59:33.339765+00:00",
+  "updated_at": "2026-10-04T02:31:05.623289+00:00",
   "selected_experiment": "E1",
   "selection_rationale": "Species adjustment directly tests the differing aggregation condition. Weighted learning, discrimination, coverage, feasibility and cost scores favor it over year adjustment; scores are explicit heuristics.",
-  "verified_sha256": "c82e2a7f6cf7fa27e30b093478b28f36b48c55109a0091e71364949bcb61b0f5"
+  "verified_sha256": "38b91bf14c377bd672e6e4f3f6b499ab2e3e336c37b2943b7bb607020c54a312"
 }
