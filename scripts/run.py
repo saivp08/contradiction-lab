@@ -1,4 +1,5 @@
 """Portable launcher; also recognizes workspace-local dependency installation."""
+
 import os
 import sys
 from pathlib import Path
@@ -12,9 +13,11 @@ os.chdir(root)
 if __name__ == "__main__":
     import uvicorn
     from dotenv import load_dotenv
+
     load_dotenv()
     from backend import store
     import json
+
     seed = root / "data" / "verified-run.json"
     if not store.list_records() and seed.exists():
         record = json.loads(seed.read_text(encoding="utf-8"))

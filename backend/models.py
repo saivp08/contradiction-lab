@@ -1,4 +1,5 @@
 """Validated scientific contracts. No model-generated executable code."""
+
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
@@ -11,9 +12,9 @@ class Strict(BaseModel):
 class Citation(Strict):
     title: str = Field(min_length=5)
     authors: list[str] = Field(min_length=1)
-    year: int = Field(ge=1900, le=2100)
+    year: int | None = Field(default=None, ge=1900, le=2100)
     identifier: str = Field(min_length=3)
-    url: HttpUrl
+    url: HttpUrl | None = None
     location: str = Field(min_length=3)
     retrieved_at: str
 
@@ -64,7 +65,10 @@ class Experiment(Strict):
     experiment_id: str
     hypothesis_targets: list[str] = Field(min_length=1)
     scientific_question: str
-    method: Literal["species_adjustment", "year_sensitivity"]
+    method: Literal[
+        "species_adjustment", "year_sensitivity", "species_sex_year", "claim_alignment_audit", "condition_scan"
+    ]
+    title: str = ""
     required_data: str
     variables: list[str]
     expected_information_gain: float = Field(ge=0, le=1)
@@ -80,13 +84,28 @@ class Experiment(Strict):
 
 
 class NewInvestigation(Strict):
-    objective: str = Field(default="Why does the relationship between penguin bill length and depth reverse when species are separated?", min_length=10, max_length=600)
+    objective: str = Field(
+        default="Why does the relationship between penguin bill length and depth reverse when species are separated?",
+        min_length=10,
+        max_length=600,
+    )
+    label: str | None = Field(default=None, max_length=120)
+    source_analysis: str | None = Field(default=None, pattern=r"^analysis-[0-9a-f]{12}$")
     mode: Literal["local", "omnigent"] = "local"
     seed: int = Field(default=42, ge=0, le=2**32 - 1)
 
 
 class Approval(Strict):
     experiment_id: str
+    approved: Literal[True]
+
+
+class PaperPair(Strict):
+    paper_a: str = Field(pattern=r"^[0-9a-f]{64}$")
+    paper_b: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class FollowupApproval(Strict):
     approved: Literal[True]
 
 

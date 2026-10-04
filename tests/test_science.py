@@ -90,6 +90,7 @@ def test_approval_and_handoff_enforced():
 
 def test_dataset_tampering_and_missing_data_fail_closed(tmp_path, monkeypatch):
     import experiments.penguins as runner
+
     replacement = tmp_path / "changed.csv"
     replacement.write_text("species,bill_length_mm,bill_depth_mm,year\nAdelie,1,2,2007\n")
     monkeypatch.setattr(runner, "DATA", replacement)
@@ -107,7 +108,12 @@ def test_sponsor_generated_hypotheses_reject_malformed_contract():
     with pytest.raises(ValueError, match="structured AI-generated"):
         workflow.advance(record["id"], "HypothesisAgent", "Generate falsifiable competing explanations.")
     with pytest.raises(ValidationError):
-        workflow.advance(record["id"], "HypothesisAgent", "Generate falsifiable competing explanations.", [{"statement": "Incomplete"}])
+        workflow.advance(
+            record["id"],
+            "HypothesisAgent",
+            "Generate falsifiable competing explanations.",
+            [{"statement": "Incomplete"}],
+        )
 
 
 def test_alternative_experiment_changes_full_loop_decision():
@@ -150,3 +156,117 @@ def test_complete_discovery_loop_and_lineage():
     assert not store.verify(tampered)
     result["data"]["provenance"] = {}
     assert "Missing experiment provenance" in science.rigor(record)
+
+
+def test_vectorized_bootstrap_matches_resampling_reference():
+    import pandas as pd
+
+    from experiments.penguins import adjusted
+
+    frame, _ = load_data()
+    rng = np.random.default_rng(42)
+    parts = [part for _, part in frame.groupby("species")]
+    reference = []
+    for _ in range(50):
+        sample = pd.concat([part.iloc[rng.integers(0, len(part), len(part))] for part in parts], ignore_index=True)
+        reference.append(adjusted(sample, "species"))
+    result = compute(frame, "species_adjustment", 42, 50)
+    assert np.allclose(np.quantile(reference, [0.025, 0.975]), result["adjusted_ci95"], atol=1e-12)
+
+
+def test_model_comparison_favors_species_adjustment():
+    frame, _ = load_data()
+    species = compute(frame, "species_adjustment", 42, 100)["model_comparison"]
+    assert species["delta_bic"] > 10 and species["favored_model"] == "species"
+    assert compute(frame, "year_sensitivity", 42, 100)["model_comparison"]["delta_bic"] < 0
+
+
+def test_followup_requires_completion_and_seals_record():
+    record = workflow.create(NewInvestigation(label="Follow-up check"))
+    workflow.run_local(record["id"])
+    with pytest.raises(ValueError, match="completed investigation"):
+        workflow.run_followup(record["id"])
+    workflow.approve(record["id"], "E1")
+    workflow.run_local(record["id"])
+    record = workflow.run_followup(record["id"])
+    assert record["label"] == "Follow-up check"
+    result = store.by_kind(record, "followup_result")[0]["data"]
+    assert result["method"] == "species_sex_year"
+    assert 0 < result["adjusted_slope"] < result["species_only_slope"]
+    interpretation = store.by_kind(record, "followup_decision")[0]["data"]
+    assert interpretation["hypothesis_id"] == "H3" and interpretation["next_decision"]
+    assert store.verify(record) and science.rigor(record) == []
+    with pytest.raises(ValueError, match="already"):
+        workflow.run_followup(record["id"])
+
+
+def test_followup_rejected_when_decision_did_not_propose_it():
+    record = workflow.create(NewInvestigation())
+    workflow.run_local(record["id"])
+    workflow.approve(record["id"], "E2")
+    workflow.run_local(record["id"])
+    with pytest.raises(ValueError, match="did not propose"):
+        workflow.run_followup(record["id"])
+
+
+def test_slope_decomposition_is_exact_and_explains_reversal():
+    from experiments.penguins import decompose
+
+    frame, _ = load_data()
+    parts = decompose(frame, "species")
+    assert parts["within_contribution"] + parts["between_contribution"] == pytest.approx(parts["pooled_slope"])
+    assert parts["within_slope"] > 0 > parts["between_slope"] and parts["pooled_slope"] < 0
+    assert {m["group"] for m in parts["group_means"]} == {"Adelie", "Chinstrap", "Gentoo"}
+    assert compute(frame, "species_adjustment", 42, 100)["decomposition"]["within_slope"] == pytest.approx(
+        parts["within_slope"]
+    )
+
+
+def test_critic_challenges_are_settled_by_computed_numbers():
+    frame, _ = load_data()
+    reference = compute(frame, "species_adjustment", 42, 100)
+    verdicts = {c["challenge_id"]: c["verdict"] for c in science.critique(reference)}
+    assert verdicts == {"X1": "rebutted", "X2": "rebutted", "X3": "rebutted", "X4": "rebutted", "X5": "open"}
+    # Synthetic counterfactual only in a unit test: without within-species signal the attacks land.
+    altered = frame.copy()
+    altered["bill_depth_mm"] = np.random.default_rng(8).normal(17, 2, len(frame))
+    weak = {c["challenge_id"]: c["verdict"] for c in science.critique(compute(altered, "species_adjustment", 42, 100))}
+    assert weak["X1"] == "stands" and weak["X4"] == "stands"
+
+
+def test_critic_runs_between_analysis_and_decision():
+    record = workflow.create(NewInvestigation())
+    workflow.run_local(record["id"])
+    workflow.approve(record["id"], "E1")
+    workflow.run_local(record["id"])
+    record = store.get(record["id"])
+    agents = [e["agent"] for e in record["events"] if e["agent"] in workflow.ROLES and e["status"] == "complete"]
+    assert agents[agents.index("AnalysisAgent") + 1] == "CriticAgent"
+    critique = store.by_kind(record, "critique")[0]
+    decision = store.by_kind(record, "decision")[0]
+    assert critique["id"] in decision["input_ids"]
+    assert decision["data"]["open_challenges"] == ["X5"]
+    record = workflow.run_followup(record["id"])
+    resolved = store.by_kind(record, "critique")[-1]["data"]["challenges"][0]
+    assert resolved["challenge_id"] == "X5" and resolved["verdict"] == "partly conceded"
+
+
+def test_discovery_metrics_are_measured_not_invented():
+    record = workflow.create(NewInvestigation())
+    workflow.run_local(record["id"])
+    workflow.approve(record["id"], "E1")
+    workflow.run_local(record["id"])
+    metrics = store.get(record["id"])["metrics"]
+    assert metrics["agent_handoffs"] == 9
+    assert metrics["challenges_raised"] == 5
+    assert metrics["challenges_rebutted"] == 4
+    assert metrics["challenges_open"] == 1
+    assert metrics["followup_experiments"] == 0
+    assert "baseline" in metrics and "No manual baseline" in metrics["baseline"]
+    record = workflow.run_followup(record["id"])
+    metrics = record["metrics"]
+    assert metrics["followup_experiments"] == 1
+    assert metrics["human_approvals"] == 2
+    assert metrics["challenges_open"] == 0
+    assert metrics["challenges_partly_conceded"] == 1
+    assert store.verify(record)
