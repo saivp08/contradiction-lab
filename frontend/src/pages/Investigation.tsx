@@ -9,7 +9,7 @@ import { ResultChapter } from '../chapters/ResultChapter';
 import { DecisionChapter } from '../chapters/DecisionChapter';
 import { InstrumentPanel } from '../panels/InstrumentPanel';
 import { Arena } from '../arena/Arena';
-import { AGENTS, buildBeats, visibleRecord } from '../arena/beats';
+import { AGENTS, buildBeats, visibleRecord, type Challenge } from '../arena/beats';
 import { usePlayback } from '../arena/usePlayback';
 import { ApprovalDialog, ProvenanceDialog } from '../panels/Dialogs';
 import {
@@ -252,6 +252,12 @@ export function Investigation({
   const decision = objects<Decision>(view, 'decision')[0];
   const followupResult = objects<Result>(view, 'followup_result')[0];
   const followup = objects<FollowupDecision>(view, 'followup_decision')[0];
+  // Latest verdict per critic challenge; a follow-up re-judges the one it was run for.
+  const challenges = new Map<string, Challenge>();
+  for (const critique of objects<{ challenges: Challenge[] }>(view, 'critique'))
+    for (const c of critique.challenges) challenges.set(c.challenge_id, c);
+  const openChallenges = [...challenges.values()].filter((c) => c.verdict === 'open');
+  const resolvedChallenge = [...challenges.values()].find((c) => c.verdict === 'partly conceded');
   const ready = (i: number) => !!view && (sectionReady(stage, i) || (i === 5 && stage >= 4));
   const done = (i: number) => !!view && (view.status === 'complete' || sectionReady(stage, i + 1));
   const waiting = failed
@@ -281,7 +287,11 @@ export function Investigation({
         </button>
         <div className="run-title">
           <span className="eyebrow">
-            {isReplay ? 'VERIFIED REPLAY' : live ? 'LIVE AI AGENTS' : 'RULE-BASED RUN'}
+            {isReplay
+              ? 'VERIFIED REPLAY · SEALED RECORD'
+              : live
+                ? 'OMNIGENT ORCHESTRATED · LIVE AGENTS'
+                : 'LOCAL DETERMINISTIC RUN · NO LLM'}
           </span>
           <h1>
             {record?.label ||
@@ -418,7 +428,9 @@ export function Investigation({
                       updates={updates}
                       status={view.status}
                       events={view.events}
+                      openChallenges={followup ? [] : openChallenges}
                       onInspect={() => findObject('result')}
+                      onNextMove={() => pick(6)}
                     />
                   </StorySection>,
                   <StorySection
@@ -430,6 +442,10 @@ export function Investigation({
                       decision={decision}
                       followup={followup}
                       followupResult={followupResult}
+                      openChallenge={openChallenges[0]}
+                      resolvedChallenge={resolvedChallenge}
+                      followupApproval={view.followup_approval}
+                      metrics={view.metrics}
                       canRunFollowup={view.status === 'complete' && !isReplay}
                       busy={busy}
                       onRunFollowup={() => setPending({ kind: 'followup' })}

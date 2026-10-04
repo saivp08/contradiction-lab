@@ -23,7 +23,7 @@ export function HypothesesChapter({
             One contradiction.
           </>
         }
-        aside={<span className="muted">Support scores are heuristics, not probabilities</span>}
+        aside={<b className="stamp hon">Heuristic · not a probability</b>}
       />
       {hypotheses.length ? (
         <>

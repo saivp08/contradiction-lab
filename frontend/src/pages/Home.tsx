@@ -114,21 +114,63 @@ export function Home({
     <main className="home">
       <section className="home-hero">
         <div className="hero-copy">
-          <span className="eyebrow">CONTRADICTION LAB · AGENTIC SCIENCE</span>
+          <span className="eyebrow">CONTRADICTION LAB · AGENTIC SCIENTIFIC DISCOVERY</span>
           <h1>
-            Two findings disagree. <em>Let the agents fight it out.</em>
+            A laboratory that <em>tries to prove itself wrong.</em>
           </h1>
           <p>
-            Ten seats, one contested question. Specialists pull the evidence, propose explanations and design
-            a test. You approve it. Then a critic attacks the result, and every challenge is settled by
-            numbers the experiment actually computed.
+            Nine specialist agents and one human seat. The lab finds a contradiction, designs a test, runs
+            real computation, attacks its own result, and lets the surviving evidence pick the next
+            experiment.
           </p>
-          <blockquote className="hero-question">{REFERENCE_QUESTION}</blockquote>
+          <div className="hero-facts">
+            <div className="fact">
+              <span>KNOWN CONTRADICTION · WORKFLOW CASE STUDY</span>
+              <strong>
+                <b className="coral">{signed(featuredSummary?.result?.pooled_slope ?? -0.085)}</b> pooled ·{' '}
+                <b className="mint">{signed(featuredSummary?.result?.adjusted_slope ?? 0.2)}</b> within
+                species
+              </strong>
+              <small>{REFERENCE_QUESTION}</small>
+            </div>
+            <div className="fact loop-line-text" aria-label="What happened">
+              Hypotheses → experiment → <b className="mint">result</b> → <b className="coral">critic</b> →
+              follow-up
+            </div>
+            {featuredSummary?.followup && (
+              <div className="fact">
+                <span>CURRENT FINDING · COMPUTED</span>
+                <strong>
+                  <b className="mint">{signed(featuredSummary.followup.adjusted_slope)}</b> after species +
+                  sex + year
+                </strong>
+                <small>
+                  95% CI [{featuredSummary.followup.adjusted_ci95.map((v) => v.toFixed(3)).join(', ')}] · the
+                  critic's sex challenge partly conceded
+                </small>
+              </div>
+            )}
+            {featuredSummary?.next_decision && (
+              <div className="fact">
+                <span>NEXT SCIENTIFIC QUESTION</span>
+                <strong>{featuredSummary.next_decision}</strong>
+              </div>
+            )}
+          </div>
           <div className="hero-actions">
             <button className="button primary" disabled={busy} onClick={onQuickStart}>
               <Play size={15} />
               {busy ? 'Starting…' : 'Start a debate'}
             </button>
+            {featured && (
+              <button
+                className="text-button"
+                onClick={() => navigate({ page: 'run', id: featured.id, replay: true })}
+              >
+                <RotateCcw size={14} />
+                Watch the recorded demo
+              </button>
+            )}
             <button className="text-button" onClick={onNew}>
               Name the run first
               <ArrowRight size={15} />

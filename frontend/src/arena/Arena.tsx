@@ -75,10 +75,12 @@ function Packet({ beat, speed }: { beat: Beat; speed: number }) {
   if (!beat.from || !beat.to) return null;
   const r = route(SEATS[beat.from], SEATS[beat.to]);
   const p = at(r, t);
-  const label = beat.kind === 'defend' ? beat.label.toUpperCase() : beat.label;
+  const raw = beat.kind === 'defend' ? beat.label.toUpperCase() : beat.label;
+  const label = raw.length > 24 ? raw.slice(0, 23) + '…' : raw;
   const width = Math.min(180, label.length * 6.6 + 18);
+  const payload = beat.kind === 'handoff' && beat.payload ? ' k-' + beat.payload : '';
   return (
-    <g className={'packet ' + TONE[beat.kind]} style={{ opacity: t >= 1 ? 0.0 : 1 }}>
+    <g className={'packet ' + TONE[beat.kind] + payload} style={{ opacity: t >= 1 ? 0.0 : 1 }}>
       <path d={r.d} className="trail" pathLength={1} strokeDasharray="1" strokeDashoffset={1 - t} />
       <g transform={`translate(${p.x} ${p.y})`}>
         <rect x={-width / 2} y={-10} width={width} height={20} rx={10} />
@@ -337,6 +339,21 @@ export function Arena({
         speed={speed}
         waitingForYou={waitingForYou}
       />
+      <div className="arena-legend" aria-hidden="true">
+        {[
+          ['evidence', 'Evidence'],
+          ['hypothesis', 'Hypotheses'],
+          ['experiment', 'Test spec'],
+          ['result', 'Result'],
+          ['critique', 'Critique'],
+          ['decision', 'Decision'],
+        ].map(([k, name]) => (
+          <span key={k} className={'legend-' + k}>
+            <i />
+            {name}
+          </span>
+        ))}
+      </div>
       {waitingForYou && (
         <button className="gate-call" onClick={onReview}>
           The planner needs your approval to run an experiment. Review the options →

@@ -37,6 +37,8 @@ export interface Beat {
   text: string;
   eventIndex: number;
   timestamp: string;
+  /** Object kind the packet carries, for colour-coding (evidence, hypothesis, experiment, result…). */
+  payload?: string;
   challenge?: Challenge;
 }
 
@@ -101,6 +103,8 @@ export function buildBeats(record: RecordData | null): Beat[] {
         .sort((a, b) => b.at - a.at)[0];
       const from = (latest?.agent ?? lastRole) as AgentId | undefined;
       const carried = describe(e.input_ids, record);
+      const kinds = e.input_ids.map((id) => record.objects[id]?.kind).filter(Boolean);
+      const payload = kinds.at(-1);
       beats.push({
         ...base,
         key: e.id,
@@ -108,6 +112,7 @@ export function buildBeats(record: RecordData | null): Beat[] {
         from: from === to ? undefined : from,
         to,
         label: carried || 'handoff',
+        payload,
         // The critic's summary is the verdict tally, so it is told after the exchanges rather than before.
         text: e.agent === 'CriticAgent' ? `Took the ${carried} under review.` : e.action,
       });

@@ -3,7 +3,10 @@ import { Clock3, Layers3, ShieldCheck } from 'lucide-react';
 export function QuestionChapter({ question }: { question: string }) {
   return (
     <section className="question-card">
-      <span className="eyebrow">01 / RESEARCH QUESTION</span>
+      <div className="section-kicker">
+        <span className="eyebrow">01 / RESEARCH QUESTION</span>
+        <b className="stamp hon">Known result · workflow case study</b>
+      </div>
       <h2>{question}</h2>
       <div className="question-meta">
         <span>

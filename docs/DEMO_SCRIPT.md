@@ -36,7 +36,7 @@ Scroll to **Science moves when the plan changes**. “Species composition receiv
 
 ## 1:50–2:00 — Audit and measurable progress
 
-Optionally run the approved follow-up (sex + year shrinks the slope by 65% but it stays positive). Show the **Research graph** tab and measured activity. “Two claims, three hypotheses, two tests compared, measured computation and decision time. No invented speedup.”
+Optionally run the approved follow-up (sex + year shrinks the slope by 65% but it stays positive). Point at the UNRESOLVED gap callout on the Result stage, then the learning loop branching back into Experiment on Next move. After the follow-up, open the Discovery acceleration panel (measured, no invented multiplier) and the Why this decision? chain. Show the **Research graph** tab and measured activity. “Two claims, three hypotheses, two tests compared, measured computation and decision time. No invented speedup.”
 
 Click **Replay verified run**. “This is the persisted completed computation, checksum-verified and explicitly labeled replay.”
 

@@ -1,4 +1,5 @@
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import type { Challenge } from '../arena/beats';
 import { Slopes } from '../Plots';
 import { signed } from '../lib';
 import type { LabEvent, ModelComparison, Result, Update } from '../types';
@@ -34,13 +35,17 @@ export function ResultChapter({
   updates,
   status,
   events,
+  openChallenges = [],
   onInspect,
+  onNextMove,
 }: {
   result?: Result;
   updates?: Update[];
   status?: string;
   events: LabEvent[];
+  openChallenges?: Challenge[];
   onInspect: () => void;
+  onNextMove: () => void;
 }) {
   return (
     <section>
@@ -92,6 +97,28 @@ export function ResultChapter({
           </div>
           {result.model_comparison && (
             <ModelEvidence comparison={result.model_comparison} label={result.group} />
+          )}
+          {openChallenges.length > 0 && (
+            <div className="gap-callout" role="status">
+              <div className="gap-head">
+                <span className="eyebrow">CRITIC FOUND A GAP</span>
+                <b className="stamp open">unresolved</b>
+              </div>
+              {openChallenges.map((c) => (
+                <div key={c.challenge_id} className="gap-body">
+                  <h3>
+                    <em>“{c.attack}”</em>
+                  </h3>
+                  <p>
+                    {c.evidence} The result survives the other challenges, but this one has not been tested.
+                  </p>
+                </div>
+              ))}
+              <button className="button amber" onClick={onNextMove}>
+                Next experiment required: species + sex + year regression
+                <ArrowRight size={16} />
+              </button>
+            </div>
           )}
           <details className="details">
             <summary>Slopes by species, with uncertainty</summary>

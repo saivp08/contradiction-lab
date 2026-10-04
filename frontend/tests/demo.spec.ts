@@ -3,12 +3,26 @@ import { test, expect, type Page } from '@playwright/test';
 const noHorizontalScroll = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
 
+/** No text may escape its card: checks horizontal overflow on every matching element. */
+const noCardOverflow = async (page: Page) => {
+  const escaped = await page.evaluate(() => {
+    const selectors =
+      '.run-card, .hypothesis-card, .experiment-card, .evidence-card, .challenge, .decision-card, ' +
+      '.model-evidence, .gap-callout, .why-decision, .acceleration-grid > div, .fact, .key-numbers > div, ' +
+      '.next-test, .transcript .line, .status-pill, .run-title';
+    return Array.from(document.querySelectorAll<HTMLElement>(selectors))
+      .filter((el) => el.scrollWidth > el.clientWidth + 1)
+      .map((el) => el.className);
+  });
+  expect(escaped).toEqual([]);
+};
+
 test('debate: dashboard → arena playback → approval → critic → follow-up → replay', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: /Two findings disagree/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /tries to prove itself wrong/ })).toBeVisible();
 
   // A fresh run plays the specialists' handoffs back in the arena, then pauses for the human.
   await page.getByRole('button', { name: 'Start a debate' }).click();
@@ -41,6 +55,16 @@ test('debate: dashboard → arena playback → approval → critic → follow-up
   await page.getByRole('button', { name: 'Skip to end' }).click();
   await expect(challenges.locator('.challenge.rebutted')).toHaveCount(4);
   await expect(challenges.locator('.challenge.open')).toHaveCount(1);
+
+  // The unresolved challenge is called out on the result and routes to the next experiment.
+  const gap = page.locator('.gap-callout');
+  await expect(gap).toContainText('CRITIC FOUND A GAP');
+  await expect(gap).toContainText('unresolved');
+  await noCardOverflow(page);
+  await gap.getByRole('button', { name: /Next experiment required/ }).click();
+  await expect(page.getByRole('img', { name: /open critique branches back/ })).toBeVisible();
+  await expect(page.locator('.why-decision')).toContainText('Awaiting your approval');
+  await page.getByRole('tab', { name: /Result/ }).click();
 
   // Result: reversal, model comparison and the exact slope decomposition.
   await expect(page.getByRole('heading', { name: 'The relationship reverses.', exact: true })).toBeVisible();
@@ -77,6 +101,14 @@ test('debate: dashboard → arena playback → approval → critic → follow-up
   await expect(challenges.locator('.challenge.partly-conceded')).toHaveCount(1);
   await page.getByRole('tab', { name: /Next move/ }).click();
   await expect(page.getByText('UPDATED NEXT STEP')).toBeVisible();
+  await expect(page.getByRole('img', { name: /now resolved/ })).toBeVisible();
+  await expect(page.locator('.why-decision')).toContainText('Approved ·');
+  await expect(page.locator('.why-decision')).toContainText('Slope +0.070');
+  const acceleration = page.locator('.acceleration');
+  await expect(acceleration).toContainText('Workflow compression');
+  await expect(acceleration).toContainText('Follow-ups triggered');
+  await expect(acceleration).toContainText('Rebutted by data');
+  await noCardOverflow(page);
   await page.screenshot({ path: '../docs/redesign-followup.png', animations: 'disabled' });
   await page.getByRole('tab', { name: 'Data', exact: true }).click();
   await expect(page.getByText(/Follow-up adding sex \+ year/)).toBeVisible();
@@ -97,7 +129,7 @@ test('debate: dashboard → arena playback → approval → critic → follow-up
 
   // A verified replay plays the whole debate back from the sealed record.
   await page.getByRole('button', { name: /Replay verified run/ }).click();
-  await expect(page.getByText('VERIFIED REPLAY', { exact: true })).toBeVisible();
+  await expect(page.getByText('VERIFIED REPLAY · SEALED RECORD')).toBeVisible();
   await expect(page.getByText('Checksum verified')).toBeVisible();
   await expect(arena.getByText('Playing back')).toBeVisible();
   await page.getByRole('button', { name: 'Skip to end' }).click();
@@ -115,6 +147,7 @@ test('debate: dashboard → arena playback → approval → critic → follow-up
     await page.locator('.run-card-main').first().click();
     await expect(page.getByRole('tablist', { name: 'Investigation stages' })).toBeVisible();
     expect(await noHorizontalScroll(page)).toBeTruthy();
+    await noCardOverflow(page);
     if (width === 390) await page.screenshot({ path: '../docs/redesign-mobile.png', animations: 'disabled' });
     await page.goBack();
   }

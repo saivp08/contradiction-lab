@@ -249,3 +249,24 @@ def test_critic_runs_between_analysis_and_decision():
     record = workflow.run_followup(record["id"])
     resolved = store.by_kind(record, "critique")[-1]["data"]["challenges"][0]
     assert resolved["challenge_id"] == "X5" and resolved["verdict"] == "partly conceded"
+
+
+def test_discovery_metrics_are_measured_not_invented():
+    record = workflow.create(NewInvestigation())
+    workflow.run_local(record["id"])
+    workflow.approve(record["id"], "E1")
+    workflow.run_local(record["id"])
+    metrics = store.get(record["id"])["metrics"]
+    assert metrics["agent_handoffs"] == 9
+    assert metrics["challenges_raised"] == 5
+    assert metrics["challenges_rebutted"] == 4
+    assert metrics["challenges_open"] == 1
+    assert metrics["followup_experiments"] == 0
+    assert "baseline" in metrics and "No manual baseline" in metrics["baseline"]
+    record = workflow.run_followup(record["id"])
+    metrics = record["metrics"]
+    assert metrics["followup_experiments"] == 1
+    assert metrics["human_approvals"] == 2
+    assert metrics["challenges_open"] == 0
+    assert metrics["challenges_partly_conceded"] == 1
+    assert store.verify(record)

@@ -11,7 +11,7 @@ Built for Databricks × Hack-Nation — Agentic Scientific Discovery.
 ## What works, and what is credential-dependent
 
 - **Local development:** complete, tested discovery loop on a real open dataset. Deterministic specialist functions, explicitly labeled **not Omnigent and not an LLM**.
-- **Omnigent live:** official `omnigent==0.16.0` CLI orchestrates nine declared specialist agents using role-specific function tools. The actual package loads both supplied graphs in tests. A model-backed end-to-end execution **has not been verified** because no model credentials were supplied. This remains a submission acceptance dependency, not a claim of sponsor compliance already achieved.
+- **Omnigent live:** official `omnigent==0.16.0` CLI orchestrates nine declared specialist agents using role-specific function tools. The actual package loads both supplied graphs in tests. A model-backed end-to-end execution **has not been verified** because no model credentials were supplied. The orchestration contract itself is tested end-to-end: a pytest drives the exact function-tool surface Omnigent calls (all nine specialists in order, structured state passing, the enforced approval gate, sealing) without a model. This remains a submission acceptance dependency, not a claim of sponsor compliance already achieved.
 - **Verified replay:** checksum-validated records of completed real computation. A portable local run ships in `data/verified-run.json`; replay retains its original engine label. Never presented as a live run.
 
 ![Completed investigation: data panel with slope decomposition beside the investigation story](docs/redesign-result.png)
@@ -126,6 +126,12 @@ Support scores are a transparent heuristic, not Bayesian probabilities. Alongsid
 
 **Follow-up cycle.** When the decision proposes it, the user can run the follow-up (species + sex + year regression, 333 birds with recorded sex) under a second, separate approval (`POST /api/investigations/{id}/followup`). Adjusting for sex and year shrinks the within-species slope by about 65% (0.200 → 0.070, 95% CI [0.031, 0.108]) but it stays positive, so H3 is better supported and the next step becomes sex-specific slopes. The follow-up's approval, result and interpretation are included in the replay checksum.
 
+**The lab tries to prove itself wrong.** The breakthrough claim is the workflow, not the penguin result: the case study is a known, published reversal used because it is small, real and reproducible. The same loop — contradiction → hypotheses → approved experiment → computed result → adversarial critique → unresolved gap → follow-up → updated decision — is what would be pointed at genuinely novel questions.
+
+**Discovery acceleration (measured, no invented multiplier).** The Next-move stage shows a Workflow compression · prototype measurement panel built only from the run's recorded events: hypotheses registered, experiments compared, follow-ups triggered, agent handoffs, human approval points, challenges raised / rebutted by data / still open, and the measured question→spec, compute and result→decision times. No manual baseline was measured, so no speed multiplier is claimed.
+
+**Why this decision?** Every follow-up decision carries an inspectable evidence chain: the critic challenge that triggered it, the evidence for the gap, the expected learning, the human approval timestamp, the computed result and the decision taken after it. A compact learning-loop diagram shows the critique branching back into the experiment stage and closing when the follow-up resolves it.
+
 **Live updates.** While a run is in progress the UI listens to a server-sent event stream (`GET /api/investigations/{id}/stream`) and falls back to polling if the stream fails.
 
 ## Tests and verification
@@ -145,7 +151,7 @@ npm.cmd test
 
 On macOS / Linux use `.venv/bin/python` and plain `npm` / `npx`. Format code with `.venv/bin/ruff format backend experiments scripts tests` and `npm run format` in `frontend`.
 
-The frontend lint script runs TypeScript validation; there is no separate ESLint ruleset. Browser testing covers the dashboard, arena playback, critic challenges, approval, actual results, slope decomposition, changed decision, follow-up, graph provenance, verified replay, and mobile overflow. Screenshots are generated as `docs/redesign-*.png`. Run it against a scratch database (`LAB_DB=/tmp/e2e.sqlite3 python scripts/run.py`) so test runs do not appear in your own workspace.
+The frontend lint script runs TypeScript validation; there is no separate ESLint ruleset. Browser testing covers the dashboard, arena playback, critic challenges, the unresolved-gap callout, the learning loop, the acceleration panel, approval, actual results, slope decomposition, changed decision, follow-up, graph provenance, verified replay, mobile overflow, and a per-card text-overflow audit at desktop and narrow widths. Screenshots are generated as `docs/redesign-*.png`. Run it against a scratch database (`LAB_DB=/tmp/e2e.sqlite3 python scripts/run.py`) so test runs do not appear in your own workspace.
 
 See [verification report](docs/VERIFICATION.md) for commands actually executed and limitations. Test fixtures alone use synthetic counterfactual data or dummy credentials for configuration parsing. No mocked sponsor run is counted as live execution.
 
@@ -153,7 +159,7 @@ See [verification report](docs/VERIFICATION.md) for commands actually executed a
 
 `python scripts/seed_verified_run.py` executes a real local run and writes the portable replay. The script's approval is explicitly identified as developer-authorized automation, not a UI click. The production launcher imports that record only when the database is empty.
 
-Each run records two evidence claims, three hypotheses, two candidates, time to experiment specification, CPU analysis wall time, result-to-decision time, total wall time, seed, data/code hashes and numerical-library versions. The UI displays measured values from the selected run. There is **no invented speedup or unmeasured human-time baseline**.
+Each run records two evidence claims, three hypotheses, two candidates, nine agent handoffs, five critic challenges with their latest verdicts, time to experiment specification, CPU analysis wall time, result-to-decision time, total wall time, seed, data/code hashes and numerical-library versions. The UI displays measured values from the selected run. There is **no invented speedup or unmeasured human-time baseline**.
 
 ## Documentation and submission
 
