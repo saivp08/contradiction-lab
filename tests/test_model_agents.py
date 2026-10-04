@@ -7,9 +7,11 @@ from pathlib import Path
 import pytest
 
 from backend import model_agents as agents
-from backend import science, store, workflow
-from backend.models import NewInvestigation
+from backend import paper_science, papers, science, store, workflow
+from backend.models import Evidence, NewInvestigation
 from backend.omnigent_adapter import run
+
+FIXTURES = Path(__file__).resolve().parents[1] / 'data' / 'fixtures'
 
 
 def base():
@@ -21,18 +23,39 @@ def send(identifier, role, output):
     return agents.submit(identifier, role, json.dumps({**base(), **output}))
 
 
+def paper_investigation():
+    documents = [papers.ingest((FIXTURES / n).read_bytes(), n) for n in ('caffeine-rct-young.pdf', 'caffeine-null-older.pdf')]
+    report = papers.analyze(*documents)
+    report['source_documents'] = documents
+    store.save_analysis(report)
+    record = workflow.create(NewInvestigation(mode='omnigent', source_analysis=report['analysis_id']))
+    return record['id'], documents, report
+
+
+def paper_evidence(documents):
+    """One exact top claim per uploaded paper, with page provenance and the paper's own citation."""
+    rows = []
+    for index, document in enumerate(documents):
+        claim = document['claims'][0]
+        row = papers._to_evidence(document, claim, {'shared_terms': claim['terms']}, f'EV{index + 1}',
+                                  claim['text'], 'sustained attention').model_dump(mode='json')
+        row['provenance']['quote'] = row['claim']
+        rows.append(row)
+    return rows
+
+
 def prepared():
-    r = workflow.create(NewInvestigation(mode='omnigent'))
-    identifier = r['id']
-    evidence = science.retrieve_evidence()
-    send(identifier, 'LiteratureAgent', {'evidence': [e.model_dump(mode='json') for e in evidence]})
-    send(identifier, 'ContradictionAgent', {'disposition': 'CONTRADICTION', 'classification': 'APPARENT',
-         'dimensions': {'population': 'Same birds; different aggregation'},
-         'contradiction': science.compare(*evidence).model_dump()})
+    identifier, documents, report = paper_investigation()
+    rows = paper_evidence(documents)
+    send(identifier, 'LiteratureAgent', {'evidence': rows})
+    send(identifier, 'ContradictionAgent', {'disposition': 'CONTRADICTION', 'classification': 'CONDITIONAL',
+         'dimensions': {'population': 'Young adults versus older adults'},
+         'contradiction': science.compare(*[Evidence.model_validate(r) for r in rows]).model_dump()})
     send(identifier, 'HypothesisAgent', {'hypotheses': [{**h.model_dump(), 'confidence': 0.5,
-         'proposed_test': 'Compare the allowlisted covariate adjustments'} for h in science.hypotheses(True)]})
-    send(identifier, 'ExperimentPlanner', {'experiments': [e.model_dump() for e in science.proposals(42)],
-         'selected_experiment': 'E1', 'assumptions': ['Linear associations'], 'robustness_checks': ['Year exclusion']})
+         'proposed_test': 'Audit the claim alignment'} for h in paper_science.hypotheses(report)]})
+    send(identifier, 'ExperimentPlanner', {'experiments': [e.model_dump() for e in paper_science.proposals(report, 42)],
+         'selected_experiment': 'E1', 'assumptions': ['Extracted claims are exchangeable'],
+         'robustness_checks': ['Section exclusion']})
     send(identifier, 'SafetyAgent', {'passed': True, 'checks': ['Plan and provenance checked'], 'flags': [], 'blocking_issues': []})
     r = store.get(identifier)
     r['status'] = 'awaiting_approval'  # Adapter responsibility, explicit fixture setup.
@@ -49,26 +72,26 @@ def test_real_computation_and_model_artifacts_persist(monkeypatch):
     send(identifier, 'ExperimentRunner', {'experiment_id': 'E1'})
     r = store.get(identifier)
     result = store.by_kind(r, 'result')[0]
-    assert result['data']['pooled_slope'] < 0 < result['data']['adjusted_slope']
-    assert result['data']['provenance']['tool'] == 'experiments.penguins.compute'
-    measurement = {'result_id': result['id'], 'path': 'adjusted_slope', 'value': result['data']['adjusted_slope']}
-    updates = science.evaluate(result['data'])
+    assert 0 <= result['data']['disagreement_rate'] <= 1
+    assert result['data']['provenance']['tool'] == 'experiments.papers_analysis.compute_papers'
+    measurement = {'result_id': result['id'], 'path': 'disagreement_rate', 'value': result['data']['disagreement_rate']}
+    updates = paper_science.evaluate(result['data'])
     for name in ('evaluate', 'critique', 'decide'):
-        monkeypatch.setattr(science, name, lambda *args: pytest.fail('Deterministic interpretation called in model mode'))
+        monkeypatch.setattr(paper_science, name, lambda *args: pytest.fail('Deterministic interpretation called in model mode'))
     send(identifier, 'AnalysisAgent', {'updates': updates, 'measurements': [measurement],
-         'statistical_evidence': 'Positive adjusted interval', 'scientific_interpretation': 'Association only',
-         'limitations': ['Observational']})
+         'statistical_evidence': 'Disagreement survives claim resampling', 'scientific_interpretation': 'Text evidence only',
+         'limitations': ['No shared primary dataset']})
     analysis = store.by_kind(store.get(identifier), 'analysis')[0]
     send(identifier, 'CriticAgent', {'challenges': [{'challenge_id': 'custom-challenge',
-         'attack': 'Unmeasured confounding remains a rival explanation.', 'test': 'Independent cohort',
-         'evidence': 'Not tested by this observational sample', 'verdict': 'open', 'artifact_ids': [analysis['id']]}],
-         'requested_experiments': ['Independent cohort'], 'measurements': []})
-    send(identifier, 'DecisionAgent', {'disposition': 'NEEDS_FOLLOW_UP', 'previous_plan': 'Assess aggregation',
-         'next_decision': 'Collect independent evidence', 'rationale': 'Confounding remains unresolved',
-         'next_evidence_search': 'Independent cohort', 'next_experiment': 'Replication', 'unresolved': ['Confounding'],
+         'attack': 'Different populations could explain the disagreement.', 'test': 'Matched-population replication',
+         'evidence': 'Not tested by text evidence', 'verdict': 'open', 'artifact_ids': [analysis['id']]}],
+         'requested_experiments': ['Matched-population replication'], 'measurements': []})
+    send(identifier, 'DecisionAgent', {'disposition': 'NEEDS_FOLLOW_UP', 'previous_plan': 'Assess the disagreement',
+         'next_decision': 'Collect matched-population evidence', 'rationale': 'Population remains unresolved',
+         'next_evidence_search': 'Studies of both age groups', 'next_experiment': 'Replication', 'unresolved': ['Population'],
          'contradiction_explained': False, 'measurements': []})
     send(identifier, 'SafetyAgent', {'passed': True, 'checks': ['Provenance, approval and numeric references'],
-         'flags': ['Observational findings'], 'blocking_issues': []})
+         'flags': ['Text evidence only'], 'blocking_issues': []})
     r = store.get(identifier)
     assert len(r['agent_executions']) == 10
     assert all(e['status'] == 'COMPLETED' for e in r['agent_executions'])
@@ -82,36 +105,41 @@ def test_real_computation_and_model_artifacts_persist(monkeypatch):
 
 @pytest.mark.parametrize('disposition', ['COMPATIBLE', 'INCONCLUSIVE', 'INSUFFICIENT_EVIDENCE'])
 def test_no_forced_disagreement(disposition):
-    r = workflow.create(NewInvestigation(mode='omnigent'))
-    evidence = science.retrieve_evidence()
-    send(r['id'], 'LiteratureAgent', {'evidence': [e.model_dump(mode='json') for e in evidence]})
-    comparison = science.compare(*evidence).model_dump()
+    identifier, documents, _ = paper_investigation()
+    rows = paper_evidence(documents)
+    send(identifier, 'LiteratureAgent', {'evidence': rows})
+    comparison = science.compare(*[Evidence.model_validate(r) for r in rows]).model_dump()
     comparison['contradiction_strength'] = 'none'
-    send(r['id'], 'ContradictionAgent', {'disposition': disposition, 'classification': 'INSUFFICIENT_EVIDENCE',
+    send(identifier, 'ContradictionAgent', {'disposition': disposition, 'classification': 'INSUFFICIENT_EVIDENCE',
          'dimensions': {'uncertainty': 'Unknown'}, 'contradiction': comparison})
-    saved = store.get(r['id'])
+    saved = store.get(identifier)
     assert saved['status'] == 'no_contradiction'
     assert agents.next_role(saved) is None
     assert not store.by_kind(saved, 'hypothesis')
+
+
+def test_investigations_require_uploaded_papers():
+    with pytest.raises(ValueError, match='Upload two papers'):
+        workflow.create(NewInvestigation(mode='omnigent'))
 
 
 def test_failed_model_call_has_no_fallback():
     class FailingProvider:
         async def execute(self, *args):
             raise ConnectionError('provider unavailable')
-    r = workflow.create(NewInvestigation(mode='omnigent'))
-    asyncio.run(run(r['id'], FailingProvider()))
-    r = store.get(r['id'])
+    identifier, _, _ = paper_investigation()
+    asyncio.run(run(identifier, FailingProvider()))
+    r = store.get(identifier)
     assert r['status'] == 'failed'
     assert r['agent_executions'][0]['status'] == 'FAILED'
     assert not store.by_kind(r, 'evidence')
 
 
 def test_schema_rejects_invalid_model_output():
-    r = workflow.create(NewInvestigation(mode='omnigent'))
+    identifier, _, _ = paper_investigation()
     with pytest.raises(ValueError):
-        send(r['id'], 'LiteratureAgent', {'evidence': [{'claim': 'invented'}]})
-    assert store.get(r['id'])['status'] == 'failed'
+        send(identifier, 'LiteratureAgent', {'evidence': [{'claim': 'invented'}]})
+    assert store.get(identifier)['status'] == 'failed'
 
 
 def test_approval_digest_prevents_changed_plan():
@@ -130,7 +158,7 @@ def test_measurement_must_equal_python_result():
     r = store.get(identifier)
     result = store.by_kind(r, 'result')[0]
     with pytest.raises(ValueError, match='does not match'):
-        agents.check_measurements(r, {'measurements': [{'result_id': result['id'], 'path': 'adjusted_slope', 'value': 99.0}]})
+        agents.check_measurements(r, {'measurements': [{'result_id': result['id'], 'path': 'disagreement_rate', 'value': 99.0}]})
 
 
 def test_safety_can_block():
@@ -205,8 +233,8 @@ def test_claude_provider_runs_scoped_tools_and_labels_the_run(monkeypatch):
 
     monkeypatch.setenv('ANTHROPIC_API_KEY', 'unit-test-not-a-real-key')
     monkeypatch.delenv('CLAUDE_MODEL', raising=False)
-    identifier = workflow.create(NewInvestigation(mode='omnigent'))['id']
-    evidence = [e.model_dump(mode='json') for e in science.retrieve_evidence()]
+    identifier, documents, _ = paper_investigation()
+    evidence = paper_evidence(documents)
     output = json.dumps({**base(), 'evidence': evidence})
     client = FakeClaude([
         {'stop_reason': 'tool_use', 'stop_details': None, 'content': [tool_use('read_context', 't1')]},
@@ -236,7 +264,7 @@ def test_claude_refusal_fails_closed_without_fallback_artifacts(monkeypatch):
     from backend.agent_provider import ClaudeProvider
 
     monkeypatch.setenv('ANTHROPIC_API_KEY', 'unit-test-not-a-real-key')
-    identifier = workflow.create(NewInvestigation(mode='omnigent'))['id']
+    identifier, _, _ = paper_investigation()
     client = FakeClaude([{'stop_reason': 'refusal', 'stop_details': SimpleNamespace(category='bio'), 'content': []}])
     asyncio.run(run(identifier, ClaudeProvider(client)))
     record = store.get(identifier)
@@ -248,8 +276,8 @@ def test_claude_agent_revises_a_rejected_artifact_and_rejections_are_recorded(mo
     from backend.agent_provider import ClaudeProvider
 
     monkeypatch.setenv('ANTHROPIC_API_KEY', 'unit-test-not-a-real-key')
-    identifier = workflow.create(NewInvestigation(mode='omnigent'))['id']
-    evidence = [e.model_dump(mode='json') for e in science.retrieve_evidence()]
+    identifier, documents, _ = paper_investigation()
+    evidence = paper_evidence(documents)
     bad = json.dumps({**base(), 'evidence_ids': ['EV404'], 'evidence': evidence})
     # Citing its own newly submitted evidence rows is a valid reference.
     good = json.dumps({**base(), 'evidence_ids': [e['evidence_id'] for e in evidence], 'evidence': evidence})
@@ -274,7 +302,7 @@ def test_claude_agent_fails_closed_after_three_rejections(monkeypatch):
     from backend.agent_provider import ClaudeProvider
 
     monkeypatch.setenv('ANTHROPIC_API_KEY', 'unit-test-not-a-real-key')
-    identifier = workflow.create(NewInvestigation(mode='omnigent'))['id']
+    identifier, _, _ = paper_investigation()
     bad = json.dumps({**base(), 'evidence': 'not a list'})
     client = FakeClaude([{'stop_reason': 'tool_use', 'stop_details': None,
                           'content': [tool_use('submit_artifact', f't{i}', {'output_json': bad})]} for i in range(3)])

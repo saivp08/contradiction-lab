@@ -12,14 +12,12 @@ const ARROWS: Record<string, [string, string]> = {
 export function ContradictionChapter({
   canTrace,
   onTrace,
-  papers = false,
   evidence = [],
   contradiction,
   model = false,
 }: {
   canTrace: boolean;
   onTrace: () => void;
-  papers?: boolean;
   evidence?: Evidence[];
   contradiction?: { conflicting_claim: string; differing_conditions: string[]; uncertainty: string; explanation?: string; disposition?: string };
   model?: boolean;
@@ -32,7 +30,7 @@ export function ContradictionChapter({
     <p className="caption">{contradiction?.uncertainty}</p>
     <button className="text-button" onClick={onTrace} disabled={!canTrace}>Inspect comparison and provenance <ArrowUpRight size={16} /></button>
   </section>;
-  if (papers && evidence.length === 2) {
+  if (evidence.length === 2) {
     const [a, b] = evidence;
     const [labelA, toneA] = ARROWS[a.direction_of_effect] ?? ARROWS.unknown;
     const [labelB, toneB] = ARROWS[b.direction_of_effect] ?? ARROWS.unknown;
@@ -70,22 +68,15 @@ export function ContradictionChapter({
   }
   return (
     <section>
-      <SectionHeading eyebrow="03 / THE CONTRADICTION" title="Perspective changes everything." />
-      <div className="opposing">
-        <div>
-          <span className="eyebrow">AGGREGATED DATA</span>
-          <h3 className="coral">↘ Negative relationship</h3>
-        </div>
-        <span>≠</span>
-        <div>
-          <span className="eyebrow">WITHIN SPECIES</span>
-          <h3 className="mint">↗ Positive relationship</h3>
-        </div>
-      </div>
-      <p>
-        Both claims describe the same birds. The difference is the analysis context: pooling species versus
-        separating them. Use <strong>Colour by species</strong> on the data panel to see the trend reverse.
-      </p>
+      <SectionHeading eyebrow="03 / THE CONTRADICTION" title="Where the papers disagree." />
+      <p>{contradiction?.conflicting_claim ?? 'The comparison is still being assessed.'}</p>
+      {!!contradiction?.differing_conditions.length && (
+        <ul className="differs-list">
+          {contradiction.differing_conditions.map((condition) => (
+            <li key={condition}>{condition}</li>
+          ))}
+        </ul>
+      )}
       <button className="text-button" onClick={onTrace} disabled={!canTrace}>
         Trace the contradiction record
         <ArrowUpRight size={16} />

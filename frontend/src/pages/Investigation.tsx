@@ -5,7 +5,7 @@ import { EvidenceChapter } from '../chapters/EvidenceChapter';
 import { ContradictionChapter } from '../chapters/ContradictionChapter';
 import { HypothesesChapter } from '../chapters/HypothesesChapter';
 import { ExperimentChapter } from '../chapters/ExperimentChapter';
-import { PapersResultChapter, ResultChapter } from '../chapters/ResultChapter';
+import { PapersResultChapter } from '../chapters/ResultChapter';
 import { DecisionChapter } from '../chapters/DecisionChapter';
 import { InstrumentPanel } from '../panels/InstrumentPanel';
 import { Arena } from '../arena/Arena';
@@ -13,7 +13,6 @@ import { AGENTS, buildBeats, visibleRecord, type Challenge } from '../arena/beat
 import { usePlayback } from '../arena/usePlayback';
 import { ApprovalDialog, ProvenanceDialog } from '../panels/Dialogs';
 import {
-  REFERENCE_QUESTION,
   freshRuns,
   RESTING,
   STAGES,
@@ -25,22 +24,18 @@ import {
 } from '../lib';
 import {
   objects,
-  type Dataset,
   type Contradiction,
   type Decision,
   type Evidence,
   type Experiment,
-  type FollowupDecision,
   type Hypothesis,
   type LabObject,
-  type Point,
   type RecordData,
   type PapersResult,
-  type Result,
   type Update,
 } from '../types';
 
-type Pending = { kind: 'experiment'; experiment: Experiment } | { kind: 'followup' } | null;
+type Pending = { kind: 'experiment'; experiment: Experiment } | null;
 
 /** Keeps the record current while work is in progress: server-sent events, falling back to polling. */
 function useLiveRecord(
@@ -115,17 +110,11 @@ function StorySection({
 export function Investigation({
   id,
   replay,
-  reference,
-  referencePoints,
-  dataset,
   onNew,
   onChanged,
 }: {
   id: string;
   replay: boolean;
-  reference: Evidence[];
-  referencePoints: Point[];
-  dataset: Dataset | null;
   onNew: () => void;
   onChanged: () => void;
 }) {
@@ -226,44 +215,23 @@ export function Investigation({
       setFollow(true);
       playback.play();
     });
-  const runFollowup = () =>
-    act(async () => {
-      if (!record) return;
-      setPending(null);
-      setRecord(
-        await api<RecordData>(`/investigations/${record.id}/followup`, {
-          method: 'POST',
-          body: JSON.stringify({ approved: true }),
-        }),
-      );
-      setFollow(true);
-      playback.play();
-      onChanged();
-    });
 
   const isReplay = record?.display_mode === 'replay';
   const live = view?.mode === 'omnigent';
   const stage = view?.stage ?? 0;
   const failed = view && ['failed', 'no_contradiction', 'blocked'].includes(view.status);
   const working = !!view && !isReplay && !RESTING.includes(view.status);
-  const evidence = record ? objects<Evidence>(view, 'evidence') : reference;
+  const evidence = objects<Evidence>(view, 'evidence');
   const hypotheses = objects<Hypothesis>(view, 'hypothesis');
-  const experiments = objects<Experiment>(view, 'experiment').filter((e) => !e.followup);
-  const papersMode = view?.source?.kind === 'papers';
-  const rawResult = objects<Result & Partial<PapersResult>>(view, 'result')[0];
-  const result = papersMode ? undefined : (rawResult as Result | undefined);
-  const papersResult = papersMode ? (rawResult as unknown as PapersResult | undefined) : undefined;
+  const experiments = objects<Experiment>(view, 'experiment');
+  const papersResult = objects<PapersResult>(view, 'result')[0];
   const contradiction = objects<Contradiction>(view, 'contradiction')[0];
   const updates = objects<{ updates: Update[] }>(view, 'analysis')[0]?.updates;
   const decision = objects<Decision>(view, 'decision')[0];
-  const followupResult = objects<Result>(view, 'followup_result')[0];
-  const followup = objects<FollowupDecision>(view, 'followup_decision')[0];
-  // Latest verdict per critic challenge; a follow-up re-judges the one it was run for.
   const challenges = new Map<string, Challenge>();
   for (const critique of objects<{ challenges: Challenge[] }>(view, 'critique'))
     for (const c of critique.challenges) challenges.set(c.challenge_id, c);
   const openChallenges = [...challenges.values()].filter((c) => c.verdict === 'open');
-  const resolvedChallenge = [...challenges.values()].find((c) => c.verdict === 'partly conceded');
   const ready = (i: number) => !!view && (sectionReady(stage, i) || (i === 5 && stage >= 4));
   const done = (i: number) => !!view && (view.status === 'complete' || sectionReady(stage, i + 1));
   const waiting = failed
@@ -281,10 +249,8 @@ export function Investigation({
         live ? 'live AI agents' : 'rule-based specialists'
       }.`
     : live
-      ? 'Language-model agents (via Omnigent) choose and sequence the steps. All numbers come from Python code, not the model.'
-      : papersMode
-        ? 'Each step is a fixed, deterministic function: no language model is involved. Claims are exact sentences parsed from the uploaded PDFs; the experiments quantify how robust the detected disagreement is to the extraction.'
-        : 'Each step is a fixed, deterministic function: no language model is involved. Statistics are computed on the real dataset; the hypotheses and experiment options are pre-registered.';
+      ? 'Language-model agents read the uploaded papers and author each step; every artifact is validated against the PDFs. All numbers come from Python code, not the model.'
+      : 'Each step is a fixed, deterministic function: no language model is involved. Claims are exact sentences parsed from the uploaded PDFs; the experiments quantify how robust the detected disagreement is to the extraction.';
 
   return (
     <div className="investigation">
@@ -298,7 +264,7 @@ export function Investigation({
             {isReplay
               ? 'VERIFIED REPLAY · SEALED RECORD'
               : live
-                ? 'OMNIGENT ORCHESTRATED · LIVE AGENTS'
+                ? 'LIVE MODEL AGENTS'
                 : 'LOCAL DETERMINISTIC RUN · NO LLM'}
           </span>
           <h1>
@@ -369,7 +335,6 @@ export function Investigation({
         <InstrumentPanel
           key={id + (replay ? ':replay' : '')}
           record={view}
-          referencePoints={referencePoints}
           onSelect={setSelected}
           arena={
             <Arena
@@ -414,20 +379,16 @@ export function Investigation({
                 [
                   <StorySection index={0} ready waiting="">
                     <QuestionChapter
-                      question={view.objective || REFERENCE_QUESTION}
-                      {...(papersMode && view.source
-                        ? {
-                            stamp: 'User-supplied papers · parsed evidence',
-                            chips: view.source.papers.map(
-                              (paper, index) =>
-                                [
-                                  'file',
-                                  `${index === 0 ? 'A' : 'B'} · ${paper.meta.title.slice(0, 44)}${paper.meta.title.length > 44 ? '…' : ''}`,
-                                ] as ['file', string],
-                            ),
-                            scope: view.scope ?? undefined,
-                          }
-                        : {})}
+                      question={view.objective}
+                      stamp="User-supplied papers · parsed evidence"
+                      chips={(view.source?.papers ?? []).map(
+                        (paper, index) =>
+                          [
+                            'file',
+                            `${index === 0 ? 'A' : 'B'} · ${paper.meta.title.slice(0, 44)}${paper.meta.title.length > 44 ? '…' : ''}`,
+                          ] as ['file', string],
+                      )}
+                      scope={view.scope ?? undefined}
                     />
                   </StorySection>,
                   <StorySection index={1} ready={ready(1)} waiting={waiting}>
@@ -437,7 +398,6 @@ export function Investigation({
                     <ContradictionChapter
                       canTrace={stage >= 2}
                       onTrace={() => findObject('contradiction')}
-                      papers={papersMode}
                       model={live}
                       evidence={evidence}
                       contradiction={contradiction}
@@ -465,29 +425,16 @@ export function Investigation({
                     ready={ready(5)}
                     waiting={failed ? waiting : 'Unlocks after an experiment is approved and run.'}
                   >
-                    {papersMode ? (
-                      <PapersResultChapter
-                        result={papersResult}
-                        updates={updates}
-                        status={view.status}
-                        events={view.events}
-                        openChallenges={openChallenges}
-                        nextLabel={decision?.next_experiment ?? 'a follow-up with comparable data'}
-                        onInspect={() => findObject('result')}
-                        onNextMove={() => pick(6)}
-                      />
-                    ) : (
-                      <ResultChapter
-                        result={result}
-                        updates={updates}
-                        status={view.status}
-                        events={view.events}
-                        openChallenges={followup ? [] : openChallenges}
-                        nextLabel={decision?.next_experiment ?? 'Review the model decision'}
-                        onInspect={() => findObject('result')}
-                        onNextMove={() => pick(6)}
-                      />
-                    )}
+                    <PapersResultChapter
+                      result={papersResult}
+                      updates={updates}
+                      status={view.status}
+                      events={view.events}
+                      openChallenges={openChallenges}
+                      nextLabel={decision?.next_experiment ?? 'a follow-up with comparable data'}
+                      onInspect={() => findObject('result')}
+                      onNextMove={() => pick(6)}
+                    />
                   </StorySection>,
                   <StorySection
                     index={6}
@@ -496,16 +443,9 @@ export function Investigation({
                   >
                     <DecisionChapter
                       decision={decision}
-                      followup={followup}
-                      followupResult={followupResult}
                       openChallenge={openChallenges[0]}
                       openChallenges={openChallenges}
-                      resolvedChallenge={resolvedChallenge}
-                      followupApproval={view.followup_approval}
                       metrics={view.metrics}
-                      canRunFollowup={view.status === 'complete' && !isReplay && !live}
-                      busy={busy}
-                      onRunFollowup={() => setPending({ kind: 'followup' })}
                     />
                     {live && view.status === 'complete' && !isReplay && <button className="button primary" disabled={busy}
                       onClick={() => act(async () => {
@@ -548,37 +488,19 @@ export function Investigation({
             `Hypotheses: ${pending.experiment.hypothesis_targets?.join(", ") ?? "See plan"}`,
             ...pending.experiment.limitations,
             ...objects<{ assumptions: string[] }>(record, "plan_review").flatMap(p => p.assumptions),
-            ...(papersMode && view?.source
+            ...(view?.source
               ? [
                   `Evidence: ${view.source.analysis.claims_a.length} + ${view.source.analysis.claims_b.length} claims extracted from 2 uploaded PDFs (SHA-256 checksummed)`,
-                  `${pending.experiment.bootstrap_samples} claim resamples · seed ${pending.experiment.seed}`,
-                  live ? 'Python computes locally; model agents interpret results through the configured provider' : 'Runs locally on this machine in a few seconds; no network calls',
-                  'Your approval is recorded in the lab notebook and cannot be undone',
                 ]
-              : [
-                  `Data: ${dataset ? `${dataset.n_complete} of ${dataset.n_raw}` : 'all complete'} penguin records, checksum-verified`,
-                  `${pending.experiment.bootstrap_samples} bootstrap resamples · seed ${pending.experiment.seed}`,
-                  live ? 'Python computes locally; model agents interpret results through the configured provider' : 'Runs locally on this machine in a few seconds; no network calls',
-                  'Your approval is recorded in the lab notebook and cannot be undone',
-                ])
+              : []),
+            `${pending.experiment.bootstrap_samples} claim resamples · seed ${pending.experiment.seed}`,
+            live
+              ? 'Python computes locally; model agents interpret results through the configured provider'
+              : 'Runs locally on this machine in a few seconds; no network calls',
+            'Your approval is recorded in the lab notebook and cannot be undone',
           ]}
           busy={busy}
           onConfirm={() => approve(pending.experiment.experiment_id)}
-          onClose={() => setPending(null)}
-        />
-      )}
-      {pending?.kind === 'followup' && (
-        <ApprovalDialog
-          title="Species + sex + year regression"
-          question="Does the positive within-species slope survive adjustment for sex and collection year?"
-          details={[
-            'Data: penguin records with recorded sex, checksum-verified',
-            `500 bootstrap resamples within species · seed ${record?.seed ?? 42}`,
-            live ? 'Python computes locally; model agents interpret results through the configured provider' : 'Runs locally on this machine in a few seconds; no network calls',
-            'A separate approval from the first experiment; recorded in the lab notebook',
-          ]}
-          busy={busy}
-          onConfirm={runFollowup}
           onClose={() => setPending(null)}
         />
       )}

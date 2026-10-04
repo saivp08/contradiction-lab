@@ -53,7 +53,6 @@ const KIND_LABELS: Record<string, [string, string]> = {
   analysis: ['analysis', 'analyses'],
   critique: ['critique', 'critiques'],
   decision: ['decision', 'decisions'],
-  followup_result: ['follow-up result', 'follow-up results'],
 };
 
 function describe(ids: string[], record: RecordData) {

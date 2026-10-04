@@ -1,7 +1,5 @@
 import type { Citation, Evidence, Experiment } from './types';
 
-export const REFERENCE_QUESTION =
-  'Why does the relationship between penguin bill length and depth reverse when species are separated?';
 export const STAGES = [
   'Question',
   'Evidence',
@@ -42,15 +40,19 @@ export function evidenceLabels(e: Evidence, index: number) {
   const direction = e.direction_of_effect;
   const x = lower(e.intervention_or_variable),
     y = lower(e.outcome);
-  const headline =
-    direction === 'negative'
+  const noEffect = !!e.experimental_conditions.reported_effect;
+  const headline = noEffect
+    ? `No significant effect on ${y}.`
+    : direction === 'negative'
       ? `Greater ${x}, lower ${y}.`
       : direction === 'positive'
         ? `Greater ${x}, greater ${y}.`
         : `${direction} association.`;
   return {
     eyebrow: `${letter} / ${context}`.toUpperCase(),
-    tag: `${direction[0].toUpperCase()}${direction.slice(1)} association`,
+    tag: noEffect
+      ? 'No significant effect'
+      : `${direction[0].toUpperCase()}${direction.slice(1)} association`,
     headline,
     tone: direction === 'negative' ? 'negative' : 'positive',
   };

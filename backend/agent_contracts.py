@@ -107,11 +107,11 @@ SCHEMAS = dict(zip(
 ))
 
 RESPONSIBILITIES = {
-    'LiteratureAgent': 'Extract important findings from supplied paper passages or the cited reference catalog. '
+    'LiteratureAgent': 'Extract important findings from the supplied passages of both uploaded papers. '
         'Each paper evidence claim and provenance.quote must be the same exact passage, with pdf_sha256, page, '
         'section and extraction fields. Never invent metadata or citations. Select evidence from BOTH papers. '
         'Use EV1, EV2 etc as evidence_id. Unknown scientific attributes must say unknown. '
-        'The catalog is curated, not a live literature search.',
+        'Copy each citation exactly from required_citations.',
     'ContradictionAgent': 'Assess research question, exposure, outcome, population, conditions, effect direction '
         'and magnitude, statistical uncertainty, model specification, covariates, selection and measurement definitions. '
         'Put every dimension in dimensions; missing information is unknown. Null significance alone does not '
@@ -119,8 +119,8 @@ RESPONSIBILITIES = {
         'incomparable and insufficient evidence. Stop without manufacturing disagreement. contradiction.evidence_a/b '
         'must reference selected EV IDs; contradiction_strength is none when disposition is not CONTRADICTION.',
     'HypothesisAgent': 'Generate specific falsifiable explanations grounded in the actual disagreement. Include '
-        'supporting/conflicting EV IDs, predictions and falsification criteria. Do not impose a penguin-specific '
-        'rubric on other papers. Use H1 etc. agent_generated=true. support_score is a heuristic, not probability.',
+        'supporting/conflicting EV IDs, predictions and falsification criteria. Use H1 etc. agent_generated=true. '
+        'support_score is a heuristic, not probability.',
     'ExperimentPlanner': 'Design bounded executable tests for the hypotheses using ONLY the supplied computation '
         'capabilities. Choose parameters, assumptions, limitations, variables, success/failure criteria and robustness '
         'checks. Do not execute or approve. Text audits test extraction stability, NOT biological truth or causal '

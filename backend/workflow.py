@@ -5,9 +5,8 @@ from datetime import datetime
 from time import perf_counter
 
 from backend import paper_science, science, store
-from backend.models import AgentAnnotation, Experiment, Hypothesis, NewInvestigation
+from backend.models import AgentAnnotation, Evidence, Experiment, NewInvestigation
 from experiments.papers_analysis import compute_papers
-from experiments.penguins import compute, load_data
 
 LOCKS: dict[str, threading.RLock] = {}
 LOCK_GUARD = threading.Lock()
@@ -42,6 +41,8 @@ def create(request: NewInvestigation) -> dict:
         decision = store.by_kind(parent, 'decision')[0]['data']
         objective = f"Follow up: {decision['next_experiment']}. {decision['rationale']}"
         source = parent.get('source')
+    elif not request.source_analysis:
+        raise ValueError('Upload two papers and analyze them before starting an investigation')
     if request.source_analysis:
         analysis = store.load_analysis(request.source_analysis)
         if request.mode == 'omnigent' and not analysis.get('source_documents'):
@@ -74,8 +75,10 @@ def create(request: NewInvestigation) -> dict:
         "id": store.uid("lab"),
         "objective": objective,
         "label": request.label,
-        "reference_question": "Why does the bill length–depth association reverse across aggregation choices?",
-        "scope": "Reference investigation only. The dataset, variables and question are fixed; the optional label is for the user.",
+        "scope": (
+            "Comparison of two user-supplied papers via extracted text evidence; "
+            "the computational experiments quantify extraction robustness, not either paper's truth."
+        ),
         "mode": request.mode,
         "status": "created",
         "stage": 0,
@@ -87,12 +90,7 @@ def create(request: NewInvestigation) -> dict:
         "metrics": {},
         "error": None,
     }
-    if source:
-        record["source"] = source
-        record["scope"] = (
-            "Comparison of two user-supplied papers via extracted text evidence; "
-            "the computational experiments quantify extraction robustness, not either paper's truth."
-        )
+    record["source"] = source
     store.add(record, "question", {"objective": objective, "scope": record["scope"]}, [])
     if parent:
         record['parent_investigation'] = parent['id']
@@ -118,38 +116,26 @@ def _advance_deterministic(identifier: str, role: str, rationale: str = "", cand
         expected = ROLES[record["stage"]]
         if role != expected:
             raise ValueError(f"Invalid handoff: expected {expected}, received {role}")
-        papers_mode = record.get("source", {}).get("kind") == "papers"
-        paper_analysis = record.get("source", {}).get("analysis") if papers_mode else None
+        paper_analysis = record["source"]["analysis"]
         if record["mode"] == "omnigent":
             AgentAnnotation(rationale=rationale)
         started = perf_counter()
         inputs, outputs = [], []
         if role == "LiteratureAgent":
             inputs = [store.by_kind(record, "question")[0]["id"]]
-            if papers_mode:
-                for row in record["source"]["evidence"]:
-                    outputs.append(store.add(record, "evidence", row, inputs))
-                papers_meta = record["source"]["papers"]
-                action, tool = (
-                    f"Parsed {len(papers_meta)} uploaded PDFs "
-                    f"({sum(p['pages'] for p in papers_meta)} pages); extracted "
-                    f"{len(paper_analysis['claims_a']) + len(paper_analysis['claims_b'])} candidate claims; "
-                    "selected the top aligned pair with page-level provenance.",
-                    "ingest_papers",
-                )
-            else:
-                evidence = science.retrieve_evidence()
-                for row in evidence:
-                    outputs.append(store.add(record, "evidence", row.model_dump(mode="json"), inputs))
-                action, tool = (
-                    f"Retrieved {len(evidence)} curated claims from 1 cited article; offline reference catalog.",
-                    "retrieve_evidence",
-                )
+            for row in record["source"]["evidence"]:
+                outputs.append(store.add(record, "evidence", row, inputs))
+            papers_meta = record["source"]["papers"]
+            action, tool = (
+                f"Parsed {len(papers_meta)} uploaded PDFs "
+                f"({sum(p['pages'] for p in papers_meta)} pages); extracted "
+                f"{len(paper_analysis['claims_a']) + len(paper_analysis['claims_b'])} candidate claims; "
+                "selected the top aligned pair with page-level provenance.",
+                "ingest_papers",
+            )
         elif role == "ContradictionAgent":
             evidence = store.by_kind(record, "evidence")
             inputs = [e["id"] for e in evidence]
-            from backend.models import Evidence
-
             contradiction = science.compare(*[Evidence.model_validate(e["data"]) for e in evidence[:2]])
             outputs = [store.add(record, "contradiction", contradiction.model_dump(), inputs)]
             action, tool = contradiction.explanation, "compare_claims"
@@ -157,16 +143,7 @@ def _advance_deterministic(identifier: str, role: str, rationale: str = "", cand
                 record["status"] = "no_contradiction"
         elif role == "HypothesisAgent":
             inputs = [store.by_kind(record, "contradiction")[0]["id"]]
-            rows = paper_science.hypotheses(paper_analysis) if papers_mode else science.hypotheses(False)
-            if record["mode"] == "omnigent":
-                if candidates is None:
-                    raise ValueError("Omnigent must supply structured AI-generated hypotheses")
-                rows = [Hypothesis.model_validate(row) for row in candidates]
-                if [h.hypothesis_id for h in rows] != ["H1", "H2", "H3"]:
-                    raise ValueError("Reference rubric requires H1 species, H2 sampling, H3 sex/year in order")
-                for row in rows:
-                    row.agent_generated = True
-                    row.support_score = 50
+            rows = paper_science.hypotheses(paper_analysis)
             for row in rows:
                 outputs.append(store.add(record, "hypothesis", row.model_dump(), inputs))
             action, tool = (
@@ -175,11 +152,7 @@ def _advance_deterministic(identifier: str, role: str, rationale: str = "", cand
             )
         elif role == "ExperimentPlanner":
             inputs = [v["id"] for v in store.by_kind(record, "hypothesis")]
-            candidates = (
-                paper_science.proposals(paper_analysis, record["seed"])
-                if papers_mode
-                else science.proposals(record["seed"])
-            )
+            candidates = paper_science.proposals(paper_analysis, record["seed"])
             for row in candidates:
                 outputs.append(
                     store.add(record, "experiment", {**row.model_dump(), "planning_score": science.score(row)}, inputs)
@@ -189,8 +162,6 @@ def _advance_deterministic(identifier: str, role: str, rationale: str = "", cand
             record["selection_rationale"] = (
                 "The robustness audit directly tests whether the detected disagreement survives resampling "
                 "and section exclusion; scores are explicit heuristics."
-                if papers_mode
-                else "Species adjustment directly tests the differing aggregation condition. Weighted learning, discrimination, coverage, feasibility and cost scores favor it over year adjustment; scores are explicit heuristics."
             )
             record["status"] = "awaiting_approval" if record["mode"] == "local" else "sponsor_preparing_approval"
             record["metrics"]["question_to_spec_seconds"] = (
@@ -223,50 +194,31 @@ def _advance_deterministic(identifier: str, role: str, rationale: str = "", cand
             def progress(message):
                 store.event(record, role, message, [run_id], [], "scientific_python", status="running")
 
-            if papers_mode:
-                progress("Loading extracted claims")
-                result = compute_papers(paper_analysis, spec.method, spec.seed, spec.bootstrap_samples, progress)
-                pdf_hashes = "+".join(p["id"] for p in record["source"]["papers"])
-                result["provenance"] = {
-                    "dataset_sha256": hashlib.sha256(pdf_hashes.encode()).hexdigest(),
-                    "dataset": {"papers": record["source"]["papers"], "pdf_sha256": pdf_hashes.split("+")},
-                    "code_sha256": paper_code_hash(),
-                    "tool": "experiments.papers_analysis.compute_papers",
-                    "timestamp": store.now(),
-                    "parameters": spec.model_dump(),
-                    "runtime": runtime_versions(),
-                }
-                counts = result["n_claims"]
-                action, tool = (
-                    f"Computed alignment robustness over {counts['a']} + {counts['b']} extracted claims with "
-                    f"{spec.bootstrap_samples} bootstrap resamples and section-exclusion sensitivity.",
-                    "experiments.papers_analysis.compute_papers",
-                )
-            else:
-                progress("Loading dataset")
-                frame, metadata = load_data()
-                progress("Validating schema")
-                result = compute(frame, spec.method, spec.seed, spec.bootstrap_samples, progress)
-                result["provenance"] = {
-                    "dataset_sha256": metadata["sha256"],
-                    "dataset": metadata,
-                    "code_sha256": science.code_hash(),
-                    "tool": "experiments.penguins.compute",
-                    "timestamp": store.now(),
-                    "parameters": spec.model_dump(),
-                    "runtime": runtime_versions(),
-                }
-                action, tool = (
-                    f"Computed real regression and {spec.bootstrap_samples} stratified bootstrap draws on {len(frame)} birds.",
-                    "experiments.penguins.compute",
-                )
+            progress("Loading extracted claims")
+            result = compute_papers(paper_analysis, spec.method, spec.seed, spec.bootstrap_samples, progress)
+            pdf_hashes = "+".join(p["id"] for p in record["source"]["papers"])
+            result["provenance"] = {
+                "dataset_sha256": hashlib.sha256(pdf_hashes.encode()).hexdigest(),
+                "dataset": {"papers": record["source"]["papers"], "pdf_sha256": pdf_hashes.split("+")},
+                "code_sha256": paper_code_hash(),
+                "tool": "experiments.papers_analysis.compute_papers",
+                "timestamp": store.now(),
+                "parameters": spec.model_dump(),
+                "runtime": runtime_versions(),
+            }
+            counts = result["n_claims"]
+            action, tool = (
+                f"Computed alignment robustness over {counts['a']} + {counts['b']} extracted claims with "
+                f"{spec.bootstrap_samples} bootstrap resamples and section-exclusion sensitivity.",
+                "experiments.papers_analysis.compute_papers",
+            )
             outputs = [store.add(record, "result", result, [run_id])]
             progress("Saving run artifact")
             record["metrics"]["compute_seconds"] = result["compute_seconds"]
         elif role == "AnalysisAgent":
             result = store.by_kind(record, "result")[0]
             inputs = [result["id"]] + [v["id"] for v in store.by_kind(record, "hypothesis")]
-            updates = paper_science.evaluate(result["data"]) if papers_mode else science.evaluate(result["data"])
+            updates = paper_science.evaluate(result["data"])
             outputs = [
                 store.add(
                     record,
@@ -287,7 +239,7 @@ def _advance_deterministic(identifier: str, role: str, rationale: str = "", cand
             result = store.by_kind(record, "result")[0]
             analysis = store.by_kind(record, "analysis")[0]
             inputs = [result["id"], analysis["id"]]
-            challenges = paper_science.critique(result["data"]) if papers_mode else science.critique(result["data"])
+            challenges = paper_science.critique(result["data"])
             outputs = [store.add(record, "critique", {"challenges": challenges}, inputs)]
             tally = {v: sum(c["verdict"] == v for c in challenges) for v in ("rebutted", "stands", "open")}
             action, tool = (
@@ -300,10 +252,8 @@ def _advance_deterministic(identifier: str, role: str, rationale: str = "", cand
             analysis = store.by_kind(record, "analysis")[0]
             critique = store.by_kind(record, "critique")[0]
             inputs = [result["id"], analysis["id"], critique["id"]]
-            decision = (
-                paper_science.decide(result["data"], analysis["data"]["updates"], critique["data"]["challenges"])
-                if papers_mode
-                else science.decide(result["data"], analysis["data"]["updates"], critique["data"]["challenges"])
+            decision = paper_science.decide(
+                result["data"], analysis["data"]["updates"], critique["data"]["challenges"]
             )
             outputs = [store.add(record, "decision", decision, inputs)]
             action, tool = "Research plan updated: " + decision["next_decision"], "choose_next_decision"
@@ -329,7 +279,7 @@ def _advance_deterministic(identifier: str, role: str, rationale: str = "", cand
                         ],
                         "flags": [
                             "No causal or clinical claims permitted",
-                            "Known contextual reversal, not independent-study disagreement",
+                            "Text-evidence comparison; no shared primary dataset was re-analysed",
                             "No measured speedup baseline",
                         ],
                     },
@@ -351,7 +301,7 @@ def _advance_deterministic(identifier: str, role: str, rationale: str = "", cand
             record["metrics"].update(
                 {
                     "claims_retrieved": len(store.by_kind(record, "evidence")),
-                    "unique_sources": 1,
+                    "unique_sources": len(record["source"]["papers"]),
                     "hypotheses_evaluated": len(store.by_kind(record, "hypothesis")),
                     "experiments_compared": len(store.by_kind(record, "experiment")),
                     "total_wall_seconds": (
@@ -438,94 +388,6 @@ def approve(identifier: str, experiment_id: str, actor: str = "local human opera
             [],
             "approval_gate",
         )
-        return record
-
-
-def run_followup(identifier: str, actor: str = "local human operator") -> dict:
-    """Run the decision's proposed next experiment under a fresh, separate human approval."""
-    with lock_for(identifier):
-        record = store.get(identifier)
-        if record["status"] != "complete":
-            raise ValueError("Follow-up requires a completed investigation")
-        if record['mode'] == 'omnigent':
-            raise ValueError('Model follow-ups require a new planned investigation and approval; this shortcut is deterministic-only')
-        if record.get("source", {}).get("kind") == "papers":
-            raise ValueError(
-                "Follow-up execution needs an executable dataset; a paper comparison records the proposed "
-                "next experiment without running it."
-            )
-        if record.get("followup_approval"):
-            raise ValueError("Follow-up has already been run")
-        decision = store.by_kind(record, "decision")[0]
-        if decision["data"]["next_experiment"] != science.FOLLOWUP_EXPERIMENT:
-            raise ValueError("The recorded decision did not propose the sex and year follow-up")
-        spec = science.followup_proposal(record["seed"])
-        experiment_id = store.add(record, "experiment", {**spec.model_dump(), "followup": True}, [decision["id"]])
-        record["followup_approval"] = {
-            "experiment_id": spec.experiment_id,
-            "approved_at": store.now(),
-            "actor": actor,
-            "scope": "One allowlisted local follow-up experiment",
-        }
-        store.event(
-            record,
-            "Human",
-            f"Approved follow-up {spec.experiment_id} ({actor})",
-            [decision["id"]],
-            [experiment_id],
-            "approval_gate",
-        )
-        started = perf_counter()
-        frame, metadata = load_data()
-        result = compute(frame, spec.method, spec.seed, spec.bootstrap_samples)
-        result["provenance"] = {
-            "dataset_sha256": metadata["sha256"],
-            "dataset": metadata,
-            "code_sha256": science.code_hash(),
-            "tool": "experiments.penguins.compute",
-            "timestamp": store.now(),
-            "parameters": spec.model_dump(),
-            "runtime": runtime_versions(),
-        }
-        result_id = store.add(record, "followup_result", result, [experiment_id])
-        store.event(
-            record,
-            "ExperimentRunner",
-            f"Computed {spec.title} with {spec.bootstrap_samples} bootstrap draws on {result['n']} birds.",
-            [experiment_id],
-            [result_id],
-            "experiments.penguins.compute",
-            perf_counter() - started,
-        )
-        challenge = science.resolve_followup_challenge(result)
-        challenge_id = store.add(record, "critique", {"challenges": [challenge], "followup": True}, [result_id])
-        store.event(
-            record,
-            "CriticAgent",
-            f"Challenge X5 (sex confounding) {challenge['verdict']}: {challenge['evidence']}",
-            [result_id],
-            [challenge_id],
-            "challenge_result",
-        )
-        interpretation = science.interpret_followup(result)
-        interpretation_id = store.add(record, "followup_decision", interpretation, [result_id, decision["id"]])
-        store.event(
-            record,
-            "DecisionAgent",
-            "Follow-up: " + interpretation["summary"],
-            [result_id],
-            [interpretation_id],
-            "interpret_followup",
-        )
-        record["metrics"]["followup_compute_seconds"] = result["compute_seconds"]
-        record["metrics"]["followup_experiments"] = 1
-        record["metrics"]["human_approvals"] = record["metrics"].get("human_approvals", 1) + 1
-        record["metrics"]["agent_handoffs"] = sum(
-            1 for e in record["events"] if e["agent"] in ROLES and e["status"] == "complete"
-        )
-        record["metrics"].update(challenge_metrics(record))
-        record["verified_sha256"] = store.scientific_digest(record)
-        store.save(record)
         return record
 
 
