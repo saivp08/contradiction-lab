@@ -39,7 +39,7 @@ test('two uploaded papers → parsed evidence → contradiction → existing wor
   await expect(page.getByText(/p = 0\.003/).first()).toBeVisible();
   await expect(page.getByText('WHAT DIFFERS?')).toBeVisible();
   await expect(page.locator('.differs-grid')).toContainText('ages 18-30');
-  await page.screenshot({ path: '../docs/redesign-papers.png', animations: 'disabled' });
+  await page.screenshot({ path: '../artifacts/browser-tests/redesign-papers.png', animations: 'disabled' });
   await noCardOverflow(page);
 
   // The defensible disagreement feeds the SAME workflow: arena, approval gate, critic, decision.

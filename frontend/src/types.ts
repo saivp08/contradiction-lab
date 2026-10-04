@@ -34,6 +34,8 @@ export interface Experiment {
   title?: string;
   followup?: boolean;
   scientific_question: string;
+  required_data?: string;
+  hypothesis_targets?: string[];
   method: string;
   planning_score: number;
   expected_information_gain: number;
@@ -137,7 +139,13 @@ export interface LabEvent {
   timestamp: string;
   status: string;
 }
+export interface AgentExecution {
+  id: string; role: string; status: string; started_at: string; completed_at?: string;
+  provider: string; model: string; input_summary: string; input_ids: string[];
+  output: Record<string, unknown> | null; output_ids?: string[]; confidence?: number; error: string | null;
+}
 export interface RecordData {
+  agent_executions?: AgentExecution[];
   id: string;
   objective: string;
   label?: string | null;

@@ -2,6 +2,10 @@
 import type { LabObject, RecordData } from './types';
 const kinds = [
   'question',
+  'paper',
+  'prior_result',
+  'prior_critique',
+  'prior_decision',
   'evidence',
   'contradiction',
   'hypothesis',
@@ -9,7 +13,9 @@ const kinds = [
   'run',
   'result',
   'analysis',
+  'critique',
   'decision',
+  'plan_review',
   'safety',
   'followup_result',
   'followup_decision',

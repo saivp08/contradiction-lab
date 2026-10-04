@@ -3068,3 +3068,13 @@ pre,
     gap: 2px;
   }
 }
+.agent-trace {
+  margin: 12px 24px;
+  max-width: calc(100% - 48px);
+}
+.agent-trace pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 480px;
+  overflow: auto;
+}

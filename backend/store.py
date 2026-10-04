@@ -161,6 +161,9 @@ def scientific_digest(record: dict) -> str:
         payload["followup_approval"] = record["followup_approval"]
     if record.get("omnigent_receipts"):
         payload["omnigent_receipts"] = record["omnigent_receipts"]
+    for key in ('agent_executions', 'verified_plan_sha256', 'parent_investigation'):
+        if key in record:
+            payload[key] = record[key]
     return hashlib.sha256(json.dumps(payload, sort_keys=True, allow_nan=False).encode()).hexdigest()
 
 

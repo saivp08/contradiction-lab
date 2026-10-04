@@ -133,8 +133,8 @@ export function buildBeats(record: RecordData | null): Beat[] {
           beats.push({
             ...base,
             key: `${e.id}-${c.challenge_id}-defend`,
-            kind: 'defend',
-            from: 'AnalysisAgent',
+            kind: record.mode === 'omnigent' ? 'work' : 'defend',
+            from: record.mode === 'omnigent' ? 'CriticAgent' : 'AnalysisAgent',
             to: 'CriticAgent',
             label: c.verdict,
             text: c.evidence,

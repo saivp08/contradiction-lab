@@ -112,7 +112,7 @@ export function ResultChapter({
                     <em>“{c.attack}”</em>
                   </h3>
                   <p>
-                    {c.evidence} The result survives the other challenges, but this one has not been tested.
+                    {c.evidence}
                   </p>
                 </div>
               ))}

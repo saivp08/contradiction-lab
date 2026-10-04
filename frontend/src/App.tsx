@@ -14,7 +14,7 @@ export default function App() {
   const [points, setPoints] = useState<Point[]>([]);
   const [dataset, setDataset] = useState<Dataset | null>(null);
   const [ready, setReady] = useState(false);
-  const [mode, setMode] = useState('local');
+  const [mode, setMode] = useState('omnigent');
   const [label, setLabel] = useState('');
   const [newOpen, setNewOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -30,10 +30,10 @@ export default function App() {
     if (route.page === 'home') window.scrollTo({ top: 0 });
   }, [route.page]);
   useEffect(() => {
-    api<{ omnigent_ready: boolean }>('/health')
+    api<{ omnigent_ready: boolean; default_mode: string }>('/health')
       .then((h) => {
         setReady(h.omnigent_ready);
-        if (h.omnigent_ready) setMode('omnigent');
+        setMode(h.default_mode);
       })
       .catch((e) => setError(e.message));
     api<{ evidence: Evidence[]; dataset: Dataset; points: Point[] }>('/reference')

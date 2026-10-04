@@ -35,7 +35,7 @@ export function ExperimentChapter({
             <div className="approval-callout" role="status">
               <ShieldCheck size={20} />
               <p>
-                <strong>Nothing runs without you.</strong> Review both tests below, then approve one to run it
+                <strong>Nothing runs without you.</strong> Review the proposed tests below, then approve one to run it
                 on the dataset.
               </p>
             </div>

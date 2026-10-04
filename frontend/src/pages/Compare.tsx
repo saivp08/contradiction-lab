@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ArrowLeft, ArrowRight, FileText, Play, Scale, Upload, X } from 'lucide-react';
 import { api, freshRuns, navigate, uploadFile } from '../lib';
 import type { AnalysisReport, PaperClaim, PaperSummary, RecordData } from '../types';
@@ -275,6 +275,8 @@ function Report({ report, busy, onStart }: { report: AnalysisReport; busy: boole
 }
 
 export function Compare() {
+  const [mode, setMode] = useState('omnigent');
+  useEffect(() => { api<{ default_mode: string }>('/health').then(h => setMode(h.default_mode)).catch(() => {}); }, []);
   const [slotA, setSlotA] = useState<Slot>({ status: 'empty' });
   const [slotB, setSlotB] = useState<Slot>({ status: 'empty' });
   const [report, setReport] = useState<AnalysisReport | null>(null);
@@ -297,12 +299,14 @@ export function Compare() {
     setAnalyzing(true);
     setError('');
     try {
-      setReport(
-        await api<AnalysisReport>('/papers/analyze', {
-          method: 'POST',
-          body: JSON.stringify({ paper_a: slotA.summary.id, paper_b: slotB.summary.id }),
-        }),
-      );
+      const response = await api<AnalysisReport | RecordData>('/papers/analyze', {
+        method: 'POST',
+        body: JSON.stringify({ paper_a: slotA.summary.id, paper_b: slotB.summary.id, mode }),
+      });
+      if ('id' in response) {
+        freshRuns.add(response.id);
+        navigate({ page: 'run', id: response.id, replay: false });
+      } else setReport(response);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -352,6 +356,10 @@ export function Compare() {
           </button>
         </div>
       )}
+      <label>Investigation engine <select aria-label="Paper investigation engine" value={mode} onChange={e => setMode(e.target.value)}>
+        <option value="omnigent">Live model agents via Omnigent</option>
+        <option value="local">Deterministic fallback (no AI)</option>
+      </select></label>
       <div className="paper-slots">
         <PaperSlot
           letter="A"

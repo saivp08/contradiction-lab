@@ -42,7 +42,12 @@ def compute_papers(
     kinds = [p["kind"] for p in comparable]
     top = _best_disagreement(claims_a, claims_b, focus)
     if top is None:
-        raise ValueError("No defensible disagreement pair exists in this analysis")
+        # A semantic disagreement may have no directional keyword/term-overlap match.
+        # Audit that failure honestly (rate can be zero), without overruling the model.
+        if analysis.get('engine', '').startswith('Model-backed') and analysis.get('best_pair'):
+            top = analysis['best_pair']
+        else:
+            raise ValueError("No defensible disagreement pair exists in this analysis")
     claim_a, claim_b = claims_a[top["a"]], claims_b[top["b"]]
 
     progress("Bootstrapping claim extraction")
