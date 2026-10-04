@@ -16,25 +16,53 @@ def retrieve_evidence() -> list[Evidence]:
 
 
 def compare(a: Evidence, b: Evidence) -> Contradiction:
-    opposite = {a.direction_of_effect, b.direction_of_effect} == {"positive", "negative"}
-    same_outcome = (
-        a.outcome == b.outcome
-        and a.intervention_or_variable == b.intervention_or_variable
-        and a.population_or_system == b.population_or_system
-    )
-    conflict = opposite and same_outcome
+    """Generic comparability check over two Evidence records; works for any pair with shared fields."""
+    directions = {a.direction_of_effect, b.direction_of_effect}
+    opposite = directions == {"positive", "negative"}
+    null_markers = ("null result" in str(a.experimental_conditions), "null result" in str(b.experimental_conditions))
+    tension = bool(directions & {"positive", "negative"}) and "unknown" in directions and any(null_markers)
+    same_outcome = a.outcome == b.outcome and a.intervention_or_variable == b.intervention_or_variable
+    same_population = a.population_or_system == b.population_or_system
+    if same_outcome and opposite:
+        strength = "contextual reversal" if same_population else "unresolved"
+    elif same_outcome and tension:
+        strength = "unresolved"
+    else:
+        strength = "none"
+    differing = [
+        f"{key}: {a.experimental_conditions.get(key, '—')} · {b.experimental_conditions.get(key, '—')}"
+        for key in sorted(set(a.experimental_conditions) | set(b.experimental_conditions))
+        if a.experimental_conditions.get(key) != b.experimental_conditions.get(key)
+    ]
+    if not same_population:
+        differing.insert(0, f"population: {a.population_or_system} · {b.population_or_system}")
+
+    def describe(e: Evidence) -> str:
+        if "null result" in str(e.experimental_conditions):
+            return "no significant effect"
+        return f"{e.direction_of_effect} effect"
+
+    if strength == "none":
+        conflicting = "No comparable directional conflict found."
+    else:
+        conflicting = f"For {a.outcome}, source A reports a {describe(a)} while source B reports a {describe(b)}."
     return Contradiction(
         contradiction_id="C1",
         evidence_a=a.evidence_id,
         evidence_b=b.evidence_id,
-        conflicting_claim="Bill length and depth have opposite association directions across aggregation choices."
-        if conflict
-        else "No comparable directional conflict found.",
-        shared_context="Palmer Archipelago penguin bill measurements, 2007–2009.",
-        differing_conditions=["Species pooled versus species separated"],
-        contradiction_strength="contextual reversal" if conflict else "none",
-        uncertainty="Same dataset, not independent replications. Different estimands can legitimately have different signs.",
-        explanation="An apparent contradiction due to analysis context; not evidence that either source is false.",
+        conflicting_claim=conflicting,
+        shared_context=(a.population_or_system if same_population else f"Shared outcome: {a.outcome}"),
+        differing_conditions=differing or ["No differing conditions extracted"],
+        contradiction_strength=strength,
+        uncertainty=(
+            "Different contexts or estimands can legitimately yield different signs; "
+            "a disagreement is a question to investigate, not proof that either source is false."
+        ),
+        explanation=(
+            "An apparent contradiction tied to analysis context within one source."
+            if same_population
+            else "A context-dependent disagreement: the sources differ in extracted conditions."
+        ),
     )
 
 

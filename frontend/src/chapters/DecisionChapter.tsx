@@ -9,7 +9,15 @@ const FOLLOWUP = 'Species + sex + year regression';
 const LOOP_NODES = ['Question', 'Evidence', 'Hypotheses', 'Experiment', 'Result', 'Critique', 'Decision'];
 
 /** The discovery loop with the critique → experiment branch: learning, not a progress bar. */
-function LearningLoop({ branched, closed }: { branched: boolean; closed: boolean }) {
+function LearningLoop({
+  branched,
+  closed,
+  openCount = 1,
+}: {
+  branched: boolean;
+  closed: boolean;
+  openCount?: number;
+}) {
   const x = (i: number) => 56 + i * 98;
   return (
     <svg
@@ -35,7 +43,9 @@ function LearningLoop({ branched, closed }: { branched: boolean; closed: boolean
             markerEnd="url(#loop-arrow)"
           />
           <text className="loop-back-label" x={(x(3) + x(5)) / 2} y="106" textAnchor="middle">
-            {closed ? 'follow-up run · challenge partly conceded' : '1 open challenge → new experiment'}
+            {closed
+              ? 'follow-up run · challenge partly conceded'
+              : `${openCount} open challenge${openCount === 1 ? '' : 's'} → new experiment`}
           </text>
           <defs>
             <marker
@@ -162,6 +172,7 @@ export function DecisionChapter({
   followup,
   followupResult,
   openChallenge,
+  openChallenges,
   resolvedChallenge,
   followupApproval,
   metrics,
@@ -173,6 +184,7 @@ export function DecisionChapter({
   followup?: FollowupDecision;
   followupResult?: Result;
   openChallenge?: Challenge;
+  openChallenges?: Challenge[];
   resolvedChallenge?: Challenge;
   followupApproval?: { approved_at: string; actor: string } | null;
   metrics?: Record<string, number | string>;
@@ -181,6 +193,7 @@ export function DecisionChapter({
   onRunFollowup: () => void;
 }) {
   const branched = !!(openChallenge || resolvedChallenge);
+  const openCount = openChallenges?.length ?? (openChallenge ? 1 : 0);
   return (
     <section>
       <SectionHeading
@@ -190,7 +203,7 @@ export function DecisionChapter({
       />
       {decision ? (
         <div className="decision-card">
-          <LearningLoop branched={branched} closed={!!followup} />
+          <LearningLoop branched={branched} closed={!!followup} openCount={openCount} />
           <div className="decision-columns">
             <div>
               <span className="eyebrow">BEFORE THE EXPERIMENT</span>

@@ -5,12 +5,12 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from backend import store, workflow
-from backend.models import Approval, FollowupApproval, NewInvestigation
+from backend.models import Approval, FollowupApproval, NewInvestigation, PaperPair
 
 ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT / ".env")
@@ -73,6 +73,54 @@ def launch(identifier: str):
         from backend.omnigent_adapter import run
 
         asyncio.run(run(identifier))
+
+
+PAPERS_DIR = ROOT / "artifacts" / "papers"
+
+
+def _paper_summary(paper: dict) -> dict:
+    return {
+        **{k: paper[k] for k in ("id", "filename", "pages", "meta", "sample_size", "sections", "warnings")},
+        "n_claims": len(paper["claims"]),
+        "top_claims": [
+            {k: c[k] for k in ("text", "section", "page", "direction", "stats")} for c in paper["claims"][:5]
+        ],
+        "engine": "rule-based parser (no LLM); exact quotes with page provenance",
+    }
+
+
+@app.post("/api/papers", status_code=201)
+async def upload_paper(file: UploadFile):
+    from backend import papers
+
+    blob = await file.read()
+    try:
+        paper = papers.ingest(blob, file.filename or "paper.pdf")
+    except papers.PaperError as error:
+        raise HTTPException(422, str(error)) from error
+    PAPERS_DIR.mkdir(parents=True, exist_ok=True)
+    (PAPERS_DIR / f"{paper['id']}.pdf").write_bytes(blob)
+    (PAPERS_DIR / f"{paper['id']}.json").write_text(papers.dumps(paper), encoding="utf-8")
+    return _paper_summary(paper)
+
+
+@app.post("/api/papers/analyze")
+def analyze_papers(request: PaperPair):
+    import json as _json
+
+    from backend import papers
+
+    if request.paper_a == request.paper_b:
+        raise HTTPException(409, "Upload two different papers; the same PDF was supplied twice.")
+    loaded = []
+    for identifier in (request.paper_a, request.paper_b):
+        path = PAPERS_DIR / f"{identifier}.json"
+        if not path.exists():
+            raise HTTPException(404, f"Uploaded paper {identifier[:12]}… was not found; upload it again.")
+        loaded.append(_json.loads(path.read_text(encoding="utf-8")))
+    report = papers.analyze(loaded[0], loaded[1])
+    store.save_analysis(report)
+    return report
 
 
 @app.post("/api/investigations", status_code=201)

@@ -5,7 +5,7 @@ import { EvidenceChapter } from '../chapters/EvidenceChapter';
 import { ContradictionChapter } from '../chapters/ContradictionChapter';
 import { HypothesesChapter } from '../chapters/HypothesesChapter';
 import { ExperimentChapter } from '../chapters/ExperimentChapter';
-import { ResultChapter } from '../chapters/ResultChapter';
+import { PapersResultChapter, ResultChapter } from '../chapters/ResultChapter';
 import { DecisionChapter } from '../chapters/DecisionChapter';
 import { InstrumentPanel } from '../panels/InstrumentPanel';
 import { Arena } from '../arena/Arena';
@@ -26,6 +26,7 @@ import {
 import {
   objects,
   type Dataset,
+  type Contradiction,
   type Decision,
   type Evidence,
   type Experiment,
@@ -34,6 +35,7 @@ import {
   type LabObject,
   type Point,
   type RecordData,
+  type PapersResult,
   type Result,
   type Update,
 } from '../types';
@@ -247,7 +249,11 @@ export function Investigation({
   const evidence = record ? objects<Evidence>(view, 'evidence') : reference;
   const hypotheses = objects<Hypothesis>(view, 'hypothesis');
   const experiments = objects<Experiment>(view, 'experiment').filter((e) => !e.followup);
-  const result = objects<Result>(view, 'result')[0];
+  const papersMode = view?.source?.kind === 'papers';
+  const rawResult = objects<Result & Partial<PapersResult>>(view, 'result')[0];
+  const result = papersMode ? undefined : (rawResult as Result | undefined);
+  const papersResult = papersMode ? (rawResult as unknown as PapersResult | undefined) : undefined;
+  const contradiction = objects<Contradiction>(view, 'contradiction')[0];
   const updates = objects<{ updates: Update[] }>(view, 'analysis')[0]?.updates;
   const decision = objects<Decision>(view, 'decision')[0];
   const followupResult = objects<Result>(view, 'followup_result')[0];
@@ -276,7 +282,9 @@ export function Investigation({
       }.`
     : live
       ? 'Language-model agents (via Omnigent) choose and sequence the steps. All numbers come from Python code, not the model.'
-      : 'Each step is a fixed, deterministic function: no language model is involved. Statistics are computed on the real dataset; the hypotheses and experiment options are pre-registered.';
+      : papersMode
+        ? 'Each step is a fixed, deterministic function: no language model is involved. Claims are exact sentences parsed from the uploaded PDFs; the experiments quantify how robust the detected disagreement is to the extraction.'
+        : 'Each step is a fixed, deterministic function: no language model is involved. Statistics are computed on the real dataset; the hypotheses and experiment options are pre-registered.';
 
   return (
     <div className="investigation">
@@ -393,13 +401,34 @@ export function Investigation({
               {
                 [
                   <StorySection index={0} ready waiting="">
-                    <QuestionChapter question={view.objective || REFERENCE_QUESTION} />
+                    <QuestionChapter
+                      question={view.objective || REFERENCE_QUESTION}
+                      {...(papersMode && view.source
+                        ? {
+                            stamp: 'User-supplied papers · parsed evidence',
+                            chips: view.source.papers.map(
+                              (paper, index) =>
+                                [
+                                  'file',
+                                  `${index === 0 ? 'A' : 'B'} · ${paper.meta.title.slice(0, 44)}${paper.meta.title.length > 44 ? '…' : ''}`,
+                                ] as ['file', string],
+                            ),
+                            scope: view.scope ?? undefined,
+                          }
+                        : {})}
+                    />
                   </StorySection>,
                   <StorySection index={1} ready={ready(1)} waiting={waiting}>
                     <EvidenceChapter evidence={evidence} />
                   </StorySection>,
                   <StorySection index={2} ready={ready(2)} waiting={waiting}>
-                    <ContradictionChapter canTrace={stage >= 2} onTrace={() => findObject('contradiction')} />
+                    <ContradictionChapter
+                      canTrace={stage >= 2}
+                      onTrace={() => findObject('contradiction')}
+                      papers={papersMode}
+                      evidence={evidence}
+                      contradiction={contradiction}
+                    />
                   </StorySection>,
                   <StorySection index={3} ready={ready(3)} waiting={waiting}>
                     <HypothesesChapter
@@ -423,15 +452,28 @@ export function Investigation({
                     ready={ready(5)}
                     waiting={failed ? waiting : 'Unlocks after an experiment is approved and run.'}
                   >
-                    <ResultChapter
-                      result={result}
-                      updates={updates}
-                      status={view.status}
-                      events={view.events}
-                      openChallenges={followup ? [] : openChallenges}
-                      onInspect={() => findObject('result')}
-                      onNextMove={() => pick(6)}
-                    />
+                    {papersMode ? (
+                      <PapersResultChapter
+                        result={papersResult}
+                        updates={updates}
+                        status={view.status}
+                        events={view.events}
+                        openChallenges={openChallenges}
+                        nextLabel={decision?.next_experiment ?? 'a follow-up with comparable data'}
+                        onInspect={() => findObject('result')}
+                        onNextMove={() => pick(6)}
+                      />
+                    ) : (
+                      <ResultChapter
+                        result={result}
+                        updates={updates}
+                        status={view.status}
+                        events={view.events}
+                        openChallenges={followup ? [] : openChallenges}
+                        onInspect={() => findObject('result')}
+                        onNextMove={() => pick(6)}
+                      />
+                    )}
                   </StorySection>,
                   <StorySection
                     index={6}
@@ -443,6 +485,7 @@ export function Investigation({
                       followup={followup}
                       followupResult={followupResult}
                       openChallenge={openChallenges[0]}
+                      openChallenges={openChallenges}
                       resolvedChallenge={resolvedChallenge}
                       followupApproval={view.followup_approval}
                       metrics={view.metrics}
@@ -478,12 +521,21 @@ export function Investigation({
         <ApprovalDialog
           title={experimentTitle(pending.experiment)}
           question={pending.experiment.scientific_question}
-          details={[
-            `Data: ${dataset ? `${dataset.n_complete} of ${dataset.n_raw}` : 'all complete'} penguin records, checksum-verified`,
-            `${pending.experiment.bootstrap_samples} bootstrap resamples · seed ${pending.experiment.seed}`,
-            'Runs locally on this machine in a few seconds; no network calls',
-            'Your approval is recorded in the lab notebook and cannot be undone',
-          ]}
+          details={
+            papersMode && view?.source
+              ? [
+                  `Evidence: ${view.source.analysis.claims_a.length} + ${view.source.analysis.claims_b.length} claims extracted from 2 uploaded PDFs (SHA-256 checksummed)`,
+                  `${pending.experiment.bootstrap_samples} claim resamples · seed ${pending.experiment.seed}`,
+                  'Runs locally on this machine in a few seconds; no network calls',
+                  'Your approval is recorded in the lab notebook and cannot be undone',
+                ]
+              : [
+                  `Data: ${dataset ? `${dataset.n_complete} of ${dataset.n_raw}` : 'all complete'} penguin records, checksum-verified`,
+                  `${pending.experiment.bootstrap_samples} bootstrap resamples · seed ${pending.experiment.seed}`,
+                  'Runs locally on this machine in a few seconds; no network calls',
+                  'Your approval is recorded in the lab notebook and cannot be undone',
+                ]
+          }
           busy={busy}
           onConfirm={() => approve(pending.experiment.experiment_id)}
           onClose={() => setPending(null)}

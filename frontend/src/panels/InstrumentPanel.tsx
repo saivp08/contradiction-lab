@@ -3,7 +3,15 @@ import { ArrowRight, ArrowUpRight, Check, Clock3, Download, ShieldCheck } from '
 import { DecompositionChart, Scatter } from '../Plots';
 import { ResearchGraph } from '../ResearchGraph';
 import { fmt, signed } from '../lib';
-import type { Decomposition, LabObject, Point, RecordData, Result } from '../types';
+import type {
+  Decomposition,
+  LabObject,
+  PapersResult,
+  PapersSource,
+  Point,
+  RecordData,
+  Result,
+} from '../types';
 import { Empty } from '../ui';
 
 const TABS = ['Arena', 'Data', 'Lineage', 'Activity'] as const;
@@ -134,6 +142,7 @@ export function InstrumentPanel({
   onSelect: (o: LabObject) => void;
   arena: ReactNode;
 }) {
+  const source = record?.source ?? null;
   const [tab, setTab] = useState<Tab>('Arena');
   const results = Object.values(record?.objects ?? {});
   const result = results.find((o) => o.kind === 'result')?.data as Result | undefined;
@@ -156,7 +165,16 @@ export function InstrumentPanel({
       </div>
       <div className="panel-body" role="tabpanel" aria-label={tab}>
         {tab === 'Arena' && arena}
-        {tab === 'Data' && (
+        {tab === 'Data' && source?.kind === 'papers' && (
+          <PapersData
+            source={source}
+            result={
+              Object.values(record?.objects ?? {}).find((o) => o.kind === 'result')?.data as
+                PapersResult | undefined
+            }
+          />
+        )}
+        {tab === 'Data' && source?.kind !== 'papers' && (
           <>
             <KeyNumbers result={result} points={points} />
             {followup && (
@@ -191,5 +209,78 @@ export function InstrumentPanel({
           ))}
       </div>
     </aside>
+  );
+}
+
+/** Data tab for paper comparisons: parsed metadata, claim counts and the contested quotes. */
+function PapersData({ source, result }: { source: PapersSource; result?: PapersResult }) {
+  const analysis = source.analysis;
+  const best = analysis.best_pair;
+  const quotes = result
+    ? [
+        [result.top_pair.quote_a, result.top_pair.location_a],
+        [result.top_pair.quote_b, result.top_pair.location_b],
+      ]
+    : best
+      ? [
+          [
+            analysis.claims_a[best.a].text,
+            `p. ${analysis.claims_a[best.a].page} · ${analysis.claims_a[best.a].section}`,
+          ],
+          [
+            analysis.claims_b[best.b].text,
+            `p. ${analysis.claims_b[best.b].page} · ${analysis.claims_b[best.b].section}`,
+          ],
+        ]
+      : [];
+  return (
+    <>
+      <div className="key-numbers">
+        <div>
+          <span>Extracted claims</span>
+          <strong>
+            {analysis.claims_a.length}+{analysis.claims_b.length}
+          </strong>
+          <small>with page-level provenance</small>
+        </div>
+        <div>
+          <span>Relationship</span>
+          <strong className="relationship-word">{source.relationship}</strong>
+          <small>
+            {result
+              ? `disagreement rate ${Math.round(result.disagreement_rate * 100)}%`
+              : 'audit pending approval'}
+          </small>
+        </div>
+      </div>
+      {source.papers.map((paper, index) => (
+        <div className="panel-block" key={paper.id}>
+          <span className="eyebrow">PAPER {index === 0 ? 'A' : 'B'}</span>
+          <h3>{paper.meta.title}</h3>
+          <p className="caption">
+            {(paper.meta.authors.length ? paper.meta.authors.join(', ') : 'Authors not extracted') +
+              ` · ${paper.meta.year ?? 'year unknown'} · ${paper.pages} pages` +
+              (paper.meta.doi ? ` · DOI ${paper.meta.doi}` : ' · no DOI found') +
+              (paper.sample_size ? ` · n = ${paper.sample_size}` : '')}
+          </p>
+          {quotes[index] && (
+            <blockquote className="quote-card">
+              “{quotes[index][0]}”<footer>{quotes[index][1]}</footer>
+            </blockquote>
+          )}
+        </div>
+      ))}
+      {analysis.condition_differences.length > 0 && (
+        <div className="panel-block">
+          <h3>What differs</h3>
+          {analysis.condition_differences.map((difference) => (
+            <p className="caption" key={difference.field}>
+              <strong>{difference.field}:</strong> {difference.a} · {difference.b}
+            </p>
+          ))}
+        </div>
+      )}
+      <p className="caption">{source.engine}.</p>
+    </>
   );
 }

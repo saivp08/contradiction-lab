@@ -1,9 +1,11 @@
+import hashlib
 import threading
 from datetime import datetime
 from time import perf_counter
 
-from backend import science, store
+from backend import paper_science, science, store
 from backend.models import AgentAnnotation, Experiment, Hypothesis, NewInvestigation
+from experiments.papers_analysis import compute_papers
 from experiments.penguins import compute, load_data
 
 LOCKS: dict[str, threading.RLock] = {}
@@ -27,9 +29,38 @@ def lock_for(identifier: str):
 
 
 def create(request: NewInvestigation) -> dict:
+    source = None
+    objective = request.objective
+    if request.source_analysis:
+        if request.mode == "omnigent":
+            raise ValueError(
+                "Paper-comparison investigations currently run with the local deterministic specialists; "
+                "Omnigent mode remains tied to the reference case study."
+            )
+        analysis = store.load_analysis(request.source_analysis)
+        if not analysis.get("defensible_contradiction") or "evidence" not in analysis:
+            raise ValueError(
+                "The paper analysis found no defensible contradiction; an investigation will not be fabricated."
+            )
+        objective = paper_science.objective(analysis)
+        source = {
+            "kind": "papers",
+            "analysis_id": analysis["analysis_id"],
+            "engine": analysis["engine"],
+            "papers": [
+                {
+                    **{k: p[k] for k in ("id", "filename", "pages", "meta", "sections")},
+                    "sample_size": p.get("sample_size"),
+                }
+                for p in analysis["papers"]
+            ],
+            "relationship": analysis["relationship"],
+            "analysis": analysis,
+            "evidence": analysis["evidence"],
+        }
     record = {
         "id": store.uid("lab"),
-        "objective": request.objective,
+        "objective": objective,
         "label": request.label,
         "reference_question": "Why does the bill length–depth association reverse across aggregation choices?",
         "scope": "Reference investigation only. The dataset, variables and question are fixed; the optional label is for the user.",
@@ -44,7 +75,13 @@ def create(request: NewInvestigation) -> dict:
         "metrics": {},
         "error": None,
     }
-    store.add(record, "question", {"objective": request.objective, "scope": record["scope"]}, [])
+    if source:
+        record["source"] = source
+        record["scope"] = (
+            "Comparison of two user-supplied papers via extracted text evidence; "
+            "the computational experiments quantify extraction robustness, not either paper's truth."
+        )
+    store.add(record, "question", {"objective": objective, "scope": record["scope"]}, [])
     store.save(record)
     return record
 
@@ -57,19 +94,33 @@ def advance(identifier: str, role: str, rationale: str = "", candidates: list[di
         expected = ROLES[record["stage"]]
         if role != expected:
             raise ValueError(f"Invalid handoff: expected {expected}, received {role}")
+        papers_mode = record.get("source", {}).get("kind") == "papers"
+        paper_analysis = record.get("source", {}).get("analysis") if papers_mode else None
         if record["mode"] == "omnigent":
             AgentAnnotation(rationale=rationale)
         started = perf_counter()
         inputs, outputs = [], []
         if role == "LiteratureAgent":
             inputs = [store.by_kind(record, "question")[0]["id"]]
-            evidence = science.retrieve_evidence()
-            for row in evidence:
-                outputs.append(store.add(record, "evidence", row.model_dump(mode="json"), inputs))
-            action, tool = (
-                f"Retrieved {len(evidence)} curated claims from 1 cited article; offline reference catalog.",
-                "retrieve_evidence",
-            )
+            if papers_mode:
+                for row in record["source"]["evidence"]:
+                    outputs.append(store.add(record, "evidence", row, inputs))
+                papers_meta = record["source"]["papers"]
+                action, tool = (
+                    f"Parsed {len(papers_meta)} uploaded PDFs "
+                    f"({sum(p['pages'] for p in papers_meta)} pages); extracted "
+                    f"{len(paper_analysis['claims_a']) + len(paper_analysis['claims_b'])} candidate claims; "
+                    "selected the top aligned pair with page-level provenance.",
+                    "ingest_papers",
+                )
+            else:
+                evidence = science.retrieve_evidence()
+                for row in evidence:
+                    outputs.append(store.add(record, "evidence", row.model_dump(mode="json"), inputs))
+                action, tool = (
+                    f"Retrieved {len(evidence)} curated claims from 1 cited article; offline reference catalog.",
+                    "retrieve_evidence",
+                )
         elif role == "ContradictionAgent":
             evidence = store.by_kind(record, "evidence")
             inputs = [e["id"] for e in evidence]
@@ -82,7 +133,7 @@ def advance(identifier: str, role: str, rationale: str = "", candidates: list[di
                 record["status"] = "no_contradiction"
         elif role == "HypothesisAgent":
             inputs = [store.by_kind(record, "contradiction")[0]["id"]]
-            rows = science.hypotheses(False)
+            rows = paper_science.hypotheses(paper_analysis) if papers_mode else science.hypotheses(False)
             if record["mode"] == "omnigent":
                 if candidates is None:
                     raise ValueError("Omnigent must supply structured AI-generated hypotheses")
@@ -100,7 +151,11 @@ def advance(identifier: str, role: str, rationale: str = "", candidates: list[di
             )
         elif role == "ExperimentPlanner":
             inputs = [v["id"] for v in store.by_kind(record, "hypothesis")]
-            candidates = science.proposals(record["seed"])
+            candidates = (
+                paper_science.proposals(paper_analysis, record["seed"])
+                if papers_mode
+                else science.proposals(record["seed"])
+            )
             for row in candidates:
                 outputs.append(
                     store.add(record, "experiment", {**row.model_dump(), "planning_score": science.score(row)}, inputs)
@@ -108,7 +163,10 @@ def advance(identifier: str, role: str, rationale: str = "", candidates: list[di
             chosen = max(candidates, key=science.score)
             record["selected_experiment"] = chosen.experiment_id
             record["selection_rationale"] = (
-                "Species adjustment directly tests the differing aggregation condition. Weighted learning, discrimination, coverage, feasibility and cost scores favor it over year adjustment; scores are explicit heuristics."
+                "The robustness audit directly tests whether the detected disagreement survives resampling "
+                "and section exclusion; scores are explicit heuristics."
+                if papers_mode
+                else "Species adjustment directly tests the differing aggregation condition. Weighted learning, discrimination, coverage, feasibility and cost scores favor it over year adjustment; scores are explicit heuristics."
             )
             record["status"] = "awaiting_approval" if record["mode"] == "local" else "sponsor_preparing_approval"
             record["metrics"]["question_to_spec_seconds"] = (
@@ -141,30 +199,50 @@ def advance(identifier: str, role: str, rationale: str = "", candidates: list[di
             def progress(message):
                 store.event(record, role, message, [run_id], [], "scientific_python", status="running")
 
-            progress("Loading dataset")
-            frame, metadata = load_data()
-            progress("Validating schema")
-            result = compute(frame, spec.method, spec.seed, spec.bootstrap_samples, progress)
-            result["provenance"] = {
-                "dataset_sha256": metadata["sha256"],
-                "dataset": metadata,
-                "code_sha256": science.code_hash(),
-                "tool": "experiments.penguins.compute",
-                "timestamp": store.now(),
-                "parameters": spec.model_dump(),
-                "runtime": runtime_versions(),
-            }
+            if papers_mode:
+                progress("Loading extracted claims")
+                result = compute_papers(paper_analysis, spec.method, spec.seed, spec.bootstrap_samples, progress)
+                pdf_hashes = "+".join(p["id"] for p in record["source"]["papers"])
+                result["provenance"] = {
+                    "dataset_sha256": hashlib.sha256(pdf_hashes.encode()).hexdigest(),
+                    "dataset": {"papers": record["source"]["papers"], "pdf_sha256": pdf_hashes.split("+")},
+                    "code_sha256": paper_code_hash(),
+                    "tool": "experiments.papers_analysis.compute_papers",
+                    "timestamp": store.now(),
+                    "parameters": spec.model_dump(),
+                    "runtime": runtime_versions(),
+                }
+                counts = result["n_claims"]
+                action, tool = (
+                    f"Computed alignment robustness over {counts['a']} + {counts['b']} extracted claims with "
+                    f"{spec.bootstrap_samples} bootstrap resamples and section-exclusion sensitivity.",
+                    "experiments.papers_analysis.compute_papers",
+                )
+            else:
+                progress("Loading dataset")
+                frame, metadata = load_data()
+                progress("Validating schema")
+                result = compute(frame, spec.method, spec.seed, spec.bootstrap_samples, progress)
+                result["provenance"] = {
+                    "dataset_sha256": metadata["sha256"],
+                    "dataset": metadata,
+                    "code_sha256": science.code_hash(),
+                    "tool": "experiments.penguins.compute",
+                    "timestamp": store.now(),
+                    "parameters": spec.model_dump(),
+                    "runtime": runtime_versions(),
+                }
+                action, tool = (
+                    f"Computed real regression and {spec.bootstrap_samples} stratified bootstrap draws on {len(frame)} birds.",
+                    "experiments.penguins.compute",
+                )
             outputs = [store.add(record, "result", result, [run_id])]
             progress("Saving run artifact")
             record["metrics"]["compute_seconds"] = result["compute_seconds"]
-            action, tool = (
-                f"Computed real regression and {spec.bootstrap_samples} stratified bootstrap draws on {len(frame)} birds.",
-                "experiments.penguins.compute",
-            )
         elif role == "AnalysisAgent":
             result = store.by_kind(record, "result")[0]
             inputs = [result["id"]] + [v["id"] for v in store.by_kind(record, "hypothesis")]
-            updates = science.evaluate(result["data"])
+            updates = paper_science.evaluate(result["data"]) if papers_mode else science.evaluate(result["data"])
             outputs = [
                 store.add(
                     record,
@@ -185,7 +263,7 @@ def advance(identifier: str, role: str, rationale: str = "", candidates: list[di
             result = store.by_kind(record, "result")[0]
             analysis = store.by_kind(record, "analysis")[0]
             inputs = [result["id"], analysis["id"]]
-            challenges = science.critique(result["data"])
+            challenges = paper_science.critique(result["data"]) if papers_mode else science.critique(result["data"])
             outputs = [store.add(record, "critique", {"challenges": challenges}, inputs)]
             tally = {v: sum(c["verdict"] == v for c in challenges) for v in ("rebutted", "stands", "open")}
             action, tool = (
@@ -198,7 +276,11 @@ def advance(identifier: str, role: str, rationale: str = "", candidates: list[di
             analysis = store.by_kind(record, "analysis")[0]
             critique = store.by_kind(record, "critique")[0]
             inputs = [result["id"], analysis["id"], critique["id"]]
-            decision = science.decide(result["data"], analysis["data"]["updates"], critique["data"]["challenges"])
+            decision = (
+                paper_science.decide(result["data"], analysis["data"]["updates"], critique["data"]["challenges"])
+                if papers_mode
+                else science.decide(result["data"], analysis["data"]["updates"], critique["data"]["challenges"])
+            )
             outputs = [store.add(record, "decision", decision, inputs)]
             action, tool = "Research plan updated: " + decision["next_decision"], "choose_next_decision"
             record["metrics"]["result_to_decision_seconds"] = (
@@ -281,6 +363,14 @@ def challenge_metrics(record: dict) -> dict:
     }
 
 
+def paper_code_hash() -> str:
+    from pathlib import Path as _Path
+
+    return hashlib.sha256(
+        (_Path(__file__).resolve().parents[1] / "experiments" / "papers_analysis.py").read_bytes()
+    ).hexdigest()
+
+
 def runtime_versions():
     import platform
     import numpy
@@ -327,6 +417,11 @@ def run_followup(identifier: str, actor: str = "local human operator") -> dict:
         record = store.get(identifier)
         if record["status"] != "complete":
             raise ValueError("Follow-up requires a completed investigation")
+        if record.get("source", {}).get("kind") == "papers":
+            raise ValueError(
+                "Follow-up execution needs an executable dataset; a paper comparison records the proposed "
+                "next experiment without running it."
+            )
         if record.get("followup_approval"):
             raise ValueError("Follow-up has already been run")
         decision = store.by_kind(record, "decision")[0]

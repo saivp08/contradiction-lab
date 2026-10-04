@@ -42,7 +42,12 @@ function InvestigationCard({ item }: { item: Summary }) {
             {item.mode === 'omnigent' ? 'AI agents' : 'Rule-based'}
           </span>
         </div>
-        <h3>{item.label || `Investigation ${item.id.slice(-6)}`}</h3>
+        <h3>
+          {item.label ||
+            (item.papers
+              ? `${item.papers.titles[0].slice(0, 34)}… vs ${item.papers.titles[1].slice(0, 34)}…`
+              : `Investigation ${item.id.slice(-6)}`)}
+        </h3>
         {item.result ? (
           <div className="run-card-result">
             <MiniSlopes
@@ -60,6 +65,17 @@ function InvestigationCard({ item }: { item: Summary }) {
                 {item.result.group}-adjusted · n = {item.result.n}
                 {item.followup && ` · follow-up ${signed(item.followup.adjusted_slope)}`}
               </small>
+            </div>
+          </div>
+        ) : item.paper_result ? (
+          <div className="run-card-result">
+            <div>
+              <strong>
+                <span className={item.paper_result.robust_disagreement ? 'mint' : 'coral'}>
+                  {Math.round(item.paper_result.disagreement_rate * 100)}%
+                </span>
+              </strong>
+              <small>disagreement rate · {item.papers?.relationship ?? 'paper comparison'}</small>
             </div>
           </div>
         ) : (
@@ -171,9 +187,12 @@ export function Home({
                 Watch the recorded demo
               </button>
             )}
+            <button className="text-button" onClick={() => navigate({ page: 'compare' })}>
+              Compare two papers
+              <ArrowRight size={15} />
+            </button>
             <button className="text-button" onClick={onNew}>
               Name the run first
-              <ArrowRight size={15} />
             </button>
           </div>
         </div>
@@ -223,8 +242,11 @@ export function Home({
                 />
               </label>
             )}
+            <button className="button" onClick={() => navigate({ page: 'compare' })}>
+              Compare two papers…
+            </button>
             <button className="button" onClick={onNew}>
-              New investigation…
+              New reference run…
             </button>
           </div>
         </div>
