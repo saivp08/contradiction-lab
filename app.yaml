@@ -1,0 +1,8 @@
+command: ["python", "scripts/run.py"]
+env:
+  - name: ANTHROPIC_API_KEY
+    valueFrom: anthropic-api-key
+  - name: CLAUDE_MODEL
+    value: claude-opus-5-5
+  - name: AGENT_MODE
+    value: model

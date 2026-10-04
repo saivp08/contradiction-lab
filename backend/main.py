@@ -3,6 +3,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request, UploadFile
@@ -20,9 +21,12 @@ app = FastAPI(title="Contradiction Lab", version="1.0.0")
 @app.middleware("http")
 async def local_security(request: Request, call_next):
     origin = request.headers.get("origin")
+    served_from = {request.headers.get("x-forwarded-host"), request.headers.get("host")} - {None}
+    same_origin = origin and urlparse(origin).netloc in served_from
     if (
         request.method in {"POST", "PUT", "DELETE", "PATCH"}
         and origin
+        and not same_origin
         and origin
         not in {f"http://localhost:{os.getenv('LAB_PORT', '8000')}",
                 f"http://127.0.0.1:{os.getenv('LAB_PORT', '8000')}",
@@ -50,9 +54,11 @@ async def invalid(request, error):
 
 @app.get("/api/health")
 def health():
-    installed = importlib.util.find_spec("omnigent") is not None
-    configured = bool(os.getenv("OPENAI_API_KEY"))
+    claude = bool(os.getenv("ANTHROPIC_API_KEY")) and importlib.util.find_spec("anthropic") is not None
+    installed = claude or importlib.util.find_spec("omnigent") is not None
+    configured = claude or bool(os.getenv("OPENAI_API_KEY"))
     return {
+        "agent_provider": "claude" if claude else ("openai" if configured else None),
         "status": "ok",
         "default_mode": default_mode(),
         "omnigent_installed": installed,
@@ -124,7 +130,7 @@ def analyze_papers(request: PaperPair, background: BackgroundTasks):
     report = papers.analyze(loaded[0], loaded[1])
     if request.mode == 'omnigent':
         if not health()['omnigent_ready']:
-            raise HTTPException(503, 'Model mode requires Omnigent and OPENAI_API_KEY; no fallback was run.')
+            raise HTTPException(503, 'Model mode requires ANTHROPIC_API_KEY; no fallback was run.')
         # Rule-based output is preprocessing only; model context does not expose its conclusion.
         report['source_documents'] = loaded
         report['analysis_id'] = store.uid('analysis')
@@ -145,7 +151,7 @@ def new(request: NewInvestigation, background: BackgroundTasks):
     if request.mode == "omnigent" and not health()["omnigent_ready"]:
         raise HTTPException(
             503,
-            "Omnigent requires the official package and OPENAI_API_KEY. Configure them or explicitly select local development mode.",
+            "Model agents require ANTHROPIC_API_KEY in .env. Configure it or explicitly select local development mode.",
         )
     record = workflow.create(request)
     background.add_task(launch, record["id"])

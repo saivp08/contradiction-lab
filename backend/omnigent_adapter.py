@@ -6,20 +6,24 @@ import os
 from datetime import datetime
 from pathlib import Path
 from backend import model_agents, store, workflow
-from backend.agent_provider import AgentProvider, OmnigentProvider
+from backend.agent_provider import AgentProvider, ClaudeProvider, OmnigentProvider, default_provider
 ROOT = Path(__file__).resolve().parents[1]
 
 async def run(identifier: str, provider: AgentProvider | None = None):
     try:
-        if not os.getenv('OPENAI_API_KEY') and provider is None:
-            raise ValueError('OPENAI_API_KEY is required')
-        version = importlib.metadata.version('omnigent')
-        if version != '0.16.0':
+        if provider is None and not (os.getenv('ANTHROPIC_API_KEY') or os.getenv('OPENAI_API_KEY')):
+            raise ValueError('ANTHROPIC_API_KEY is required')
+        provider = provider or default_provider()
+        claude = isinstance(provider, ClaudeProvider)
+        omnigent = isinstance(provider, OmnigentProvider)
+        version = importlib.metadata.version('anthropic' if claude else 'omnigent') if claude or omnigent else 'custom'
+        if omnigent and version != '0.16.0':
             raise ValueError('Expected validated Omnigent version 0.16.0')
-        provider = provider or OmnigentProvider()
+        adapter = f'Claude API, anthropic SDK {version}' if claude else 'official OpenAIAgentsSDKExecutor'
         record = store.get(identifier)
         phase = 'prepare' if record['stage'] < 4 else 'execute'
-        store.event(record, 'Omnigent', f'Starting {phase}: official Omnigent executor {version}',
+        store.event(record, 'Omnigent', f'Starting {phase}: {adapter}' if claude else
+                    f'Starting {phase}: official Omnigent executor {version}',
                     [], [], 'omnigent_executor', status='running')
         async with asyncio.timeout(int(os.getenv('OMNIGENT_TIMEOUT', '900'))):
             while role := model_agents.next_role(store.get(identifier)):
@@ -31,7 +35,7 @@ async def run(identifier: str, provider: AgentProvider | None = None):
         record = store.get(identifier)
         record.setdefault('omnigent_receipts', []).append({
             'version': version, 'phase': phase, 'returncode': 0,
-            'adapter': 'official OpenAIAgentsSDKExecutor',
+            'adapter': adapter, 'model': model_agents.provider_model(),
             'config_sha256': hashlib.sha256((ROOT / 'omnigent_config' / f'{phase}.yaml').read_bytes()).hexdigest(),
             'timestamp': store.now(),
         })

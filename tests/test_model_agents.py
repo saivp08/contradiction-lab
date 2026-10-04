@@ -164,3 +164,122 @@ def test_paper_provenance_exact_page_and_quote():
     rows[0]['provenance']['page'] = '999'
     with pytest.raises(ValueError, match='exact passage'):
         agents.validate_evidence(r, rows)
+
+
+class FakeClaude:
+    """Scripted stand-in for anthropic.AsyncAnthropic; records each request. Not a live model."""
+
+    def __init__(self, replies):
+        self.replies, self.requests = list(replies), []
+        self.beta = type('Beta', (), {'messages': self})()
+
+    def stream(self, **kwargs):
+        from types import SimpleNamespace
+
+        self.requests.append(kwargs)
+        reply = self.replies.pop(0)
+
+        class Stream:
+            async def __aenter__(self):
+                return self
+
+            async def __aexit__(self, *exc):
+                return False
+
+            async def get_final_message(self):
+                usage = SimpleNamespace(input_tokens=10, output_tokens=5, cache_read_input_tokens=7,
+                                        cache_creation_input_tokens=3)
+                return SimpleNamespace(usage=usage, **reply)
+
+        return Stream()
+
+
+def tool_use(name, call_id, payload=None):
+    from types import SimpleNamespace
+
+    return SimpleNamespace(type='tool_use', name=name, id=call_id, input=payload or {})
+
+
+def test_claude_provider_runs_scoped_tools_and_labels_the_run(monkeypatch):
+    from backend.agent_provider import ClaudeProvider
+
+    monkeypatch.setenv('ANTHROPIC_API_KEY', 'unit-test-not-a-real-key')
+    monkeypatch.delenv('CLAUDE_MODEL', raising=False)
+    identifier = workflow.create(NewInvestigation(mode='omnigent'))['id']
+    evidence = [e.model_dump(mode='json') for e in science.retrieve_evidence()]
+    output = json.dumps({**base(), 'evidence': evidence})
+    client = FakeClaude([
+        {'stop_reason': 'tool_use', 'stop_details': None, 'content': [tool_use('read_context', 't1')]},
+        {'stop_reason': 'tool_use', 'stop_details': None,
+         'content': [tool_use('submit_artifact', 't2', {'output_json': output})]},
+    ])
+    agents.context(identifier, 'LiteratureAgent')
+    usage = asyncio.run(ClaudeProvider(client).execute(identifier, 'LiteratureAgent', 'prepare'))
+    assert usage == {'input_tokens': 20, 'output_tokens': 10, 'cache_read_input_tokens': 14,
+                     'cache_creation_input_tokens': 6, 'requests': 2}
+    first, second = client.requests
+    assert first['model'] == 'claude-opus-5-5' and first['fallbacks'] == 'default'
+    assert first['cache_control'] == {'type': 'ephemeral'}
+    assert first['betas'] == ['server-side-fallback-2026-07-01'] and 'tool_choice' not in first
+    assert {t['name'] for t in first['tools']} == {'read_context', 'submit_artifact'}
+    # Append-only history: the assistant turn is echoed back unchanged before the tool result.
+    assert second['messages'][1]['role'] == 'assistant' and second['messages'][2]['content'][0]['tool_use_id'] == 't1'
+    record = store.get(identifier)
+    execution = record['agent_executions'][0]
+    assert execution['provider'] == 'Claude API (anthropic SDK)' and execution['model'] == 'claude-opus-5-5'
+    assert execution['status'] == 'COMPLETED' and len(store.by_kind(record, 'evidence')) == len(evidence)
+
+
+def test_claude_refusal_fails_closed_without_fallback_artifacts(monkeypatch):
+    from types import SimpleNamespace
+
+    from backend.agent_provider import ClaudeProvider
+
+    monkeypatch.setenv('ANTHROPIC_API_KEY', 'unit-test-not-a-real-key')
+    identifier = workflow.create(NewInvestigation(mode='omnigent'))['id']
+    client = FakeClaude([{'stop_reason': 'refusal', 'stop_details': SimpleNamespace(category='bio'), 'content': []}])
+    asyncio.run(run(identifier, ClaudeProvider(client)))
+    record = store.get(identifier)
+    assert record['status'] == 'failed' and not store.by_kind(record, 'evidence')
+    assert 'declined' in record['agent_executions'][0]['error']
+
+
+def test_claude_agent_revises_a_rejected_artifact_and_rejections_are_recorded(monkeypatch):
+    from backend.agent_provider import ClaudeProvider
+
+    monkeypatch.setenv('ANTHROPIC_API_KEY', 'unit-test-not-a-real-key')
+    identifier = workflow.create(NewInvestigation(mode='omnigent'))['id']
+    evidence = [e.model_dump(mode='json') for e in science.retrieve_evidence()]
+    bad = json.dumps({**base(), 'evidence_ids': ['EV404'], 'evidence': evidence})
+    # Citing its own newly submitted evidence rows is a valid reference.
+    good = json.dumps({**base(), 'evidence_ids': [e['evidence_id'] for e in evidence], 'evidence': evidence})
+    client = FakeClaude([
+        {'stop_reason': 'tool_use', 'stop_details': None, 'content': [tool_use('read_context', 't1')]},
+        {'stop_reason': 'tool_use', 'stop_details': None, 'content': [tool_use('submit_artifact', 't2', {'output_json': bad})]},
+        {'stop_reason': 'tool_use', 'stop_details': None, 'content': [tool_use('submit_artifact', 't3', {'output_json': good})]},
+    ])
+    agents.context(identifier, 'LiteratureAgent')
+    asyncio.run(ClaudeProvider(client).execute(identifier, 'LiteratureAgent', 'prepare'))
+    results = [block for m in client.requests[-1]['messages'] if m['role'] == 'user' and isinstance(m['content'], list)
+               for block in m['content']]
+    feedback = next(block for block in results if block['tool_use_id'] == 't2')
+    assert feedback['is_error'] and 'Unknown evidence/artifact reference' in feedback['content']
+    execution = store.get(identifier)['agent_executions'][0]
+    assert execution['status'] == 'COMPLETED' and execution['rejections'] == [
+        'ValueError: Unknown evidence/artifact reference'
+    ]
+
+
+def test_claude_agent_fails_closed_after_three_rejections(monkeypatch):
+    from backend.agent_provider import ClaudeProvider
+
+    monkeypatch.setenv('ANTHROPIC_API_KEY', 'unit-test-not-a-real-key')
+    identifier = workflow.create(NewInvestigation(mode='omnigent'))['id']
+    bad = json.dumps({**base(), 'evidence': 'not a list'})
+    client = FakeClaude([{'stop_reason': 'tool_use', 'stop_details': None,
+                          'content': [tool_use('submit_artifact', f't{i}', {'output_json': bad})]} for i in range(3)])
+    asyncio.run(run(identifier, ClaudeProvider(client)))
+    record = store.get(identifier)
+    assert record['status'] == 'failed' and not store.by_kind(record, 'evidence')
+    error = record['agent_executions'][0]['error']
+    assert error.startswith('Output rejected: Schema validation failed: evidence') and 'not a list' not in error
