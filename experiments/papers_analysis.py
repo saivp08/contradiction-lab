@@ -10,16 +10,15 @@ from time import perf_counter
 
 import numpy as np
 
-from backend.papers import rank_pairs
+from backend.papers import is_comparable, rank_pairs
 
 METHODS = {"claim_alignment_audit", "condition_scan"}
 DISAGREEMENT_KINDS = {"opposed", "tension"}
-COMPARABLE_THRESHOLD = 0.18
 
 
-def _best_disagreement(claims_a: list[dict], claims_b: list[dict]) -> dict | None:
-    for pair in rank_pairs(claims_a, claims_b, limit=50):
-        if pair["kind"] in DISAGREEMENT_KINDS and pair["similarity"] >= COMPARABLE_THRESHOLD:
+def _best_disagreement(claims_a: list[dict], claims_b: list[dict], focus: list[str] | None) -> dict | None:
+    for pair in rank_pairs(claims_a, claims_b, limit=50, focus=focus):
+        if pair["kind"] in DISAGREEMENT_KINDS and is_comparable(pair):
             return pair
     return None
 
@@ -36,11 +35,12 @@ def compute_papers(
     started = perf_counter()
     rng = np.random.default_rng(seed)
     claims_a, claims_b = analysis["claims_a"], analysis["claims_b"]
+    focus = analysis.get("focus_terms")
     progress("Re-ranking aligned claim pairs")
-    pairs = rank_pairs(claims_a, claims_b, limit=50)
-    comparable = [p for p in pairs if p["similarity"] >= COMPARABLE_THRESHOLD]
+    pairs = rank_pairs(claims_a, claims_b, limit=50, focus=focus)
+    comparable = [p for p in pairs if is_comparable(p)]
     kinds = [p["kind"] for p in comparable]
-    top = _best_disagreement(claims_a, claims_b)
+    top = _best_disagreement(claims_a, claims_b, focus)
     if top is None:
         raise ValueError("No defensible disagreement pair exists in this analysis")
     claim_a, claim_b = claims_a[top["a"]], claims_b[top["b"]]
@@ -50,7 +50,7 @@ def compute_papers(
     for _ in range(draws):
         resample_a = [claims_a[i] for i in rng.integers(0, len(claims_a), len(claims_a))]
         resample_b = [claims_b[i] for i in rng.integers(0, len(claims_b), len(claims_b))]
-        best = _best_disagreement(resample_a, resample_b)
+        best = _best_disagreement(resample_a, resample_b, focus)
         if best is not None:
             found += 1
             similarities.append(best["similarity"])
@@ -65,7 +65,7 @@ def compute_papers(
     for section in sections:
         kept_a = [c for c in claims_a if c["section"] != section]
         kept_b = [c for c in claims_b if c["section"] != section]
-        best = _best_disagreement(kept_a, kept_b) if kept_a and kept_b else None
+        best = _best_disagreement(kept_a, kept_b, focus) if kept_a and kept_b else None
         sensitivity.append(
             {
                 "excluded_section": section,
@@ -111,6 +111,7 @@ def compute_papers(
         "condition_differences": analysis["condition_differences"],
         "robust_disagreement": bool(robust),
         "relationship": analysis["relationship"],
+        "topic": analysis.get("topic"),
         "bootstrap_samples": draws,
         "seed": seed,
         "compute_seconds": perf_counter() - started,

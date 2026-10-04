@@ -40,12 +40,12 @@ def compare(a: Evidence, b: Evidence) -> Contradiction:
     def describe(e: Evidence) -> str:
         if "null result" in str(e.experimental_conditions):
             return "no significant effect"
-        return f"{e.direction_of_effect} effect"
+        return f"a {e.direction_of_effect} effect"
 
     if strength == "none":
         conflicting = "No comparable directional conflict found."
     else:
-        conflicting = f"For {a.outcome}, source A reports a {describe(a)} while source B reports a {describe(b)}."
+        conflicting = f"For {a.outcome}, source A reports {describe(a)} while source B reports {describe(b)}."
     return Contradiction(
         contradiction_id="C1",
         evidence_a=a.evidence_id,
