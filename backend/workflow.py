@@ -252,12 +252,33 @@ def advance(identifier: str, role: str, rationale: str = "", candidates: list[di
                         datetime.fromisoformat(store.now()) - datetime.fromisoformat(record["created_at"])
                     ).total_seconds(),
                     "human_approvals": int(record["approval"]["actor"] == "local human operator"),
+                    "agent_handoffs": sum(
+                        1 for e in record["events"] if e["agent"] in ROLES and e["status"] == "complete"
+                    ),
+                    "followup_experiments": 0,
+                    **challenge_metrics(record),
                     "baseline": "No manual baseline measured; wall time includes approval wait.",
                 }
             )
             record["verified_sha256"] = store.scientific_digest(record)
             store.save(record)
         return record
+
+
+def challenge_metrics(record: dict) -> dict:
+    """Tally of critic challenges by their latest verdict; a follow-up may re-judge a challenge."""
+    latest = {
+        c["challenge_id"]: c["verdict"]
+        for critique in store.by_kind(record, "critique")
+        for c in critique["data"]["challenges"]
+    }
+    verdicts = list(latest.values())
+    return {
+        "challenges_raised": len(verdicts),
+        "challenges_rebutted": verdicts.count("rebutted"),
+        "challenges_open": verdicts.count("open"),
+        "challenges_partly_conceded": verdicts.count("partly conceded"),
+    }
 
 
 def runtime_versions():
@@ -370,6 +391,12 @@ def run_followup(identifier: str, actor: str = "local human operator") -> dict:
             "interpret_followup",
         )
         record["metrics"]["followup_compute_seconds"] = result["compute_seconds"]
+        record["metrics"]["followup_experiments"] = 1
+        record["metrics"]["human_approvals"] = record["metrics"].get("human_approvals", 1) + 1
+        record["metrics"]["agent_handoffs"] = sum(
+            1 for e in record["events"] if e["agent"] in ROLES and e["status"] == "complete"
+        )
+        record["metrics"].update(challenge_metrics(record))
         record["verified_sha256"] = store.scientific_digest(record)
         store.save(record)
         return record
