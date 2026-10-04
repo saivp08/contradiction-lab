@@ -27,6 +27,28 @@ CONTEXT_KINDS = {
 }
 
 
+def provider_name():
+    return 'Claude API (anthropic SDK)' if os.getenv('ANTHROPIC_API_KEY') else 'openai-agents via Omnigent'
+
+
+def provider_model():
+    if os.getenv('ANTHROPIC_API_KEY'):
+        return os.getenv('CLAUDE_MODEL', 'claude-opus-5-5')
+    return os.getenv('OMNIGENT_MODEL', 'gpt-4.1-mini')
+
+
+def expected_citation(paper):
+    """Citation fields an evidence row must carry for an uploaded paper: its own parsed metadata."""
+    meta = paper['meta']
+    return {
+        'title': meta['title'],
+        'authors': meta['authors'] or ['Author not extracted'],
+        'year': meta['year'],
+        'identifier': meta['doi'] or f"sha256:{paper['id'][:16]}",
+        'url': f"https://doi.org/{meta['doi']}" if meta['doi'] else None,
+    }
+
+
 def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, allow_nan=False).encode()).hexdigest()
 
@@ -65,6 +87,8 @@ def context(identifier, role):
                 e.model_dump(mode='json') for e in science.retrieve_evidence()]
             if len(json.dumps(data['sources'])) > 220_000:
                 raise ValueError('Paper text exceeds the model context budget; use shorter papers')
+            if papers:
+                data['required_citations'] = {p['id']: expected_citation(p) for p in data['sources']}
         if role == 'ExperimentPlanner':
             data['capabilities'] = {
                 'methods': ['claim_alignment_audit', 'condition_scan'] if papers else
@@ -80,8 +104,8 @@ def context(identifier, role):
         active = next((e for e in executions if e['role'] == role and e['status'] == 'THINKING'), None)
         if active is None:
             executions.append({'id': store.uid('execution'), 'role': role, 'status': 'THINKING',
-                               'started_at': store.now(), 'provider': 'openai-agents via Omnigent',
-                               'model': os.getenv('OMNIGENT_MODEL', 'gpt-4.1-mini'),
+                               'started_at': store.now(), 'provider': provider_name(),
+                               'model': provider_model(),
                                'input_ids': [o['id'] for o in objects], 'input_sha256': digest(data),
                                'input_summary': f"{len(objects)} scoped artifacts; {data['phase']}",
                                'input_snapshot': data,
@@ -127,20 +151,31 @@ def validate_evidence(record, rows):
         if len(quote) < 15 or row['claim'] != quote or not any(quote in p['text'] for p in passages):
             raise ValueError('Paper claim must be an exact passage at the cited page and section')
         citation = row['citation']
-        if citation['title'] != paper['meta']['title'] or citation['authors'] != (paper['meta']['authors'] or ['Author not extracted']):
-            raise ValueError('Citation metadata differs from the uploaded paper')
-        if citation['year'] != paper['meta']['year']:
-            raise ValueError('Citation year differs from the uploaded paper')
-        expected_identifier = paper['meta']['doi'] or f"sha256:{paper['id'][:16]}"
-        expected_url = f"https://doi.org/{paper['meta']['doi']}" if paper['meta']['doi'] else None
-        if citation['identifier'] != expected_identifier or citation['url'] != expected_url:
-            raise ValueError('Citation identifier differs from the uploaded paper')
+        for field, value in expected_citation(paper).items():
+            if citation.get(field) != value:
+                # Expected values are the uploaded paper's own metadata, already in the agent's context.
+                raise ValueError(f"{row['evidence_id']} citation.{field} must equal the uploaded paper's metadata: "
+                                 f"{json.dumps(value)[:160]}")
         seen.add(paper['id'])
     if seen != set(documents):
         raise ValueError('Evidence must cover both uploaded papers')
 
 
-def submit(identifier, role, output_json):
+class SubmissionRejected(ValueError):
+    """A specialist's artifact failed validation; nothing was persisted and the agent may revise it."""
+
+
+def rejection_reason(error):
+    from pydantic import ValidationError
+
+    if isinstance(error, ValidationError):
+        # Field locations and messages only; never echo the unvalidated model payload.
+        problems = ['.'.join(str(p) for p in e['loc']) + ': ' + e['msg'] for e in error.errors()[:6]]
+        return 'Schema validation failed: ' + '; '.join(problems)
+    return f'{type(error).__name__}: {error}'[:400]
+
+
+def submit(identifier, role, output_json, final=True):
     with workflow.lock_for(identifier):
         record = store.get(identifier)
         ensure_role(record, role)
@@ -154,9 +189,15 @@ def submit(identifier, role, output_json):
             return result
         except Exception as error:
             # Never persist raw provider exceptions or unvalidated model payloads.
+            reason = rejection_reason(error)
             record = store.get(identifier)
             execution = next(e for e in record['agent_executions'] if e['id'] == execution['id'])
-            execution.update(status='FAILED', completed_at=store.now(), error=f'Output rejected: {type(error).__name__}')
+            if not final and role != 'ExperimentRunner':
+                execution.setdefault('rejections', []).append(reason)
+                store.event(record, role, f'Artifact rejected by validator; revising: {reason}', execution['input_ids'],
+                            [], 'validated_submission', status='running')
+                raise SubmissionRejected(reason) from error
+            execution.update(status='FAILED', completed_at=store.now(), error=f'Output rejected: {reason}')
             record.update(status='failed', error=f'{role} output validation or execution failed; no fallback was run.')
             store.event(record, role, execution['error'], execution['input_ids'], [], 'validated_submission', status='failed')
             raise
@@ -166,6 +207,8 @@ def apply_output(record, role, output, execution):
     started = perf_counter()
     inputs = execution['input_ids']
     known = set(record['objects']) | {o['data'].get('evidence_id') for o in store.by_kind(record, 'evidence')}
+    if role == 'LiteratureAgent':
+        known |= {row['evidence_id'] for row in output.get('evidence', [])}
     if not set(output['evidence_ids']) <= known:
         raise ValueError('Unknown evidence/artifact reference')
     check_measurements(record, output)

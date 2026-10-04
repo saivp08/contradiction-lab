@@ -75,8 +75,11 @@ Copy `.env.example` to `.env` if needed. **No keys are needed for the local demo
 | `LAB_HOST` | `127.0.0.1`; local single-user application |
 | `LAB_PORT` | `8000` |
 | `LAB_DB` | `artifacts/lab.sqlite3`; persistent research record |
-| `OPENAI_API_KEY` | Required only for the supplied Omnigent openai-agents harness |
-| `OMNIGENT_MODEL` | `gpt-4.1-mini`; choose an accessible model supporting tools |
+| `ANTHROPIC_API_KEY` | Enables live model agents: each specialist runs on the Claude API with only its two scoped tools |
+| `CLAUDE_MODEL` | `claude-opus-5-5` |
+| `CLAUDE_EFFORT` | `medium`; Claude effort level (`low` … `max`) |
+| `OPENAI_API_KEY` | Legacy: used only when `ANTHROPIC_API_KEY` is unset, through the Omnigent openai-agents harness |
+| `OMNIGENT_MODEL` | `gpt-4.1-mini`; model for the legacy OpenAI path |
 
 The Omnigent integration is open source; Databricks credentials are not required for the supplied configuration. Managed Databricks execution needs separate workspace/model configuration; see [Omnigent setup](docs/OMNIGENT.md). Secrets remain backend-side and are excluded from exports.
 

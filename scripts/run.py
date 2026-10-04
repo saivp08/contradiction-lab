@@ -23,4 +23,7 @@ if __name__ == "__main__":
         record = json.loads(seed.read_text(encoding="utf-8"))
         if store.verify(record):
             store.save(record)
-    uvicorn.run("backend.main:app", host=os.getenv("LAB_HOST", "127.0.0.1"), port=int(os.getenv("LAB_PORT", "8000")))
+    platform_port = os.getenv("DATABRICKS_APP_PORT")
+    host = os.getenv("LAB_HOST") or ("0.0.0.0" if platform_port else "127.0.0.1")
+    port = int(os.getenv("LAB_PORT") or platform_port or "8000")
+    uvicorn.run("backend.main:app", host=host, port=port, proxy_headers=True, forwarded_allow_ips="*")
