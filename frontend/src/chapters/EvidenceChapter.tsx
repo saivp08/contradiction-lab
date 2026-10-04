@@ -8,10 +8,10 @@ export function EvidenceChapter({ evidence }: { evidence: Evidence[] }) {
     <section>
       <SectionHeading
         eyebrow="02 / SOURCE EVIDENCE"
-        title="A contradiction hiding in plain sight"
+        title="What each paper actually says"
         aside={
           <Tag>
-            {sources} source{sources === 1 ? '' : 's'} · {evidence.length} contexts
+            {sources} source{sources === 1 ? '' : 's'} · {evidence.length} claims
           </Tag>
         }
       />
@@ -50,10 +50,10 @@ export function EvidenceChapter({ evidence }: { evidence: Evidence[] }) {
       <div className="conflict-band">
         <span className="conflict-symbol">≠</span>
         <div>
-          <strong>Same measurements. Opposite associations.</strong>
+          <strong>Same question. Different answers.</strong>
           <p>
-            {sources === 1 ? 'One published source' : `${sources} published sources`}, {evidence.length}{' '}
-            analysis contexts.
+            {sources === 1 ? 'One uploaded paper' : `${sources} uploaded papers`}, {evidence.length} quoted
+            claims with page-level provenance.
           </p>
         </div>
       </div>

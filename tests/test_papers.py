@@ -106,8 +106,6 @@ def test_full_workflow_runs_on_uploaded_papers(caffeine_pair):
     decision = store.by_kind(record, "decision")[0]["data"]
     assert "X5" in decision["open_challenges"]
     assert store.verify(record) and record["metrics"]["challenges_open"] >= 1
-    with pytest.raises(ValueError, match="executable dataset"):
-        workflow.run_followup(record["id"])
     # Determinism: identical seeds reproduce identical numbers.
     from experiments.papers_analysis import compute_papers
 
@@ -166,7 +164,7 @@ def test_api_upload_analyze_and_investigate(client):
     finished = client.get(f"/api/investigations/{identifier}").json()
     assert finished["status"] == "complete"
     assert client.get(f"/api/investigations/{identifier}/replay").json()["replay_verified"]
-    assert client.post(f"/api/investigations/{identifier}/followup", json={"approved": True}).status_code == 409
+    assert client.post(f"/api/investigations/{identifier}/followup", json={"approved": True}).status_code == 404
     listing = client.get("/api/investigations").json()
     row = next(r for r in listing if r["id"] == identifier)
     assert row["papers"]["relationship"] == "context-dependent disagreement"

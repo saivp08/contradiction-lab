@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from backend import store, workflow
-from backend.models import Approval, FollowupApproval, NewInvestigation, PaperPair, default_mode
+from backend.models import Approval, NewInvestigation, PaperPair, default_mode
 
 ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT / ".env")
@@ -65,7 +65,6 @@ def health():
         "omnigent_configured": configured,
         "omnigent_ready": installed and configured,
         "local_mode": "Deterministic scientific tools; no LLM or sponsor orchestration",
-        "reference": "Palmer Penguins: contextual aggregation reversal",
     }
 
 
@@ -186,11 +185,6 @@ async def stream(identifier: str):
     return StreamingResponse(updates(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"})
 
 
-@app.post("/api/investigations/{identifier}/followup")
-def followup(identifier: str, request: FollowupApproval):
-    return workflow.run_followup(identifier)
-
-
 @app.post("/api/investigations/{identifier}/approve")
 def approve(identifier: str, request: Approval, background: BackgroundTasks):
     record = workflow.approve(identifier, request.experiment_id)
@@ -216,23 +210,6 @@ def replay(identifier: str):
     if record["status"] != "complete" or not store.verify(record):
         raise HTTPException(409, "Replay rejected: completed record checksum verification failed")
     return {**record, "display_mode": "replay", "replay_verified": True}
-
-
-@app.get("/api/reference")
-def reference():
-    from backend.science import retrieve_evidence
-    from experiments.penguins import load_data
-
-    frame, metadata = load_data()
-    points = [
-        {"x": float(row.bill_length_mm), "y": float(row.bill_depth_mm), "species": row.species, "year": int(row.year)}
-        for row in frame.itertuples()
-    ]
-    return {
-        "dataset": metadata,
-        "evidence": [v.model_dump(mode="json") for v in retrieve_evidence()],
-        "points": points,
-    }
 
 
 if (ROOT / "frontend/dist/assets").exists():

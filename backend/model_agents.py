@@ -81,24 +81,17 @@ def context(identifier, role):
         data = {'investigation_id': identifier, 'objective': record['objective'], 'objects': objects,
                 'approval': record['approval'], 'phase': 'preflight' if record['status'] == 'verifying_plan' else 'scientific',
                 'schema': SCHEMAS[role].model_json_schema(), 'responsibility': RESPONSIBILITIES[role]}
-        papers = record.get('source', {}).get('kind') == 'papers'
         if role == 'LiteratureAgent':
-            data['sources'] = record['source']['analysis']['source_documents'] if papers else [
-                e.model_dump(mode='json') for e in science.retrieve_evidence()]
+            data['sources'] = record['source']['analysis']['source_documents']
             if len(json.dumps(data['sources'])) > 220_000:
                 raise ValueError('Paper text exceeds the model context budget; use shorter papers')
-            if papers:
-                data['required_citations'] = {p['id']: expected_citation(p) for p in data['sources']}
+            data['required_citations'] = {p['id']: expected_citation(p) for p in data['sources']}
         if role == 'ExperimentPlanner':
             data['capabilities'] = {
-                'methods': ['claim_alignment_audit', 'condition_scan'] if papers else
-                           ['species_adjustment', 'year_sensitivity', 'species_sex_year'],
-                'data': 'Extracted paper claims only; no shared primary dataset' if papers else
-                        'Palmer Penguins: bill_length_mm, bill_depth_mm, species, sex, year; missing rows excluded',
+                'methods': ['claim_alignment_audit', 'condition_scan'],
+                'data': 'Extracted paper claims only; no shared primary dataset',
                 'seed': record['seed'], 'bootstrap_samples': '100..2000',
-                'procedures': 'Text overlap bootstrap and section exclusion' if papers else
-                              'OLS bill_depth_mm on bill_length_mm, with method-specific covariates; '
-                              'stratified bootstrap, year exclusion, BIC and slope decomposition',
+                'procedures': 'Text overlap bootstrap and section exclusion',
             }
         executions = record.setdefault('agent_executions', [])
         active = next((e for e in executions if e['role'] == role and e['status'] == 'THINKING'), None)
@@ -130,14 +123,7 @@ def check_measurements(record, output):
 def validate_evidence(record, rows):
     if len({r['evidence_id'] for r in rows}) != len(rows):
         raise ValueError('Duplicate evidence IDs')
-    source = record.get('source')
-    if not source:
-        catalog = {e.evidence_id: e.model_dump(mode='json') for e in science.retrieve_evidence()}
-        for row in rows:
-            original = catalog.get(row['evidence_id'])
-            if not original or row['claim'] != original['claim'] or row['citation'] != original['citation']:
-                raise ValueError('Reference claim/citation must match the supplied catalog')
-        return
+    source = record['source']
     documents = {p['id']: p for p in source['analysis']['source_documents']}
     seen = set()
     for row in rows:
@@ -273,8 +259,7 @@ def apply_output(record, role, output, execution):
             row['agent_generated'] = True
             outputs.append(store.add(record, 'hypothesis', row, inputs))
     elif role == 'ExperimentPlanner':
-        allowed = {'claim_alignment_audit', 'condition_scan'} if record.get('source') else {
-            'species_adjustment', 'year_sensitivity', 'species_sex_year'}
+        allowed = {'claim_alignment_audit', 'condition_scan'}
         hypotheses = {h['data']['hypothesis_id'] for h in store.by_kind(record, 'hypothesis')}
         ids = [e['experiment_id'] for e in output['experiments']]
         if len(set(ids)) != len(ids) or output['selected_experiment'] not in ids:

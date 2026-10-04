@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FastForward, Play, RotateCcw } from 'lucide-react';
-import { objects, type FollowupDecision, type Hypothesis, type RecordData, type Update } from '../types';
+import { objects, type Hypothesis, type RecordData, type Update } from '../types';
 import { AGENTS, agentOf, beatDuration, type AgentId, type Beat, type Challenge } from './beats';
 
 const W = 640,
@@ -122,11 +122,8 @@ function Seat({ id, state }: { id: AgentId; state: 'idle' | 'done' | 'active' | 
 function Board({ record }: { record: RecordData | null }) {
   const hypotheses = objects<Hypothesis>(record, 'hypothesis');
   const updates = objects<{ updates: Update[] }>(record, 'analysis')[0]?.updates;
-  const followup = objects<FollowupDecision>(record, 'followup_decision')[0];
   const support = (h: Hypothesis) =>
-    followup?.hypothesis_id === h.hypothesis_id
-      ? followup.updated_support
-      : (updates?.find((u) => u.hypothesis_id === h.hypothesis_id)?.updated_support ?? h.support_score);
+    updates?.find((u) => u.hypothesis_id === h.hypothesis_id)?.updated_support ?? h.support_score;
   return (
     <g className="board">
       <rect x={150} y={112} width={340} height={156} rx={8} />
