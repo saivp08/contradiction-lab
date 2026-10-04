@@ -2006,37 +2006,54 @@ meter::-webkit-meter-optimum-value {
     stroke 0.25s,
     fill 0.25s;
 }
-.seat text {
-  fill: #6f7d80;
-  transition: fill 0.25s;
+.seat-label {
+  box-sizing: border-box;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 8px;
+  min-width: 0;
+  overflow: hidden;
+  color: #6f7d80;
+  transition: color 0.25s;
 }
-.seat .initials {
+.seat-label.centered {
+  justify-content: center;
+  padding: 0 6px;
+}
+.seat-initials {
+  flex-shrink: 0;
   font: 600 10px var(--mono);
   letter-spacing: 0.5px;
 }
-.seat .name {
+.seat-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font: 500 12px var(--sans);
 }
 .seat.done rect {
   stroke: #a6d8c34d;
 }
-.seat.done text {
-  fill: #b9c8c3;
+.seat.done .seat-label {
+  color: #b9c8c3;
 }
-.seat.done .initials {
-  fill: var(--mint);
+.seat.done .seat-initials {
+  color: var(--mint);
 }
 .seat.active rect {
   fill: #18241f;
   stroke: #e9e4d8;
   stroke-width: 1.4;
 }
-.seat.active text {
-  fill: #f3efe6;
+.seat.active .seat-label {
+  color: #f3efe6;
 }
-.seat.critic.done .initials,
-.seat.critic.active .initials {
-  fill: var(--coral);
+.seat.critic.done .seat-initials,
+.seat.critic.active .seat-initials {
+  color: var(--coral);
 }
 .seat.critic.active rect {
   stroke: var(--coral);
@@ -2050,8 +2067,8 @@ meter::-webkit-meter-optimum-value {
   stroke-dasharray: none;
   fill: #2a2112;
 }
-.seat.human.waiting text {
-  fill: var(--amber);
+.seat.human.waiting .seat-label {
+  color: var(--amber);
 }
 .seat.human.waiting rect,
 .seat .ripple {
@@ -2096,9 +2113,13 @@ meter::-webkit-meter-optimum-value {
   font: 13px var(--serif);
   fill: #cfd8d4;
 }
-.board .statement {
-  font: 11px var(--sans);
-  fill: #a9b6b3;
+.board-statement {
+  font: 11px/16px var(--sans);
+  color: #a9b6b3;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .board .track {
   fill: #ffffff12;
@@ -2191,7 +2212,9 @@ meter::-webkit-meter-optimum-value {
   gap: 6px;
 }
 .challenge {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
   padding: 8px 9px 9px;
   border: 1px solid #ffffff1a;
   border-radius: 5px;
@@ -2203,15 +2226,16 @@ meter::-webkit-meter-optimum-value {
   color: var(--coral);
 }
 .challenge p {
-  margin: 4px 0 18px;
+  flex: 1;
+  min-width: 0;
+  margin: 4px 0 10px;
   font-size: 11.5px;
   line-height: 1.35;
   color: #b7c2c0;
 }
 .challenge b {
-  position: absolute;
-  left: 9px;
-  bottom: 7px;
+  margin-top: auto;
+  align-self: flex-start;
   font: 600 9.5px var(--mono);
   letter-spacing: 1.2px;
   text-transform: uppercase;
@@ -2271,6 +2295,8 @@ meter::-webkit-meter-optimum-value {
   color: #c9d5d1;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .transcript p {
   margin: 0;

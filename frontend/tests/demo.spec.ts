@@ -61,6 +61,33 @@ test('debate: dashboard → arena playback → approval → critic → follow-up
   await expect(gap).toContainText('CRITIC FOUND A GAP');
   await expect(gap).toContainText('unresolved');
   await noCardOverflow(page);
+
+  // Stress: an absurdly long unbroken agent output must stay inside its rectangle and stay readable.
+  const LONG = 'Confounderhypothesiswithoutanyspaces'.repeat(9) + '-sha256:' + 'f'.repeat(64);
+  await page.evaluate((text) => {
+    for (const sel of [
+      '.challenge p',
+      '.gap-body h3 em',
+      '.transcript .line p',
+      '.seat-name',
+      '.board-statement',
+    ])
+      for (const el of Array.from(document.querySelectorAll<HTMLElement>(sel)).slice(0, 1))
+        el.textContent = text;
+  }, LONG);
+  expect(await noHorizontalScroll(page)).toBeTruthy();
+  await noCardOverflow(page);
+  // Seat names and board statements clip with a real ellipsis inside their SVG rects.
+  expect(
+    await page.evaluate(() =>
+      ['.seat-name', '.board-statement'].every((sel) => {
+        const el = document.querySelector<HTMLElement>(sel);
+        if (!el) return false;
+        const style = getComputedStyle(el);
+        return style.overflow === 'hidden' && style.textOverflow === 'ellipsis';
+      }),
+    ),
+  ).toBeTruthy();
   await gap.getByRole('button', { name: /Next experiment required/ }).click();
   await expect(page.getByRole('img', { name: /open critique branches back/ })).toBeVisible();
   await expect(page.locator('.why-decision')).toContainText('Awaiting your approval');
