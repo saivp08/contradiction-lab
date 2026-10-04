@@ -43,9 +43,17 @@ def test_api_full_flow_and_replay(client):
 
 def test_api_rejects_missing_credentials_invalid_input_and_cross_origin(client, monkeypatch):
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     assert client.post("/api/investigations", json={"mode": "omnigent"}).status_code == 503
     assert client.post("/api/investigations", json={"seed": -1}).status_code == 422
     assert client.get("/api/investigations/nonexistent").status_code == 404
     assert (
         client.post("/api/investigations", json={}, headers={"Origin": "https://untrusted.example"}).status_code == 403
     )
+
+
+def test_same_origin_writes_work_behind_a_hosting_proxy(client):
+    headers = {"Origin": "https://lab-123.aws.databricksapps.com", "X-Forwarded-Host": "lab-123.aws.databricksapps.com"}
+    assert client.post("/api/investigations", json={"mode": "local"}, headers=headers).status_code == 201
+    spoofed = {"Origin": "https://evil.example", "X-Forwarded-Host": "lab-123.aws.databricksapps.com"}
+    assert client.post("/api/investigations", json={"mode": "local"}, headers=spoofed).status_code == 403

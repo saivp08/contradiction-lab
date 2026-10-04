@@ -357,7 +357,7 @@ export function Compare() {
         </div>
       )}
       <label>Investigation engine <select aria-label="Paper investigation engine" value={mode} onChange={e => setMode(e.target.value)}>
-        <option value="omnigent">Live model agents via Omnigent</option>
+        <option value="omnigent">Live model agents (Claude)</option>
         <option value="local">Deterministic fallback (no AI)</option>
       </select></label>
       <div className="paper-slots">

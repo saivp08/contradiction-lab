@@ -111,7 +111,7 @@ export function NewInvestigationDialog({
         </option>
       </select>
       {!ready && (
-        <p className="caption">Live agents need Omnigent 0.16.0 and OPENAI_API_KEY on the server.</p>
+        <p className="caption">Live agents need ANTHROPIC_API_KEY on the server.</p>
       )}
       <button className="button primary full" disabled={busy} onClick={onStart}>
         <Play size={15} />
