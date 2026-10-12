@@ -8,6 +8,8 @@ Contradiction Lab reads two user-supplied PDFs in full, quotes the claims where 
 
 Built for Databricks × Hack-Nation — Agentic Scientific Discovery.
 
+Live demo on Databricks Apps (workspace login required): https://contradiction-lab-7474658420497268.aws.databricksapps.com
+
 ## What works
 
 - **Any two papers.** `#/compare` (`POST /api/papers`) parses each PDF's full text: title, authors, year, journal, DOI, sections, sample size, and claim sentences with exact quotes and page/section provenance. Unknown fields stay null; scanned, image-only and malformed PDFs fail with an explicit message.
